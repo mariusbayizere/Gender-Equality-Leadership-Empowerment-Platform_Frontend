@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { ChevronUp, ChevronDown, Edit, Trash2, User, Mail, Phone, Shield, Hash, MoreVertical, AlertCircle, X, UserPlus, Search, RefreshCw } from 'lucide-react';
+import { Edit, List, Trash2, User, Mail, Phone, Shield, Hash, MoreVertical, AlertCircle, X, UserPlus, Search, RefreshCw, Grid3X3, Menu } from 'lucide-react';
 
 // Mock data matching your component structure
 const mockUsers = [
@@ -85,6 +85,15 @@ const mockUsers = [
   }
 ];
 
+const columns = [
+  { key: 'id', label: 'ID' },
+  { key: 'name', label: 'Name' },
+  { key: 'email', label: 'Email' },
+  { key: 'role', label: 'Role' },
+  { key: 'telephone', label: 'Telephone' },
+  { key: 'actions', label: 'Actions' },
+];
+
 // Delete Confirmation Modal Component
 const DeleteConfirmation = ({
   isOpen,
@@ -118,7 +127,6 @@ const DeleteConfirmation = ({
         className="bg-white rounded-2xl shadow-2xl w-full max-w-md mx-auto transform transition-all"
         onClick={(e) => e.stopPropagation()}
       >
-        {/* Header with close button */}
         <div className="flex items-center justify-between p-6 border-b border-gray-100">
           <div className="flex items-center space-x-3">
             <div className="flex-shrink-0 w-10 h-10 bg-red-100 rounded-full flex items-center justify-center">
@@ -128,7 +136,6 @@ const DeleteConfirmation = ({
               Delete User
             </h3>
           </div>
-          
           <button
             onClick={onCancel}
             className="text-gray-400 hover:text-gray-600 transition-colors p-1 rounded-full hover:bg-gray-100"
@@ -136,8 +143,6 @@ const DeleteConfirmation = ({
             <X className="w-6 h-6" />
           </button>
         </div>
-
-        {/* Content */}
         <div className="p-6">
           <p className="text-gray-700 mb-2">
             Are you sure you want to delete{' '}
@@ -150,8 +155,6 @@ const DeleteConfirmation = ({
             This action cannot be undone.
           </p>
         </div>
-
-        {/* Buttons */}
         <div className="flex gap-3 p-6 pt-0">
           <button
             onClick={onCancel}
@@ -197,8 +200,23 @@ const ModernUserManagement = ({
     isOpen: false,
     userToDelete: null
   });
-  const [searchQuery, setSearchQuery] = useState('');
-  const [users, setUsers] = useState(paginatedUsers);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [showCreateModal, setShowCreateModal] = useState(false);
+  const [viewMode, setViewMode] = useState('table');
+  const [showColumnToggle, setShowColumnToggle] = useState(false);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+
+  // Toggle column visibility
+  const toggleColumn = (key) => {
+    visibleColumns[key] = !visibleColumns[key];
+  };
+
+  // Dummy fetchUsers function
+  const fetchUsers = () => {};
+
+  // Calculate pagination
+  const actualTotalPages = Math.ceil(filteredUsers.length / itemsPerPage);
+  const actualStartIndex = (currentPage - 1) * itemsPerPage;
 
   // Handle delete button click - opens confirmation modal
   const handleDeleteClick = (user) => {
@@ -225,22 +243,15 @@ const ModernUserManagement = ({
     });
   };
 
-  // Calculate pagination
-  const actualTotalPages = Math.ceil(filteredUsers.length / itemsPerPage);
-  const actualStartIndex = (currentPage - 1) * itemsPerPage;
-
   // Mobile card view for small screens
   const MobileCard = ({ user, index }) => {
     const isExpanded = expandedCard === user?.id;
-    
     return (
       <div className="bg-white rounded-2xl p-6 mb-4 shadow-sm border border-gray-100">
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-center space-x-3">
             <div className="w-10 h-10 bg-gradient-to-r from-green-500 to-green-600 rounded-full flex items-center justify-center shadow-lg">
-              <span className="text-white text-sm font-semibold">
-                {(user?.firstName || 'U').charAt(0).toUpperCase()}
-              </span>
+              <User className="w-5 h-5 text-white" />
             </div>
             <div>
               <h3 className="text-gray-900 font-semibold text-base">
@@ -258,7 +269,6 @@ const ModernUserManagement = ({
             <MoreVertical className="w-5 h-5" />
           </button>
         </div>
-
         <div className="space-y-3">
           {visibleColumns.email && (
             <div className="flex items-center space-x-3">
@@ -268,7 +278,6 @@ const ModernUserManagement = ({
               <span className="text-gray-700 text-sm truncate">{user?.email || 'N/A'}</span>
             </div>
           )}
-          
           {visibleColumns.role && (
             <div className="flex items-center space-x-3">
               <div className="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center">
@@ -284,7 +293,6 @@ const ModernUserManagement = ({
             </div>
           )}
         </div>
-
         {isExpanded && (
           <div className="mt-4 pt-4 border-t border-gray-100 space-y-3">
             {visibleColumns.telephone && (
@@ -295,7 +303,6 @@ const ModernUserManagement = ({
                 <span className="text-gray-700 text-sm">{user?.telephone || 'N/A'}</span>
               </div>
             )}
-            
             {visibleColumns.actions && (
               <div className="flex items-center space-x-3 pt-3">
                 <button
@@ -324,11 +331,10 @@ const ModernUserManagement = ({
 
   // Pagination component
   const PaginationControls = () => (
-    <div className="flex flex-col sm:flex-row items-center justify-between p-6 border-t border-gray-100 bg-gray-50 space-y-3 sm:space-y-0">
+    <div className="flex flex-col sm:flex-row items-center justify-between p-6 border-t border-gray-100 bg-white space-y-3 sm:space-y-0">
       <div className="text-gray-600 text-sm font-medium order-2 sm:order-1">
         {actualStartIndex + 1} - {Math.min(actualStartIndex + itemsPerPage, filteredUsers?.length || 0)} of {filteredUsers?.length || 0} rows visible
       </div>
-      
       <div className="flex items-center space-x-2 order-1 sm:order-2">
         <button
           onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
@@ -337,7 +343,6 @@ const ModernUserManagement = ({
         >
           ‹
         </button>
-        
         {[...Array(Math.min(5, actualTotalPages))].map((_, i) => {
           const pageNum = i + 1;
           return (
@@ -354,7 +359,6 @@ const ModernUserManagement = ({
             </button>
           );
         })}
-        
         {actualTotalPages > 5 && (
           <>
             <span className="text-gray-600 px-2">...</span>
@@ -370,7 +374,6 @@ const ModernUserManagement = ({
             </button>
           </>
         )}
-        
         <button
           onClick={() => setCurrentPage(Math.min(actualTotalPages, currentPage + 1))}
           disabled={currentPage === actualTotalPages}
@@ -386,33 +389,32 @@ const ModernUserManagement = ({
     return (
       <div className="min-h-screen bg-gray-50 p-6">
         <div className="max-w-7xl mx-auto">
-          {/* Header */}
-          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-8 gap-4">
+          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-6 gap-4 bg-white rounded-xl p-4 shadow-sm">
             <div className="flex items-center gap-4">
-              <button className="bg-green-500 hover:bg-green-600 text-white px-6 py-3 rounded-2xl flex items-center gap-2 transition-all duration-200 shadow-lg hover:shadow-xl font-medium">
-                <UserPlus className="w-5 h-5" />
+              <button className="bg-green-500 hover:bg-green-600 text-white px-4 py-2.5 rounded-xl flex items-center gap-2 transition-all duration-200 shadow-sm hover:shadow-md font-medium">
+                <UserPlus className="w-4 h-4" />
                 Create User
               </button>
             </div>
-            
             <div className="flex items-center gap-3">
               <div className="relative">
-                <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
                 <input
                   type="text"
                   placeholder="Search users..."
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  className="pl-12 pr-4 py-3 border border-gray-200 rounded-2xl focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent w-80 bg-white shadow-sm"
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="pl-10 pr-4 py-2.5 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent w-64 bg-white shadow-sm"
                 />
               </div>
-              <button className="p-3 text-gray-600 hover:text-gray-800 border border-gray-200 rounded-2xl hover:bg-white transition-all duration-200 shadow-sm">
-                <RefreshCw className="w-5 h-5" />
+              <button className="p-2.5 text-gray-600 hover:text-gray-800 bg-green-500 hover:bg-green-600 text-white rounded-xl transition-all duration-200 shadow-sm">
+                <RefreshCw className="w-4 h-4" />
+              </button>
+              <button className="p-2.5 text-gray-600 hover:text-gray-800 bg-green-500 hover:bg-green-600 text-white rounded-xl transition-all duration-200 shadow-sm">
+                <Grid3X3 className="w-4 h-4" />
               </button>
             </div>
           </div>
-
-          {/* Empty state */}
           <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
             <div className="p-12 text-center">
               <User className="w-16 h-16 text-gray-300 mx-auto mb-4" />
@@ -429,40 +431,144 @@ const ModernUserManagement = ({
   return (
     <div className="min-h-screen bg-gray-50 p-6">
       <div className="max-w-7xl mx-auto">
-        {/* Header */}
-        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-8 gap-4">
-          <div className="flex items-center gap-4">
-            <button className="bg-green-500 hover:bg-green-600 text-white px-6 py-3 rounded-2xl flex items-center gap-2 transition-all duration-200 shadow-lg hover:shadow-xl font-medium">
-              <UserPlus className="w-5 h-5" />
-              Create User
+        <div className="flex flex-col space-y-4 mb-4 sm:mb-6">
+          <div className="hidden lg:flex items-center justify-between bg-white rounded-lg shadow-sm p-4 border border-gray-200">
+            <button 
+              onClick={() => setShowCreateModal(true)}
+              className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg text-sm flex items-center space-x-2 transition-colors shadow-sm"
+            >
+              <UserPlus className="w-4 h-4" />
+              <span>Create User</span>
             </button>
+            <div className="flex items-center space-x-3">
+              <div className="relative">
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500 w-4 h-4" />
+                <input
+                  type="text"
+                  placeholder="Search users..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="bg-gray-50 text-gray-700 placeholder-gray-500 pl-10 pr-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500 w-64"
+                />
+              </div>
+              <button
+                onClick={fetchUsers}
+                className="bg-green-600 hover:bg-green-700 text-white p-2 rounded-lg shadow-sm transition-colors"
+                title="Refresh"
+              >
+                <RefreshCw className="w-4 h-4" />
+              </button>
+              <button 
+                onClick={() => setViewMode(viewMode === 'table' ? 'cards' : 'table')}
+                className="bg-green-600 hover:bg-green-700 text-white p-2 rounded-lg shadow-sm transition-colors"
+                title={viewMode === 'table' ? 'Card View' : 'Table View'}
+              >
+                <List className="w-4 h-4" />
+              </button>
+              <div className="relative column-toggle-container">
+                <button
+                  onClick={() => setShowColumnToggle(!showColumnToggle)}
+                  className="bg-green-600 hover:bg-green-700 text-white p-2 rounded-lg shadow-sm transition-colors"
+                  title="Column Visibility"
+                >
+                  <Grid3X3 className="w-4 h-4" />
+                </button>
+                {showColumnToggle && (
+                  <div className="absolute right-0 top-full mt-2 bg-white rounded-lg shadow-lg border border-gray-200 py-2 px-3 z-50 min-w-[150px]">
+                    {columns.map(column => (
+                      <label key={column.key} className="flex items-center space-x-2 py-1 cursor-pointer text-gray-700 hover:bg-gray-50 rounded px-2">
+                        <input
+                          type="checkbox"
+                          checked={visibleColumns[column.key]}
+                          onChange={() => toggleColumn(column.key)}
+                          className="w-4 h-4 text-green-600 bg-gray-100 border-gray-300 rounded focus:ring-green-500"
+                        />
+                        <span className="text-sm">{column.label}</span>
+                      </label>
+                    ))}
+                  </div>
+                )}
+              </div>
+            </div>
           </div>
-          
-          <div className="flex items-center gap-3">
+          <div className="lg:hidden bg-white rounded-lg shadow-sm p-4 border border-gray-200">
+            <div className="flex items-center justify-between mb-3">
+              <button 
+                onClick={() => setShowCreateModal(true)}
+                className="bg-green-600 hover:bg-green-700 text-white px-3 py-2 rounded-lg text-sm flex items-center space-x-2 transition-colors"
+              >
+                <UserPlus className="w-4 h-4" />
+                <span className="hidden sm:inline">Create User</span>
+                <span className="sm:hidden">Create</span>
+              </button>
+              <button
+                onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+                className="bg-green-600 hover:bg-green-700 text-white p-2 rounded-lg"
+              >
+                {isMobileMenuOpen ? <X className="w-4 h-4" /> : <Menu className="w-4 h-4" />}
+              </button>
+            </div>
             <div className="relative">
-              <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500 w-4 h-4" />
               <input
                 type="text"
                 placeholder="Search users..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="pl-12 pr-4 py-3 border border-gray-200 rounded-2xl focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent w-80 bg-white shadow-sm"
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="w-full bg-gray-50 text-gray-700 placeholder-gray-500 pl-10 pr-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500"
               />
             </div>
-            <button className="p-3 text-gray-600 hover:text-gray-800 border border-gray-200 rounded-2xl hover:bg-white transition-all duration-200 shadow-sm">
-              <RefreshCw className="w-5 h-5" />
-            </button>
+            {isMobileMenuOpen && (
+              <div className="mt-3 mobile-menu-container bg-gray-50 rounded-lg p-3 space-y-3 border border-gray-200">
+                <div className="flex flex-wrap gap-2">
+                  <button
+                    onClick={fetchUsers}
+                    className="flex items-center space-x-2 bg-green-600 hover:bg-green-700 text-white px-3 py-2 rounded text-sm transition-colors"
+                  >
+                    <RefreshCw className="w-4 h-4" />
+                    <span>Refresh</span>
+                  </button>
+                  <button 
+                    className="flex items-center space-x-2 bg-green-600 hover:bg-green-700 text-white px-3 py-2 rounded text-sm transition-colors"
+                  >
+                    <List className="w-4 h-4" />
+                    <span>{viewMode === 'table' ? 'Cards' : 'Table'}</span>
+                  </button>
+                  <button
+                    onClick={() => setShowColumnToggle(!showColumnToggle)}
+                    className="flex items-center space-x-2 bg-green-600 hover:bg-green-700 text-white px-3 py-2 rounded text-sm transition-colors"
+                  >
+                    <Grid3X3 className="w-4 h-4" />
+                    <span>Columns</span>
+                  </button>
+                </div>
+                {showColumnToggle && (
+                  <div className="bg-white rounded-lg p-3 border border-gray-200">
+                    <h4 className="text-gray-700 text-sm font-medium mb-2">Show Columns:</h4>
+                    <div className="grid grid-cols-2 gap-2">
+                      {columns.map(column => (
+                        <label key={column.key} className="flex items-center space-x-2 text-gray-700 text-sm">
+                          <input
+                            type="checkbox"
+                            checked={visibleColumns[column.key]}
+                            onChange={() => toggleColumn(column.key)}
+                            className="w-4 h-4 text-green-600 bg-gray-100 border-gray-300 rounded focus:ring-green-500"
+                          />
+                          <span>{column.label}</span>
+                        </label>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
+            )}
           </div>
         </div>
-
-        {/* Users count */}
         <div className="mb-6">
           <p className="text-gray-600 text-sm font-medium">
             Showing {actualStartIndex + 1}-{Math.min(actualStartIndex + itemsPerPage, filteredUsers.length)} of {filteredUsers.length} users
           </p>
         </div>
-
-        {/* Mobile View - Cards */}
         <div className="block lg:hidden">
           <div className="space-y-4">
             {paginatedUsers.map((user, index) => (
@@ -473,12 +579,10 @@ const ModernUserManagement = ({
             <PaginationControls />
           </div>
         </div>
-
-        {/* Desktop View - Table */}
         <div className="hidden lg:block bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
           <div className="overflow-x-auto">
             <table className="w-full">
-              <thead className="bg-white border-b border-gray-200">
+              <thead className="bg-gray-50 border-b border-gray-200">
                 <tr>
                   {visibleColumns.id && (
                     <th className="text-left py-4 px-6 text-gray-600 font-medium text-sm">
@@ -534,12 +638,11 @@ const ModernUserManagement = ({
                       </td>
                     )}
                     {visibleColumns.name && (
-                      <td className="py-4 px-6">
-                        <div className="flex items-center gap-3">
-                          <div className="w-10 h-10 bg-green-500 rounded-full flex items-center justify-center">
-                            <span className="text-white text-sm font-semibold">
-                              {(user?.firstName || 'U').charAt(0).toUpperCase()}
-                            </span>
+                      <td className="py-4 px-6 text-gray-800">
+                        <div className="flex items-center space-x-2">
+                          {/* <div className="w-10 h-10 bg-green-500 rounded-full flex items-center justify-center"> */}
+                          <div className="bg-green-600 rounded-full p-1">
+                            <User className="w-3 h-3 text-white" />
                           </div>
                           <span className="text-gray-900 font-medium">
                             {(user?.firstName || '') + ' ' + (user?.lastName || '') || 'N/A'}
@@ -605,8 +708,6 @@ const ModernUserManagement = ({
           </div>
           <PaginationControls />
         </div>
-
-        {/* Delete Confirmation Modal */}
         <DeleteConfirmation
           isOpen={deleteModal.isOpen}
           userToDelete={deleteModal.userToDelete}
