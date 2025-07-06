@@ -20,12 +20,14 @@
 import React, { Component, useEffect } from 'react';
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 
+
 // import Layout from "@/routes/layout";
 // import Homepage from "@/components/Homepage/Homepage";
 // import AboutPage from "@/components/Homepage/AboutPage";
 // import ContactPage from "@/components/Homepage/ContactPage";
 // import ServicePage from "@/components/Homepage/ServicePage";
 import GELEPAdminDashboard from "@/components/User/GELEPAdminDashboard";
+import Login from "@/components/Authantication/Login";
 
 // Temporary Error Components (replace with your actual components)
 const ServerErrorPage = () => (
@@ -181,10 +183,10 @@ function App() {
         //     path: "/contact",
         //     element: <ContactPage />,
         // },
-        // {
-        //     path: "/services",
-        //     element: <ServicePage />,
-        // },
+        {
+            path: "/login",
+            element: <Login />,
+        },
         {
             path: "/user",
             element: <GELEPAdminDashboard />,
