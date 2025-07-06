@@ -662,23 +662,6 @@ const getGenderIcon = (gender) => {
       return <User className="text-gray-400 w-5 h-5" />;
   }
 };
-
-// const getGenderIcon = (gender) => {
-//   switch ((gender || '').toLowerCase()) {
-//     case 'male':
-//       return <User />; // or <UserCheck />
-//     case 'female':
-//       return <User />; // or <Users />
-//     case 'other':
-//       return <Users />;
-//     case 'prefer_not_to_say':
-//       return <HelpCircle />;
-//     default:
-//       return <User />;
-//   }
-// };
-
-
 // Delete Confirmation Modal Component
 const DeleteConfirmation = ({
   isOpen,
