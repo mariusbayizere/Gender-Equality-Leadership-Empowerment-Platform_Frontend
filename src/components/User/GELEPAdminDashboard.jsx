@@ -631,19 +631,53 @@
 // export default ModernUserManagement;
 
 
-
 import React, { useState, useEffect } from 'react';
-import { Edit, List, Trash2, User, Mail, Phone, Shield, Hash, MoreVertical, AlertCircle, X, UserPlus, Search, RefreshCw, Grid3X3, Menu } from 'lucide-react';
+import {
+  Edit, List, Trash2, User, Users,Mail, Phone, Shield, Hash, MoreVertical, AlertCircle, X, UserPlus, Search, RefreshCw, Grid3X3, Menu,
+   Smile, HelpCircle
+} from 'lucide-react';
 
 // Column definitions
 const columnsList = [
   { key: 'id', label: 'ID' },
   { key: 'name', label: 'Name' },
   { key: 'email', label: 'Email' },
+  { key: 'gender', label: 'Gender' },
   { key: 'role', label: 'Role' },
   { key: 'telephone', label: 'Telephone' },
   { key: 'actions', label: 'Actions' },
 ];
+
+const getGenderIcon = (gender) => {
+  switch ((gender || '').toLowerCase()) {
+    case 'male':
+      return <User className="text-blue-500 w-5 h-5" />;
+    case 'female':
+      return <User className="text-pink-500 w-5 h-5" />;
+    case 'other':
+      return <Users className="text-purple-500 w-5 h-5" />;
+    case 'prefer_not_to_say':
+      return <HelpCircle className="text-gray-500 w-5 h-5" />;
+    default:
+      return <User className="text-gray-400 w-5 h-5" />;
+  }
+};
+
+// const getGenderIcon = (gender) => {
+//   switch ((gender || '').toLowerCase()) {
+//     case 'male':
+//       return <User />; // or <UserCheck />
+//     case 'female':
+//       return <User />; // or <Users />
+//     case 'other':
+//       return <Users />;
+//     case 'prefer_not_to_say':
+//       return <HelpCircle />;
+//     default:
+//       return <User />;
+//   }
+// };
+
 
 // Delete Confirmation Modal Component
 const DeleteConfirmation = ({
@@ -703,7 +737,7 @@ const DeleteConfirmation = ({
 const ModernUserManagement = () => {
   const [users, setUsers] = useState([]);
   const [visibleColumns, setVisibleColumns] = useState({
-    id: true, name: true, email: true, role: true, telephone: true, actions: true
+    id: true, name: true, email: true, gender: true, role: true, telephone: true, actions: true
   });
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -813,6 +847,14 @@ const ModernUserManagement = () => {
               <span className="text-gray-700 text-sm truncate">{user?.email || 'N/A'}</span>
             </div>
           )}
+          {visibleColumns.gender && (
+            <div className="flex items-center space-x-3">
+              <div className="w-8 h-8 bg-yellow-100 rounded-full flex items-center justify-center">
+                {getGenderIcon(user?.gender)}
+              </div>
+              <span className="text-gray-700 text-sm capitalize">{user?.gender?.replace(/_/g, ' ') || 'N/A'}</span>
+            </div>
+          )}
           {visibleColumns.role && (
             <div className="flex items-center space-x-3">
               <div className="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center">
@@ -913,6 +955,49 @@ const ModernUserManagement = () => {
       <div className="flex items-center justify-center h-64 px-4">
         <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-green-500"></div>
         <span className="ml-2 text-gray-600 text-sm sm:text-base">Loading users...</span>
+      </div>
+    );
+  }
+
+  if (!paginatedUsers || paginatedUsers.length === 0) {
+    return (
+      <div className="min-h-screen bg-gray-50 p-6">
+        <div className="max-w-7xl mx-auto">
+          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-6 gap-4 bg-white rounded-xl p-4 shadow-sm">
+            <div className="flex items-center gap-4">
+              <button className="bg-green-500 hover:bg-green-600 text-white px-4 py-2.5 rounded-xl flex items-center gap-2 transition-all duration-200 shadow-sm hover:shadow-md font-medium">
+                <UserPlus className="w-4 h-4" />
+                Create User
+              </button>
+            </div>
+            <div className="flex items-center gap-3">
+              <div className="relative">
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+                <input
+                  type="text"
+                  placeholder="Search users..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="pl-10 pr-4 py-2.5 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent w-64 bg-white shadow-sm"
+                />
+              </div>
+              <button className="p-2.5 text-gray-600 hover:text-gray-800 bg-green-500 hover:bg-green-600 text-white rounded-xl transition-all duration-200 shadow-sm">
+                <RefreshCw className="w-4 h-4" />
+              </button>
+              <button className="p-2.5 text-gray-600 hover:text-gray-800 bg-green-500 hover:bg-green-600 text-white rounded-xl transition-all duration-200 shadow-sm">
+                <Grid3X3 className="w-4 h-4" />
+              </button>
+            </div>
+          </div>
+          <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+            <div className="p-12 text-center">
+              <User className="w-16 h-16 text-gray-300 mx-auto mb-4" />
+              <p className="text-gray-800 text-xl font-semibold mb-2">No users found</p>
+              <p className="text-gray-500">Try adjusting your search criteria or add some users.</p>
+            </div>
+            <PaginationControls />
+          </div>
+        </div>
       </div>
     );
   }
@@ -1068,7 +1153,8 @@ const ModernUserManagement = () => {
                     </th>
                   )}
                   {visibleColumns.name && (
-                    <th className="text-left py-4 px-6 text-gray-600 font-medium text-sm">
+                    // <th className="text-left py-4 px-6 text-gray-600 font-medium text-sm">
+                   <th className="text-left py-4 px-6 text-gray-700 font-medium cursor-pointer hover:bg-gray-100 transition-colors min-w-[250px]">
                       <div className="flex items-center space-x-2">
                         <User className="w-4 h-4" />
                         <span>NAME</span>
@@ -1080,6 +1166,15 @@ const ModernUserManagement = () => {
                       <div className="flex items-center space-x-2">
                         <Mail className="w-4 h-4" />
                         <span>EMAIL</span>
+                      </div>
+                    </th>
+                  )}
+                  {visibleColumns.gender && (
+                    <th className="text-left py-4 px-6 text-gray-600 font-medium text-sm">
+                      {/* <th className="text-left py-4 px-6 text-gray-700 font-medium cursor-pointer hover:bg-gray-100 transition-colors min-w-[200px]"> */}
+                      <div className="flex items-center space-x-2">
+                        <Smile className="w-4 h-4" />
+                        <span>GENDER</span>
                       </div>
                     </th>
                   )}
@@ -1130,6 +1225,26 @@ const ModernUserManagement = () => {
                           <Mail className="w-4 h-4 text-blue-600" />
                           <span className="text-gray-900 truncate max-w-xs" title={user?.email}>
                             {user?.email || 'N/A'}
+                          </span>
+                        </div>
+                      </td>
+                    )}
+                    {/* {visibleColumns.gender && (
+                      <td className="py-4 px-6">
+                        <div className="flex items-center gap-2">
+                          {getGenderIcon(user?.gender)}
+                          <span className="capitalize">{user?.gender?.replace(/_/g, ' ') || 'N/A'}</span>
+                        </div>
+                      </td>
+                    )} */}
+                    {visibleColumns.gender && (
+                      <td className="py-4 px-6">
+                        <div className="flex items-center gap-3">
+                          <div className="flex-shrink-0">
+                            {getGenderIcon(user?.gender)}
+                          </div>
+                          <span className="capitalize text-gray-700 font-medium">
+                            {user?.gender?.replace(/_/g, ' ') || 'N/A'}
                           </span>
                         </div>
                       </td>
