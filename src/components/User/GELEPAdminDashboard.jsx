@@ -751,6 +751,13 @@ const ModernUserManagement = () => {
     setShowCreateModal(true);
   };
 
+  const handleCloseUserForm = () => {
+  setShowCreateModal(false);
+  setUserToEdit(null);
+  setIsEditMode(false);
+};
+
+
   // After create/update, refresh users
   const handleUserSaved = () => {
     fetchUsers();
@@ -1309,13 +1316,22 @@ const ModernUserManagement = () => {
           </div>
           <PaginationControls />
         </div>
-        <UserForm
+        {/* <UserForm
             showModal={showCreateModal}
             setShowModal={setShowCreateModal}
             onUserSaved={handleUserSaved}
             userToEdit={userToEdit}
             isEditMode={isEditMode}
-          />          
+          />           */}
+
+          <UserForm
+  showModal={showCreateModal}
+  setShowModal={handleCloseUserForm}   // Only this!
+  onUserSaved={handleUserSaved}
+  userToEdit={userToEdit}
+  isEditMode={isEditMode}
+/>
+
 
         <DeleteConfirmation
           isOpen={deleteModal.isOpen}
