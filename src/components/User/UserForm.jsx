@@ -133,8 +133,8 @@ const UserForm = ({
     const fullPhone = formData.countryCode + formData.telephone;
     if (!formData.telephone.trim()) {
       errors.telephone = 'Telephone is required';
-    } else if (fullPhone.length < 13) {
-      errors.telephone = 'Telephone must be at least 13 digits';
+    } else if (fullPhone.length < 12) {
+      errors.telephone = 'Telephone must be at least 12 digits';
     } else if (fullPhone.length > 16) {
       errors.telephone = 'Telephone must not exceed 16 digits';
     } else if (!/^\d+$/.test(formData.telephone.replace(/[\s-]/g, ''))) {
@@ -605,14 +605,7 @@ const UserForm = ({
 
           {/* Action Buttons */}
           <div className="flex flex-col sm:flex-row gap-3 pt-4 border-t border-gray-200">
-            <button
-              onClick={handleClose}
-              disabled={isSubmitting}
-              className="flex-1 px-4 py-2 text-sm sm:text-base bg-gray-500 hover:bg-gray-600 disabled:bg-gray-400 text-white rounded-lg transition-colors flex items-center justify-center"
-            >
-              <X className="w-4 h-4 mr-2" />
-              Cancel
-            </button>
+            
             <button
               onClick={handleSubmit}
               disabled={isSubmitting}
@@ -638,6 +631,16 @@ const UserForm = ({
                   )}
                 </>
               )}
+            </button>
+            
+            <button
+              onClick={handleClose}
+              disabled={isSubmitting}
+            //   className="flex-1 px-4 py-2 text-sm sm:text-base bg-gray-500 hover:bg-gray-600 disabled:bg-gray-400 text-white rounded-lg transition-colors flex items-center justify-center"
+               className="flex-1 px-4 py-2 text-sm sm:text-base bg-white hover:bg-gray-50 disabled:bg-gray-100 text-black border border-gray-300 rounded-lg transition-colors flex items-center justify-center"
+            >
+              <X className="w-4 h-4 mr-2" />
+              Cancel
             </button>
           </div>
         </div>

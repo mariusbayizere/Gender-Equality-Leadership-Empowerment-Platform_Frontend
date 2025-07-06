@@ -636,6 +636,7 @@ import {
   Edit, List, Trash2, User, Users,Mail, Phone, Shield, Hash, MoreVertical, AlertCircle, X, UserPlus, Search, RefreshCw, Grid3X3, Menu,
    Smile, HelpCircle
 } from 'lucide-react';
+import UserForm from './UserForm'; 
 
 // Column definitions
 const columnsList = [
@@ -729,10 +730,34 @@ const ModernUserManagement = () => {
   const [itemsPerPage] = useState(8);
   const [expandedCard, setExpandedCard] = useState(null);
   const [deleteModal, setDeleteModal] = useState({ isOpen: false, userToDelete: null });
-  const [showCreateModal, setShowCreateModal] = useState(false);
+  // const [showCreateModal, setShowCreateModal] = useState(false);
   const [viewMode, setViewMode] = useState('table');
   const [showColumnToggle, setShowColumnToggle] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [showCreateModal, setShowCreateModal] = useState(false);
+  const [userToEdit, setUserToEdit] = useState(null);
+  const [isEditMode, setIsEditMode] = useState(false);
+
+  const handleShowCreate = () => {
+    setUserToEdit(null);
+    setIsEditMode(false);
+    setShowCreateModal(true);
+  };
+
+  // Show edit modal
+  const handleShowEdit = (user) => {
+    setUserToEdit(user);
+    setIsEditMode(true);
+    setShowCreateModal(true);
+  };
+
+  // After create/update, refresh users
+  const handleUserSaved = () => {
+    fetchUsers();
+    setShowCreateModal(false);
+    setUserToEdit(null);
+    setIsEditMode(false);
+  };
 
   // Fetch users from API
   const fetchUsers = async () => {
@@ -830,14 +855,14 @@ const ModernUserManagement = () => {
               <span className="text-gray-700 text-sm truncate">{user?.email || 'N/A'}</span>
             </div>
           )}
-          {visibleColumns.gender && (
+          {/* {visibleColumns.gender && (
             <div className="flex items-center space-x-3">
               <div className="w-8 h-8 bg-yellow-100 rounded-full flex items-center justify-center">
                 {getGenderIcon(user?.gender)}
               </div>
               <span className="text-gray-700 text-sm capitalize">{user?.gender?.replace(/_/g, ' ') || 'N/A'}</span>
             </div>
-          )}
+          )} */}
           {visibleColumns.role && (
             <div className="flex items-center space-x-3">
               <div className="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center">
@@ -863,19 +888,30 @@ const ModernUserManagement = () => {
                 <span className="text-gray-700 text-sm">{user?.telephone || 'N/A'}</span>
               </div>
             )}
+            {visibleColumns.gender && (
+            <div className="flex items-center space-x-3">
+              <div className="w-8 h-8 bg-yellow-100 rounded-full flex items-center justify-center">
+                {getGenderIcon(user?.gender)}
+              </div>
+              <span className="text-gray-700 text-sm capitalize">{user?.gender?.replace(/_/g, ' ') || 'N/A'}</span>
+            </div>
+          )}
             {visibleColumns.actions && (
               <div className="flex items-center space-x-3 pt-3">
+
                 <button
-                  className="flex-1 bg-green-500 hover:bg-green-600 text-white px-4 py-2.5 rounded-xl flex items-center justify-center gap-2 text-sm font-medium transition-all duration-200 shadow-lg hover:shadow-xl"
-                  title="Edit"
-                  disabled
-                >
-                  <Edit className="w-4 h-4" />
-                  <span>Edit</span>
-                </button>
+                onClick={() => handleShowEdit(user)}
+                // className="flex-1 bg-green-500 hover:bg-green-600 text-white px-4 py-2.5 rounded-xl flex items-center justify-center gap-2 text-sm font-medium transition-all duration-200 shadow-lg hover:shadow-xl"
+                className="flex-1 bg-green-600 bg-opacity-1 hover:bg-opacity-30 text-white px-4 py-2.5 rounded-lg flex items-center justify-center gap-2 text-sm font-medium transition-all duration-200 backdrop-blur-sm disabled:opacity-50 disabled:cursor-not-allowed"
+                title="Edit"
+              >
+                <Edit className="w-4 h-4" />
+                <span>Edit</span>
+              </button>
                 <button
                   onClick={() => handleDeleteClick(user)}
-                  className="flex-1 bg-red-500 hover:bg-red-600 text-white px-4 py-2.5 rounded-xl flex items-center justify-center gap-2 text-sm font-medium transition-all duration-200 shadow-lg hover:shadow-xl"
+                  // className="flex-1 bg-red-500 hover:bg-red-600 text-white px-4 py-2.5 rounded-xl flex items-center justify-center gap-2 text-sm font-medium transition-all duration-200 shadow-lg hover:shadow-xl"
+                  className="flex-1 bg-red-600 bg-opacity-1 hover:bg-opacity-100 text-white px-4 py-2.5 rounded-lg flex items-center justify-center gap-2 text-sm font-medium transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
                   title="Delete"
                 >
                   <Trash2 className="w-4 h-4" />
@@ -991,7 +1027,8 @@ const ModernUserManagement = () => {
         <div className="flex flex-col space-y-4 mb-4 sm:mb-6">
           <div className="hidden lg:flex items-center justify-between bg-white rounded-lg shadow-sm p-4 border border-gray-200">
             <button 
-              onClick={() => setShowCreateModal(true)}
+              // onClick={() => setShowCreateModal(true)}
+               onClick={handleShowCreate}
               className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg text-sm flex items-center space-x-2 transition-colors shadow-sm"
             >
               <UserPlus className="w-4 h-4" />
@@ -1212,14 +1249,6 @@ const ModernUserManagement = () => {
                         </div>
                       </td>
                     )}
-                    {/* {visibleColumns.gender && (
-                      <td className="py-4 px-6">
-                        <div className="flex items-center gap-2">
-                          {getGenderIcon(user?.gender)}
-                          <span className="capitalize">{user?.gender?.replace(/_/g, ' ') || 'N/A'}</span>
-                        </div>
-                      </td>
-                    )} */}
                     {visibleColumns.gender && (
                       <td className="py-4 px-6">
                         <div className="flex items-center gap-3">
@@ -1256,13 +1285,13 @@ const ModernUserManagement = () => {
                     {visibleColumns.actions && (
                       <td className="py-4 px-6">
                         <div className="flex items-center gap-2">
-                          <button
-                            className="text-white hover:text-green-200 bg-green-600 hover:bg-green-700 transition-colors p-2.5 rounded-lg"
-                            title="Edit user"
-                            disabled
-                          >
-                            <Edit className="w-4 h-4" />
-                          </button>
+                        <button
+                          onClick={() => handleShowEdit(user)}
+                          className="text-white hover:text-green-200 bg-green-600 hover:bg-green-700 transition-colors p-2.5 rounded-lg"
+                          title="Edit user"
+                        >
+                          <Edit className="w-4 h-4" />
+                        </button>
                           <button
                             onClick={() => handleDeleteClick(user)}
                             className="text-white hover:text-red-200 bg-red-600 hover:bg-red-700 transition-colors p-2.5 rounded-lg"
@@ -1280,6 +1309,14 @@ const ModernUserManagement = () => {
           </div>
           <PaginationControls />
         </div>
+        <UserForm
+            showModal={showCreateModal}
+            setShowModal={setShowCreateModal}
+            onUserSaved={handleUserSaved}
+            userToEdit={userToEdit}
+            isEditMode={isEditMode}
+          />          
+
         <DeleteConfirmation
           isOpen={deleteModal.isOpen}
           userToDelete={deleteModal.userToDelete}
