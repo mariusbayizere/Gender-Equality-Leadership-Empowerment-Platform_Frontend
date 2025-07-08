@@ -139,8 +139,7 @@ const UserForm = ({
       errors.telephone = 'Telephone must not exceed 16 digits';
     } else if (!/^\d+$/.test(formData.telephone.replace(/[\s-]/g, ''))) {
       errors.telephone = 'Telephone can only contain digits, spaces, and hyphens';
-    }
-    
+    }    
     return errors;
   };
 

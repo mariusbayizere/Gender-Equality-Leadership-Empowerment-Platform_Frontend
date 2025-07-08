@@ -633,9 +633,7 @@
 
 import React, { useState, useEffect } from 'react';
 import {
-  Edit, List, Trash2, User, Users,Mail, Phone, Shield, Hash, MoreVertical, AlertCircle, X, UserPlus, Search, RefreshCw, Grid3X3, Menu,
-   Smile, HelpCircle
-} from 'lucide-react';
+  Edit, List, Trash2, User, Users,Mail, Phone, Shield, Hash, MoreVertical, AlertCircle, X, UserPlus, Search, RefreshCw, Grid3X3, Menu, Smile, HelpCircle } from 'lucide-react';
 import UserForm from './UserForm'; 
 
 // Column definitions

@@ -26,8 +26,11 @@ import { createBrowserRouter, RouterProvider } from "react-router-dom";
 // import AboutPage from "@/components/Homepage/AboutPage";
 // import ContactPage from "@/components/Homepage/ContactPage";
 // import ServicePage from "@/components/Homepage/ServicePage";
+
 import GELEPAdminDashboard from "@/components/User/GELEPAdminDashboard";
 import Login from "@/components/Authantication/Login";
+import ModernTrainingCourseManagement from '@/components/TrainingCourse/ModernTrainingCourseManagement.jsx';
+
 
 // Temporary Error Components (replace with your actual components)
 const ServerErrorPage = () => (
@@ -179,10 +182,10 @@ function App() {
         //     path: "/about",
         //     element: <AboutPage />,
         // },
-        // {
-        //     path: "/contact",
-        //     element: <ContactPage />,
-        // },
+        {
+            path: "/training-courses",
+            element: <ModernTrainingCourseManagement />,
+        },
         {
             path: "/login",
             element: <Login />,
