@@ -897,17 +897,10 @@ import TrainingCourseForm from './TrainingCourseForm';
 import { formatDate } from './formatDate'
 import { DeleteConfirmation } from './DeleteConfirmation';
 import {ModernTrainingCourseManagementHeader} from './Header';
+import { columns } from './Hardcodedcolumn';
+import { getCourseTypeIcon, getCourseTypeBadge } from './CourseTypeBadge'; 
 
-// Column definitions
-const columns = [
-  { key: 'id', label: '# ID' },
-  { key: 'title', label: 'Course Title' },
-  { key: 'course_type', label: 'Type' },
-  { key: 'instructor_name', label: 'Instructor' },
-  { key: 'duration', label: 'Duration' },
-  { key: 'is_active', label: 'Status' },
-  { key: 'actions', label: 'Actions' }
-];
+
 
 // API Configuration
 const API_BASE_URL = 'http://localhost:3000/api/v1';
@@ -994,34 +987,6 @@ const ErrorMessage = ({ message, onRetry }) => (
   </div>
 );
 
-// Course type icon helper
-const getCourseTypeIcon = (type) => {
-  switch (type) {
-    case 'online':
-      return <Globe className="w-4 h-4 text-blue-600" />;
-    case 'webinar':
-      return <Video className="w-4 h-4 text-purple-600" />;
-    case 'certification':
-      return <Award className="w-4 h-4 text-green-600" />;
-    default:
-      return <BookOpen className="w-4 h-4 text-gray-600" />;
-  }
-};
-
-// Course type badge helper
-const getCourseTypeBadge = (type) => {
-  const baseClasses = "inline-flex px-3 py-1.5 text-xs font-semibold rounded-full";
-  switch (type) {
-    case 'online':
-      return `${baseClasses} bg-blue-100 text-blue-700`;
-    case 'webinar':
-      return `${baseClasses} bg-purple-100 text-purple-700`;
-    case 'certification':
-      return `${baseClasses} bg-green-100 text-green-700`;
-    default:
-      return `${baseClasses} bg-gray-100 text-gray-700`;
-  }
-};
 
 const ModernTrainingCourseManagement = () => {
   // State management
@@ -1349,7 +1314,6 @@ const MobileCard = ({ course, index, onEdit, onDelete, onExpand, isExpanded }) =
     </div>
   );
 };
-
 
 
   // Empty state
