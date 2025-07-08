@@ -739,6 +739,7 @@
 
 
 
+
 import React, { useState, useEffect } from 'react';
 import { Edit, List, Trash2, BookOpen, User, Clock, Hash, MoreVertical, AlertCircle, X, Plus, Search, RefreshCw, Grid3X3, Menu, Calendar, Award, Globe, Video } from 'lucide-react';
 
@@ -816,12 +817,7 @@ const apiService = {
 };
 
 // Delete Confirmation Modal Component
-const DeleteConfirmation = ({
-  isOpen,
-  courseToDelete,
-  onConfirm,
-  onCancel
-}) => {
+const DeleteConfirmation = ({ isOpen, courseToDelete, onConfirm, onCancel }) => {
   useEffect(() => {
     const handleEscape = (e) => {
       if (e.key === 'Escape' && isOpen) {
@@ -853,9 +849,7 @@ const DeleteConfirmation = ({
             <div className="flex-shrink-0 w-10 h-10 bg-red-100 rounded-full flex items-center justify-center">
               <AlertCircle className="w-5 h-5 text-red-600" />
             </div>
-            <h3 className="text-xl font-semibold text-gray-900">
-              Delete Course
-            </h3>
+            <h3 className="text-xl font-semibold text-gray-900">Delete Course</h3>
           </div>
           <button
             onClick={onCancel}
@@ -872,24 +866,39 @@ const DeleteConfirmation = ({
             </span>
             ?
           </p>
-          <p className="text-sm text-gray-500">
-            This action cannot be undone.
-          </p>
+          <p className="text-sm text-gray-500">This action cannot be undone.</p>
         </div>
-        <div className="flex gap-3 p-6 pt-0">
+        {/* <div className="flex gap-3 p-6 pt-0">
           <button
             onClick={onCancel}
-            className="flex-1 px-4 py-2.5 text-gray-700 bg-gray-100 rounded-xl hover:bg-gray-200 transition-colors font-medium"
+            // className="flex-1 px-4 py-2.5 text-gray-700 bg-gray-100 rounded-xl hover:bg-gray-200 transition-colors font-medium"
+            className="w-full sm:w-auto px-4 py-2.5 sm:py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 active:bg-gray-100 transition-colors font-medium text-sm sm:text-base"
           >
             Cancel
           </button>
           <button
             onClick={() => onConfirm(courseToDelete?.id)}
-            className="flex-1 px-4 py-2.5 text-white bg-red-500 rounded-xl hover:bg-red-600 transition-colors font-medium"
-          >
+            // className="flex-1 px-4 py-2.5 text-white bg-red-500 rounded-xl hover:bg-red-600 transition-colors font-medium"
+            // >
+            className="w-full sm:w-auto px-4 py-2.5 sm:py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 active:bg-red-800 transition-colors flex items-center justify-center gap-2 font-medium text-sm sm:text-base"
+              >
             Delete Course
           </button>
-        </div>
+        </div> */}
+<div className="flex flex-col sm:flex-row gap-3 p-6 pt-0">
+  <button
+    onClick={() => onConfirm(courseToDelete?.id)}
+    className="w-full sm:flex-1 px-4 py-3 sm:py-2.5 text-white bg-red-600 rounded-xl hover:bg-red-700 transition-colors font-medium text-base sm:text-sm"
+  >
+    Delete Course
+  </button>
+  <button
+    onClick={onCancel}
+    className="w-full sm:flex-1 px-4 py-3 sm:py-2.5 text-gray-700 bg-gray-100 rounded-xl hover:bg-gray-200 transition-colors font-medium text-base sm:text-sm"
+  >
+    Cancel
+  </button>
+</div>
       </div>
     </div>
   );
@@ -965,12 +974,10 @@ const ModernTrainingCourseManagement = () => {
   const [visibleColumns, setVisibleColumns] = useState({
     id: true,
     title: true,
-    // description: true,
     course_type: true,
     instructor_name: true,
     duration: true,
     is_active: true,
-    created_date: true,
     actions: true
   });
   const [viewMode, setViewMode] = useState('table');
@@ -1001,7 +1008,19 @@ const ModernTrainingCourseManagement = () => {
     setCurrentPage(1);
   }, [searchTerm, courses]);
 
-  // Fetch courses function
+  // Responsive view mode - automatically switch to cards on mobile
+  useEffect(() => {
+    const handleResize = () => {
+      if (window.innerWidth < 768) {
+        setViewMode('cards');
+      }
+    };
+
+    handleResize();
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
   const fetchCourses = async () => {
     try {
       setLoading(true);
@@ -1016,7 +1035,6 @@ const ModernTrainingCourseManagement = () => {
     }
   };
 
-  // Toggle column visibility
   const toggleColumn = (key) => {
     setVisibleColumns(prev => ({
       ...prev,
@@ -1024,7 +1042,6 @@ const ModernTrainingCourseManagement = () => {
     }));
   };
 
-  // Handle sorting
   const handleSort = (key) => {
     let direction = 'asc';
     if (sortConfig.key === key && sortConfig.direction === 'asc') {
@@ -1032,56 +1049,49 @@ const ModernTrainingCourseManagement = () => {
     }
     setSortConfig({ key, direction });
   };
-const formatDate = (dateValue) => {
-  if (!dateValue) return 'N/A';
 
-  try {
-    // Handle Firestore-like timestamp object from JSON
-    if (typeof dateValue === 'object' && dateValue._seconds !== undefined) {
-      const millis = dateValue._seconds * 1000 + Math.floor((dateValue._nanoseconds || 0) / 1e6);
-      return new Date(millis).toLocaleDateString();
+  const formatDate = (dateValue) => {
+    if (!dateValue) return 'N/A';
+
+    try {
+      if (typeof dateValue === 'object' && dateValue._seconds !== undefined) {
+        const millis = dateValue._seconds * 1000 + Math.floor((dateValue._nanoseconds || 0) / 1e6);
+        return new Date(millis).toLocaleDateString();
+      }
+
+      if (typeof dateValue === 'object' && typeof dateValue.toDate === 'function') {
+        return dateValue.toDate().toLocaleDateString();
+      }
+
+      if (dateValue instanceof Date) {
+        return dateValue.toLocaleDateString();
+      }
+
+      if (typeof dateValue === 'string') {
+        const date = new Date(dateValue);
+        return isNaN(date.getTime()) ? 'Invalid Date' : date.toLocaleDateString();
+      }
+
+      if (typeof dateValue === 'number') {
+        return new Date(dateValue).toLocaleDateString();
+      }
+
+      return 'N/A';
+    } catch (error) {
+      console.error('Error formatting date:', error);
+      return 'Invalid Date';
     }
-
-    // Firestore Timestamp (with .toDate method)
-    if (typeof dateValue === 'object' && typeof dateValue.toDate === 'function') {
-      return dateValue.toDate().toLocaleDateString();
-    }
-
-    // Native Date object
-    if (dateValue instanceof Date) {
-      return dateValue.toLocaleDateString();
-    }
-
-    // ISO date string
-    if (typeof dateValue === 'string') {
-      const date = new Date(dateValue);
-      return isNaN(date.getTime()) ? 'Invalid Date' : date.toLocaleDateString();
-    }
-
-    // Timestamp in ms
-    if (typeof dateValue === 'number') {
-      return new Date(dateValue).toLocaleDateString();
-    }
-
-    return 'N/A';
-  } catch (error) {
-    console.error('Error formatting date:', error);
-    return 'Invalid Date';
-  }
-};
+  };
 
   // Calculate pagination
   const totalPages = Math.ceil(filteredCourses.length / itemsPerPage);
   const startIndex = (currentPage - 1) * itemsPerPage;
   const paginatedCourses = filteredCourses.slice(startIndex, startIndex + itemsPerPage);
 
-  // Handle edit course
   const handleEdit = (course) => {
     console.log('Edit course:', course);
-    // Here you would typically open an edit modal or navigate to edit page
   };
 
-  // Handle delete course
   const handleDelete = async (courseId) => {
     try {
       await apiService.deleteCourse(courseId);
@@ -1092,7 +1102,6 @@ const formatDate = (dateValue) => {
     }
   };
 
-  // Handle delete button click - opens confirmation modal
   const handleDeleteClick = (course) => {
     setDeleteModal({
       isOpen: true,
@@ -1100,7 +1109,6 @@ const formatDate = (dateValue) => {
     });
   };
 
-  // Handle delete confirmation
   const handleDeleteConfirm = (courseId) => {
     handleDelete(courseId);
     setDeleteModal({
@@ -1109,16 +1117,16 @@ const formatDate = (dateValue) => {
     });
   };
 
-  // Handle delete cancellation
   const handleDeleteCancel = () => {
     setDeleteModal({
       isOpen: false,
       courseToDelete: null
     });
   };
+
   // Pagination component
   const PaginationControls = () => (
-    <div className="flex flex-col sm:flex-row items-center justify-between p-6 border-t border-gray-100 bg-white space-y-3 sm:space-y-0">
+    <div className="flex flex-col sm:flex-row items-center justify-between p-4 sm:p-6 border-t border-gray-100 bg-white space-y-3 sm:space-y-0">
       <div className="text-gray-600 text-sm font-medium order-2 sm:order-1">
         {filteredCourses.length > 0 ? `${startIndex + 1} - ${Math.min(startIndex + itemsPerPage, filteredCourses.length)} of ${filteredCourses.length} rows visible` : 'No data available'}
       </div>
@@ -1126,17 +1134,17 @@ const formatDate = (dateValue) => {
         <button
           onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
           disabled={currentPage === 1}
-          className="px-4 py-2 text-sm text-gray-600 hover:text-gray-800 disabled:opacity-50 disabled:cursor-not-allowed bg-white rounded-lg border border-gray-200 hover:bg-gray-50 transition-colors"
+          className="px-3 py-2 text-sm text-gray-600 hover:text-gray-800 disabled:opacity-50 disabled:cursor-not-allowed bg-white rounded-lg border border-gray-200 hover:bg-gray-50 transition-colors"
         >
           ‹
         </button>
-        {[...Array(Math.min(5, totalPages))].map((_, i) => {
+        {[...Array(Math.min(3, totalPages))].map((_, i) => {
           const pageNum = i + 1;
           return (
             <button
               key={pageNum}
               onClick={() => setCurrentPage(pageNum)}
-              className={`px-4 py-2 text-sm rounded-lg border transition-colors ${
+              className={`px-3 py-2 text-sm rounded-lg border transition-colors ${
                 currentPage === pageNum
                   ? 'bg-blue-500 text-white border-blue-500 shadow-lg'
                   : 'text-gray-600 hover:text-gray-800 hover:bg-white border-gray-200 bg-white'
@@ -1146,12 +1154,12 @@ const formatDate = (dateValue) => {
             </button>
           );
         })}
-        {totalPages > 5 && (
+        {totalPages > 3 && (
           <>
-            <span className="text-gray-600 px-2">...</span>
+            <span className="text-gray-600 px-1">...</span>
             <button
               onClick={() => setCurrentPage(totalPages)}
-              className={`px-4 py-2 text-sm rounded-lg border transition-colors ${
+              className={`px-3 py-2 text-sm rounded-lg border transition-colors ${
                 currentPage === totalPages
                   ? 'bg-blue-500 text-white border-blue-500 shadow-lg'
                   : 'text-gray-600 hover:text-gray-800 hover:bg-white border-gray-200 bg-white'
@@ -1164,7 +1172,7 @@ const formatDate = (dateValue) => {
         <button
           onClick={() => setCurrentPage(Math.min(totalPages, currentPage + 1))}
           disabled={currentPage === totalPages}
-          className="px-4 py-2 text-sm text-gray-600 hover:text-gray-800 disabled:opacity-50 disabled:cursor-not-allowed bg-white rounded-lg border border-gray-200 hover:bg-gray-50 transition-colors"
+          className="px-3 py-2 text-sm text-gray-600 hover:text-gray-800 disabled:opacity-50 disabled:cursor-not-allowed bg-white rounded-lg border border-gray-200 hover:bg-gray-50 transition-colors"
         >
           ›
         </button>
@@ -1175,7 +1183,7 @@ const formatDate = (dateValue) => {
   // Loading state
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50 p-6">
+      <div className="min-h-screen bg-gray-50 p-4 sm:p-6">
         <div className="max-w-7xl mx-auto">
           <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
             <LoadingSpinner />
@@ -1188,7 +1196,7 @@ const formatDate = (dateValue) => {
   // Error state
   if (error) {
     return (
-      <div className="min-h-screen bg-gray-50 p-6">
+      <div className="min-h-screen bg-gray-50 p-4 sm:p-6">
         <div className="max-w-7xl mx-auto">
           <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
             <ErrorMessage message={error} onRetry={fetchCourses} />
@@ -1198,42 +1206,136 @@ const formatDate = (dateValue) => {
     );
   }
 
+
+// Mobile Card Component - Fixed for better mobile experience
+const MobileCard = ({ course, index, onEdit, onDelete, onExpand, isExpanded }) => {
+  return (
+    <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4 hover:shadow-md transition-shadow">
+      <div className="flex items-start justify-between mb-3">
+        <div className="flex items-center space-x-3 flex-1 min-w-0">
+          <div className="w-10 h-10 bg-gradient-to-r from-blue-500 to-blue-600 rounded-full flex items-center justify-center flex-shrink-0">
+            <BookOpen className="w-4 h-4 text-white" />
+          </div>
+          <div className="flex-1 min-w-0">
+            <h3 className="font-semibold text-gray-900 text-sm truncate">
+              {course?.title || 'N/A'}
+            </h3>
+            {/* <p className="text-xs text-gray-500">ID: {course?.id || index + 1}</p> */}
+            <p className="text-xs text-gray-500">ID: {startIndex + index + 1}</p>
+          </div>
+        </div>
+        <button 
+            onClick={() => onExpand?.(isExpanded ? null : course.id)}
+            className="p-1 text-gray-400 hover:text-gray-600 flex-shrink-0"
+            >
+            <MoreVertical className="w-5 h-5" />
+            </button>
+      </div>
+
+      <div className="space-y-2 mb-3">
+        <div className="flex items-center space-x-2">
+          <User className="w-4 h-4 text-gray-400 flex-shrink-0" />
+          <span className="text-sm text-gray-600 truncate">
+            {course?.instructor_name || 'N/A'}
+          </span>
+        </div>
+
+        <div className="flex items-center space-x-2">
+          {getCourseTypeIcon(course?.course_type)}
+          <span className={getCourseTypeBadge(course?.course_type)}>
+            {course?.course_type?.charAt(0).toUpperCase() + course?.course_type?.slice(1) || 'N/A'}
+          </span>
+        </div>
+
+        {isExpanded && (
+          <div className="space-y-2 pt-2 border-t border-gray-100">
+            <div className="flex items-center space-x-2">
+              <Clock className="w-4 h-4 text-gray-400 flex-shrink-0" />
+              <span className="text-sm text-gray-600">
+                {course?.duration || 'N/A'}
+              </span>
+            </div>
+
+            <div className="flex items-center space-x-2">
+              <div className={`w-3 h-3 rounded-full flex-shrink-0 ${course?.is_active ? 'bg-green-500' : 'bg-red-500'}`}></div>
+              <span className={`text-sm font-medium ${course?.is_active ? 'text-green-700' : 'text-red-700'}`}>
+                {course?.is_active ? 'Active' : 'Inactive'}
+              </span>
+            </div>
+
+            {course?.created_date && (
+              <div className="flex items-center space-x-2">
+                <Calendar className="w-4 h-4 text-gray-400 flex-shrink-0" />
+                <span className="text-sm text-gray-600">
+                     {formatDate(course?.created_date)}
+                  {/* {new Date(course.created_date).toLocaleDateString()} */}
+                </span>
+              </div>
+            )}
+          </div>
+        )}
+      </div>
+
+      {isExpanded && (
+        <div className="flex space-x-2 pt-3 border-t border-gray-100">
+          <button
+            onClick={() => onEdit?.(course)}
+            className="flex-1 bg-blue-500 hover:bg-blue-600 text-white px-3 py-2 rounded-lg text-sm font-medium transition-colors flex items-center justify-center space-x-1"
+          >
+            <Edit className="w-4 h-4" />
+            <span>Edit</span>
+          </button>
+          <button
+            onClick={() => onDelete?.(course)}
+            className="flex-1 bg-red-500 hover:bg-red-600 text-white px-3 py-2 rounded-lg text-sm font-medium transition-colors flex items-center justify-center space-x-1"
+          >
+            <Trash2 className="w-4 h-4" />
+            <span>Delete</span>
+          </button>
+        </div>
+      )}
+    </div>
+  );
+};
+
+
+
   // Empty state
   if (!paginatedCourses || paginatedCourses.length === 0) {
     return (
-      <div className="min-h-screen bg-gray-50 p-6">
+      <div className="min-h-screen bg-gray-50 p-4 sm:p-6">
         <div className="max-w-7xl mx-auto">
-          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-6 gap-4 bg-white rounded-xl p-4 shadow-sm">
-            <div className="flex items-center gap-4">
-              <button className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2.5 rounded-xl flex items-center gap-2 transition-all duration-200 shadow-sm hover:shadow-md font-medium">
-                <Plus className="w-4 h-4" />
-                Create Course
-              </button>
-            </div>
-            <div className="flex items-center gap-3">
-              <div className="relative">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
-                <input
-                  type="text"
-                  placeholder="Search courses..."
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  className="pl-10 pr-4 py-2.5 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent w-64 bg-white shadow-sm"
-                />
+          <div className="flex flex-col space-y-4 mb-6">
+            <div className="bg-white rounded-xl p-4 shadow-sm">
+              <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+                <button className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2.5 rounded-xl flex items-center gap-2 transition-all duration-200 shadow-sm hover:shadow-md font-medium">
+                  <Plus className="w-4 h-4" />
+                  <span className="hidden sm:inline">Create Course</span>
+                  <span className="sm:hidden">Create</span>
+                </button>
+                <div className="flex items-center gap-3 w-full sm:w-auto">
+                  <div className="relative flex-1 sm:flex-initial">
+                    <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+                    <input
+                      type="text"
+                      placeholder="Search courses..."
+                      value={searchTerm}
+                      onChange={(e) => setSearchTerm(e.target.value)}
+                      className="pl-10 pr-4 py-2.5 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent w-full sm:w-64 bg-white shadow-sm"
+                    />
+                  </div>
+                  <button 
+                    onClick={fetchCourses}
+                    className="p-2.5 text-white bg-blue-500 hover:bg-blue-600 rounded-xl transition-all duration-200 shadow-sm"
+                  >
+                    <RefreshCw className="w-4 h-4" />
+                  </button>
+                </div>
               </div>
-              <button 
-                onClick={fetchCourses}
-                className="p-2.5 text-gray-600 hover:text-gray-800 bg-blue-500 hover:bg-blue-600 text-white rounded-xl transition-all duration-200 shadow-sm"
-              >
-                <RefreshCw className="w-4 h-4" />
-              </button>
-              <button className="p-2.5 text-gray-600 hover:text-gray-800 bg-blue-500 hover:bg-blue-600 text-white rounded-xl transition-all duration-200 shadow-sm">
-                <Grid3X3 className="w-4 h-4" />
-              </button>
             </div>
           </div>
           <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
-            <div className="p-12 text-center">
+            <div className="p-8 sm:p-12 text-center">
               <BookOpen className="w-16 h-16 text-gray-300 mx-auto mb-4" />
               <p className="text-gray-800 text-xl font-semibold mb-2">No courses found</p>
               <p className="text-gray-500">Try adjusting your search criteria or add some courses.</p>
@@ -1246,9 +1348,10 @@ const formatDate = (dateValue) => {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 p-6">
+    <div className="min-h-screen bg-gray-50 p-4 sm:p-6">
       <div className="max-w-7xl mx-auto">
         <div className="flex flex-col space-y-4 mb-4 sm:mb-6">
+          {/* Desktop Header */}
           <div className="hidden lg:flex items-center justify-between bg-white rounded-lg shadow-sm p-4 border border-gray-200">
             <button className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm flex items-center space-x-2 transition-colors shadow-sm">
               <Plus className="w-4 h-4" />
@@ -1279,7 +1382,7 @@ const formatDate = (dateValue) => {
               >
                 <List className="w-4 h-4" />
               </button>
-              <div className="relative column-toggle-container">
+              <div className="relative">
                 <button
                   onClick={() => setShowColumnToggle(!showColumnToggle)}
                   className="bg-blue-600 hover:bg-blue-700 text-white p-2 rounded-lg shadow-sm transition-colors"
@@ -1305,7 +1408,9 @@ const formatDate = (dateValue) => {
               </div>
             </div>
           </div>
-          <div className="lg:hidden bg-white rounded-lg shadow-sm p-4 border border-gray-300">
+
+          {/* Mobile Header */}
+          <div className="lg:hidden bg-white rounded-lg shadow-sm p-4 border border-gray-200">
             <div className="flex items-center justify-between mb-3">
               <button className="bg-blue-600 hover:bg-blue-700 text-white px-3 py-2 rounded-lg text-sm flex items-center space-x-2 transition-colors">
                 <Plus className="w-4 h-4" />
@@ -1330,7 +1435,7 @@ const formatDate = (dateValue) => {
               />
             </div>
             {isMobileMenuOpen && (
-              <div className="mt-3 mobile-menu-container bg-gray-50 rounded-lg p-3 space-y-3 border border-gray-200">
+              <div className="mt-3 bg-gray-50 rounded-lg p-3 space-y-3 border border-gray-200">
                 <div className="flex flex-wrap gap-2">
                   <button
                     onClick={fetchCourses}
@@ -1339,6 +1444,7 @@ const formatDate = (dateValue) => {
                     <RefreshCw className="w-4 h-4" />
                     <span>Refresh</span>
                   </button>
+
                   <button 
                     onClick={() => setViewMode(viewMode === 'table' ? 'cards' : 'table')}
                     className="flex items-center space-x-2 bg-blue-600 hover:bg-blue-700 text-white px-3 py-2 rounded text-sm transition-colors"
@@ -1346,30 +1452,40 @@ const formatDate = (dateValue) => {
                     <List className="w-4 h-4" />
                     <span>{viewMode === 'table' ? 'Cards' : 'Table'}</span>
                   </button>
+                  <button
+                    onClick={() => setShowColumnToggle(!showColumnToggle)}
+                    className="flex items-center space-x-2 bg-blue-600 hover:bg-blue-700 text-white px-3 py-2 rounded text-sm transition-colors"
+                  >
+                    <Grid3X3 className="w-4 h-4" />
+                    <span>Columns</span>
+                  </button>
                 </div>
-                <div className="bg-white rounded-lg p-3 border border-gray-200">
-                  <p className="text-sm font-medium text-gray-700 mb-2">Column Visibility</p>
-                  <div className="grid grid-cols-2 gap-2">
-                    {columns.map(column => (
-                      <label key={column.key} className="flex items-center space-x-2 cursor-pointer text-gray-700 hover:bg-gray-50 rounded px-2 py-1">
-                        <input
-                          type="checkbox"
-                          checked={visibleColumns[column.key]}
-                          onChange={() => toggleColumn(column.key)}
-                          className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500"
-                        />
-                        <span className="text-xs">{column.label}</span>
-                      </label>
-                    ))}
+                {showColumnToggle && (
+                  <div className="bg-white rounded-lg shadow-lg border border-gray-200 p-3">
+                    <div className="grid grid-cols-2 gap-2">
+                      {columns.map(column => (
+                        <label key={column.key} className="flex items-center space-x-2 cursor-pointer text-gray-700 hover:bg-gray-50 rounded px-2 py-1">
+                          <input
+                            type="checkbox"
+                            checked={visibleColumns[column.key]}
+                            onChange={() => toggleColumn(column.key)}
+                            className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500"
+                          />
+                          <span className="text-sm">{column.label}</span>
+                        </label>
+                      ))}
+                    </div>
                   </div>
-                </div>
+                )}
               </div>
             )}
           </div>
         </div>
 
-        <div className="bg-white rounded-2xl shadow-sm border border-gray-300 overflow-hidden">
+        {/* Main Content */}
+        <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
           {viewMode === 'table' ? (
+            // Table View
             <div className="overflow-x-auto">
               <table className="w-full">
                 <thead className="bg-gray-50 border-b border-gray-200">
@@ -1378,17 +1494,15 @@ const formatDate = (dateValue) => {
                       visibleColumns[column.key] && (
                         <th
                           key={column.key}
-                          className="text-left py-4 px-6 font-semibold text-gray-700 text-sm cursor-pointer hover:bg-gray-100 transition-colors"
+                          className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100 transition-colors"
                           onClick={() => column.key !== 'actions' && handleSort(column.key)}
                         >
-                          <div className="flex items-center space-x-2">
+                          <div className="flex items-center space-x-1">
                             <span>{column.label}</span>
-                            {column.key !== 'actions' && (
-                              <div className="text-gray-400">
-                                {/* {sortConfig.key === column.key ? (
-                                  sortConfig.direction === 'asc' ? '↑' : '↓'
-                                ) : '↕'} */}
-                              </div>
+                            {column.key !== 'actions' && sortConfig.key === column.key && (
+                              <span className="text-blue-600">
+                                {sortConfig.direction === 'asc' ? '↑' : '↓'}
+                              </span>
                             )}
                           </div>
                         </th>
@@ -1396,92 +1510,90 @@ const formatDate = (dateValue) => {
                     ))}
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-gray-100">
-                     {paginatedCourses.map((course, index) => (
-                       <tr key={course.id} className="hover:bg-gray-50 transition-colors">
-                         {visibleColumns.id && (
-                           <td className="px-6 py-4 whitespace-nowrap min-w-[90px]  text-sm text-gray-900">
-                             {startIndex + index + 1}
-                           </td>
-                         )}
-
+                <tbody className="bg-white divide-y divide-gray-200">
+                  {paginatedCourses.map((course, index) => (
+                    <tr key={course.id || index} className="hover:bg-gray-50 transition-colors">
+                      {visibleColumns.id && (
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                          <div className="flex items-center space-x-2">
+                            {/* <Hash className="w-4 h-4 text-gray-400" /> */}
+                            {/* <span>{course.id || index + 1}</span> */}
+                            {startIndex + index + 1}
+                          </div>
+                        </td>
+                      )}
                       {visibleColumns.title && (
-                        <td className="py-4 px-6 min-w-[360px]">
+                        <td className="px-6 py-4 whitespace-nowrap">
                           <div className="flex items-center space-x-3">
-                            <div className="w-8 h-8 bg-gradient-to-r from-blue-500 to-blue-600 rounded-full flex items-center justify-center ">
+                            <div className="w-10 h-10 bg-gradient-to-r from-blue-500 to-blue-600 rounded-full flex items-center justify-center">
                               <BookOpen className="w-4 h-4 text-white" />
                             </div>
                             <div>
-                              <div className="font-medium text-gray-900">{course?.title || 'N/A'}</div>
+                              <div className="text-sm font-medium text-gray-900">
+                                {course.title || 'N/A'}
+                              </div>
+                              {course.description && (
+                                <div className="text-sm text-gray-500 truncate max-w-xs">
+                                  {course.description}
+                                </div>
+                              )}
                             </div>
                           </div>
                         </td>
                       )}
                       {visibleColumns.course_type && (
-                        <td className="py-4 px-6">
+                        <td className="px-6 py-4 whitespace-nowrap">
                           <div className="flex items-center space-x-2">
-                            {getCourseTypeIcon(course?.course_type)}
-                            <span className={getCourseTypeBadge(course?.course_type)}>
-                              {course?.course_type?.charAt(0).toUpperCase() + course?.course_type?.slice(1) || 'N/A'}
+                            {getCourseTypeIcon(course.course_type)}
+                            <span className={getCourseTypeBadge(course.course_type)}>
+                              {course.course_type?.charAt(0).toUpperCase() + course.course_type?.slice(1) || 'N/A'}
                             </span>
                           </div>
                         </td>
                       )}
                       {visibleColumns.instructor_name && (
-                        <td className="py-4 px-6 min-w-[260px]">
+                        <td className="px-6 py-4 whitespace-nowrap">
                           <div className="flex items-center space-x-2">
                             <User className="w-4 h-4 text-gray-400" />
-                            <span className="text-gray-700">{course?.instructor_name || 'N/A'}</span>
+                            <span className="text-sm text-gray-900">
+                              {course.instructor_name || 'N/A'}
+                            </span>
                           </div>
                         </td>
                       )}
                       {visibleColumns.duration && (
-                        <td className="py-4 px-6 min-w-[140px]">
+                        <td className="px-6 py-4 whitespace-nowrap">
                           <div className="flex items-center space-x-2">
                             <Clock className="w-4 h-4 text-gray-400" />
-                            <span className="text-gray-700">{course?.duration || 'N/A'}</span>
+                            <span className="text-sm text-gray-900">
+                              {course.duration || 'N/A'}
+                            </span>
                           </div>
                         </td>
                       )}
                       {visibleColumns.is_active && (
-                        <td className="py-4 px-6">
+                        <td className="px-6 py-4 whitespace-nowrap">
                           <div className="flex items-center space-x-2">
-                            <div className={`w-3 h-3 rounded-full ${course?.is_active ? 'bg-green-500' : 'bg-red-500'}`}></div>
-                            <span className={`text-sm font-medium ${course?.is_active ? 'text-green-700' : 'text-red-700'}`}>
-                              {course?.is_active ? 'Active' : 'Inactive'}
-                            </span>
-                          </div>
-                             <div className="flex items-center space-x-2">
-                            <Calendar className="w-4 h-4 text-gray-400" />
-                            <span className="text-gray-700">
-                            {formatDate(course?.created_date)}
+                            <div className={`w-3 h-3 rounded-full ${course.is_active ? 'bg-green-500' : 'bg-red-500'}`}></div>
+                            <span className={`text-sm font-medium ${course.is_active ? 'text-green-700' : 'text-red-700'}`}>
+                              {course.is_active ? 'Active' : 'Inactive'}
                             </span>
                           </div>
                         </td>
                       )}
-                      {/* {visibleColumns.created_date && (
-                        <td className="py-4 px-6">
-                          <div className="flex items-center space-x-2">
-                            <Calendar className="w-4 h-4 text-gray-400" />
-                            <span className="text-gray-700">
-                            {formatDate(course?.created_date)}
-                            </span>
-                          </div>
-                        </td>
-                      )} */}
                       {visibleColumns.actions && (
-                        <td className="py-4 px-6">
+                        <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                           <div className="flex items-center space-x-2">
                             <button
                               onClick={() => handleEdit(course)}
-                              className="bg-green-500 hover:bg-green-600 text-white p-2 rounded-lg transition-colors shadow-sm"
+                              className="text-blue-600 hover:text-blue-800 transition-colors p-1 rounded hover:bg-blue-50"
                               title="Edit"
                             >
                               <Edit className="w-4 h-4" />
                             </button>
                             <button
                               onClick={() => handleDeleteClick(course)}
-                              className="bg-red-500 hover:bg-red-600 text-white p-2 rounded-lg transition-colors shadow-sm"
+                              className="text-red-600 hover:text-red-800 transition-colors p-1 rounded hover:bg-red-50"
                               title="Delete"
                             >
                               <Trash2 className="w-4 h-4" />
@@ -1495,15 +1607,26 @@ const formatDate = (dateValue) => {
               </table>
             </div>
           ) : (
-            <div className="p-6">
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+            // Cards View
+            <div className="p-4 sm:p-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
                 {paginatedCourses.map((course, index) => (
-                  <MobileCard key={course?.id || index} course={course} index={index} />
+                  <MobileCard
+                  // key={startIndex + index + 1}
+                    key={course.id || index}
+                    course={course}
+                    index={index}
+                    onEdit={handleEdit}
+                    onDelete={handleDeleteClick}
+                    onExpand={setExpandedCard}
+                    isExpanded={expandedCard === course.id}
+                  />
                 ))}
               </div>
             </div>
           )}
-          
+
+          {/* Pagination */}
           <PaginationControls />
         </div>
       </div>
@@ -1515,14 +1638,6 @@ const formatDate = (dateValue) => {
         onConfirm={handleDeleteConfirm}
         onCancel={handleDeleteCancel}
       />
-
-      {/* Click outside handler for column toggle */}
-      {showColumnToggle && (
-        <div 
-          className="fixed inset-0 z-10" 
-          onClick={() => setShowColumnToggle(false)}
-        />
-      )}
     </div>
   );
 };
