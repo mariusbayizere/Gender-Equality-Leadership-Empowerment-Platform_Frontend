@@ -30,6 +30,7 @@ import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import GELEPAdminDashboard from "@/components/User/GELEPAdminDashboard";
 import Login from "@/components/Authantication/Login";
 import ModernTrainingCourseManagement from '@/components/TrainingCourse/ModernTrainingCourseManagement.jsx';
+import TrainingCourseForm from '@/components/TrainingCourse/TrainingCourseForm.jsx';
 
 
 // Temporary Error Components (replace with your actual components)
@@ -178,10 +179,10 @@ function App() {
         //     path: "/home",
         //     element: <Homepage />,
         // },
-        // {
-        //     path: "/about",
-        //     element: <AboutPage />,
-        // },
+        {
+            path: "/about",
+            element: <TrainingCourseForm />,
+        },
         {
             path: "/training-courses",
             element: <ModernTrainingCourseManagement />,

@@ -742,6 +742,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { Edit, List, Trash2, BookOpen, User, Clock, Hash, MoreVertical, AlertCircle, X, Plus, Search, RefreshCw, Grid3X3, Menu, Calendar, Award, Globe, Video } from 'lucide-react';
+import TrainingCourseForm from './TrainingCourseForm';
 
 // Column definitions
 const columns = [
@@ -985,6 +986,37 @@ const ModernTrainingCourseManagement = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [showCreateModal, setShowCreateModal] = useState(false);
+const [showUpdateModal, setShowUpdateModal] = useState(false);
+const [editingCourse, setEditingCourse] = useState(null);
+
+
+const handleCreateCourse = () => {
+  setShowCreateModal(true);
+};
+
+const handleEdit = (course) => {
+  setEditingCourse(course);
+  setShowUpdateModal(true);
+};
+
+const handleCourseCreated = (newCourse) => {
+  // Add the new course to your courses list
+  setCourses(prevCourses => [...prevCourses, newCourse]);
+  // Or refresh the courses list
+  // fetchCourses();
+};
+
+const handleCourseUpdated = (updatedCourse) => {
+  // Update the course in your courses list
+  setCourses(prevCourses => 
+    prevCourses.map(course => 
+      course.id === updatedCourse.id ? updatedCourse : course
+    )
+  );
+  // Or refresh the courses list
+  // fetchCourses();
+};
 
   // Fetch courses on component mount
   useEffect(() => {
@@ -1088,9 +1120,9 @@ const ModernTrainingCourseManagement = () => {
   const startIndex = (currentPage - 1) * itemsPerPage;
   const paginatedCourses = filteredCourses.slice(startIndex, startIndex + itemsPerPage);
 
-  const handleEdit = (course) => {
-    console.log('Edit course:', course);
-  };
+//   const handleEdit = (course) => {
+//     console.log('Edit course:', course);
+//   };
 
   const handleDelete = async (courseId) => {
     try {
@@ -1353,9 +1385,16 @@ const MobileCard = ({ course, index, onEdit, onDelete, onExpand, isExpanded }) =
         <div className="flex flex-col space-y-4 mb-4 sm:mb-6">
           {/* Desktop Header */}
           <div className="hidden lg:flex items-center justify-between bg-white rounded-lg shadow-sm p-4 border border-gray-200">
-            <button className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm flex items-center space-x-2 transition-colors shadow-sm">
+            {/* <button className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm flex items-center space-x-2 transition-colors shadow-sm">
               <Plus className="w-4 h-4" />
               <span>Create Course</span>
+            </button> */}
+            <button 
+            onClick={handleCreateCourse} // Change this line
+            className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm flex items-center space-x-2 transition-colors shadow-sm"
+            >
+            <Plus className="w-4 h-4" />
+            <span>Create Course</span>
             </button>
             <div className="flex items-center space-x-3">
               <div className="relative">
@@ -1630,6 +1669,22 @@ const MobileCard = ({ course, index, onEdit, onDelete, onExpand, isExpanded }) =
           <PaginationControls />
         </div>
       </div>
+
+    <TrainingCourseForm 
+      showModal={showCreateModal}
+      setShowModal={setShowCreateModal}
+      onCourseCreated={handleCourseCreated}
+      mode="create"
+    />
+    
+    <TrainingCourseForm 
+      showModal={showUpdateModal}
+      setShowModal={setShowUpdateModal}
+      onCourseUpdated={handleCourseUpdated}
+      editingCourse={editingCourse}
+      mode="update"
+    />      
+
 
       {/* Delete Confirmation Modal */}
       <DeleteConfirmation
