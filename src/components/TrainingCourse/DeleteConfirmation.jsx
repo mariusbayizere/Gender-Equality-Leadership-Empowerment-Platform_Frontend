@@ -1,3 +1,5 @@
+import React, { useState, useEffect } from 'react';
+import { Edit, List, Trash2, BookOpen, User, Clock, Hash, MoreVertical, AlertCircle, X, Plus, Search, RefreshCw, Grid3X3, Menu, Calendar, Award, Globe, Video } from 'lucide-react';
 
 
 export const DeleteConfirmation = ({ isOpen, courseToDelete, onConfirm, onCancel }) => {
