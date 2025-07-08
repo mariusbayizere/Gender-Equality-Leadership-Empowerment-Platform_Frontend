@@ -743,6 +743,7 @@
 import React, { useState, useEffect } from 'react';
 import { Edit, List, Trash2, BookOpen, User, Clock, Hash, MoreVertical, AlertCircle, X, Plus, Search, RefreshCw, Grid3X3, Menu, Calendar, Award, Globe, Video } from 'lucide-react';
 import TrainingCourseForm from './TrainingCourseForm';
+import { formatDate } from './formatDate'
 
 // Column definitions
 const columns = [
@@ -1074,55 +1075,12 @@ const handleCourseUpdated = (updatedCourse) => {
     }));
   };
 
-  const handleSort = (key) => {
-    let direction = 'asc';
-    if (sortConfig.key === key && sortConfig.direction === 'asc') {
-      direction = 'desc';
-    }
-    setSortConfig({ key, direction });
-  };
 
-  const formatDate = (dateValue) => {
-    if (!dateValue) return 'N/A';
-
-    try {
-      if (typeof dateValue === 'object' && dateValue._seconds !== undefined) {
-        const millis = dateValue._seconds * 1000 + Math.floor((dateValue._nanoseconds || 0) / 1e6);
-        return new Date(millis).toLocaleDateString();
-      }
-
-      if (typeof dateValue === 'object' && typeof dateValue.toDate === 'function') {
-        return dateValue.toDate().toLocaleDateString();
-      }
-
-      if (dateValue instanceof Date) {
-        return dateValue.toLocaleDateString();
-      }
-
-      if (typeof dateValue === 'string') {
-        const date = new Date(dateValue);
-        return isNaN(date.getTime()) ? 'Invalid Date' : date.toLocaleDateString();
-      }
-
-      if (typeof dateValue === 'number') {
-        return new Date(dateValue).toLocaleDateString();
-      }
-
-      return 'N/A';
-    } catch (error) {
-      console.error('Error formatting date:', error);
-      return 'Invalid Date';
-    }
-  };
 
   // Calculate pagination
   const totalPages = Math.ceil(filteredCourses.length / itemsPerPage);
   const startIndex = (currentPage - 1) * itemsPerPage;
   const paginatedCourses = filteredCourses.slice(startIndex, startIndex + itemsPerPage);
-
-//   const handleEdit = (course) => {
-//     console.log('Edit course:', course);
-//   };
 
   const handleDelete = async (courseId) => {
     try {
@@ -1385,12 +1343,8 @@ const MobileCard = ({ course, index, onEdit, onDelete, onExpand, isExpanded }) =
         <div className="flex flex-col space-y-4 mb-4 sm:mb-6">
           {/* Desktop Header */}
           <div className="hidden lg:flex items-center justify-between bg-white rounded-lg shadow-sm p-4 border border-gray-200">
-            {/* <button className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm flex items-center space-x-2 transition-colors shadow-sm">
-              <Plus className="w-4 h-4" />
-              <span>Create Course</span>
-            </button> */}
             <button 
-            onClick={handleCreateCourse} // Change this line
+            onClick={handleCreateCourse} 
             className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm flex items-center space-x-2 transition-colors shadow-sm"
             >
             <Plus className="w-4 h-4" />
@@ -1451,7 +1405,7 @@ const MobileCard = ({ course, index, onEdit, onDelete, onExpand, isExpanded }) =
           {/* Mobile Header */}
           <div className="lg:hidden bg-white rounded-lg shadow-sm p-4 border border-gray-200">
             <div className="flex items-center justify-between mb-3">
-              <button className="bg-blue-600 hover:bg-blue-700 text-white px-3 py-2 rounded-lg text-sm flex items-center space-x-2 transition-colors">
+              <button  onClick={handleCreateCourse} className="bg-blue-600 hover:bg-blue-700 text-white px-3 py-2 rounded-lg text-sm flex items-center space-x-2 transition-colors">
                 <Plus className="w-4 h-4" />
                 <span className="hidden sm:inline">Create Course</span>
                 <span className="sm:hidden">Create</span>
@@ -1555,8 +1509,6 @@ const MobileCard = ({ course, index, onEdit, onDelete, onExpand, isExpanded }) =
                       {visibleColumns.id && (
                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                           <div className="flex items-center space-x-2">
-                            {/* <Hash className="w-4 h-4 text-gray-400" /> */}
-                            {/* <span>{course.id || index + 1}</span> */}
                             {startIndex + index + 1}
                           </div>
                         </td>
