@@ -890,7 +890,6 @@
 
 // export default ModernTrainingCourseManagement;
 
-
 import React, { useState, useEffect } from 'react';
 import { Edit, List, Trash2, BookOpen, User, Clock, Hash, MoreVertical, AlertCircle, X, Plus, Search, RefreshCw, Grid3X3, Menu, Calendar, Award, Globe, Video } from 'lucide-react';
 import TrainingCourseForm from './TrainingCourseForm';
@@ -899,10 +898,8 @@ import { DeleteConfirmation } from './DeleteConfirmation';
 import {ModernTrainingCourseManagementHeader} from './Header';
 import { columns } from './Hardcodedcolumn';
 import { getCourseTypeIcon, getCourseTypeBadge } from './CourseTypeBadge'; 
+import { MobileCard} from './MobileCard';
 
-
-
-// API Configuration
 const API_BASE_URL = 'http://localhost:3000/api/v1';
 const API_ENDPOINTS = {
   courses: `${API_BASE_URL}/training_courses`,
@@ -1024,10 +1021,10 @@ const handleCreateCourse = () => {
   setShowCreateModal(true);
 };
 
-const handleEdit = (course) => {
-  setEditingCourse(course);
-  setShowUpdateModal(true);
-};
+// const handleEdit = (course) => {
+//   setEditingCourse(course);
+//   setShowUpdateModal(true);
+// };
 
 const handleCourseCreated = (newCourse) => {
   // Add the new course to your courses list
@@ -1036,16 +1033,16 @@ const handleCourseCreated = (newCourse) => {
   // fetchCourses();
 };
 
-const handleCourseUpdated = (updatedCourse) => {
-  // Update the course in your courses list
-  setCourses(prevCourses => 
-    prevCourses.map(course => 
-      course.id === updatedCourse.id ? updatedCourse : course
-    )
-  );
-  // Or refresh the courses list
-  // fetchCourses();
-};
+// const handleCourseUpdated = (updatedCourse) => {
+//   // Update the course in your courses list
+//   setCourses(prevCourses => 
+//     prevCourses.map(course => 
+//       course.id === updatedCourse.id ? updatedCourse : course
+//     )
+//   );
+//   // Or refresh the courses list
+//   // fetchCourses();
+// };
 
   // Fetch courses on component mount
   useEffect(() => {
@@ -1103,7 +1100,34 @@ const handleCourseUpdated = (updatedCourse) => {
     }));
   };
 
+// Improved handleEdit function
+const handleEdit = (course) => {
+  console.log('Editing course:', course); // Debug log
+  setEditingCourse(course);
+  setShowUpdateModal(true);
+};
 
+// Handler for closing update modal
+const handleCloseUpdateModal = () => {
+  setShowUpdateModal(false);
+  setEditingCourse(null);
+};
+
+// Handler for when course is updated
+const handleCourseUpdated = (updatedCourse) => {
+  setCourses(prevCourses => 
+    prevCourses.map(course => 
+      course.id === updatedCourse.id ? updatedCourse : course
+    )
+  );
+  handleCloseUpdateModal(); // Close modal and reset editing course
+};
+
+// Debug useEffect (remove this after fixing)
+useEffect(() => {
+  console.log('EditingCourse state:', editingCourse);
+  console.log('ShowUpdateModal state:', showUpdateModal);
+}, [editingCourse, showUpdateModal]);
 
   // Calculate pagination
   const totalPages = Math.ceil(filteredCourses.length / itemsPerPage);
@@ -1224,98 +1248,23 @@ const handleCourseUpdated = (updatedCourse) => {
     );
   }
 
-
-// Mobile Card Component - Fixed for better mobile experience
-const MobileCard = ({ course, index, onEdit, onDelete, onExpand, isExpanded }) => {
-  return (
-    <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4 hover:shadow-md transition-shadow">
-      <div className="flex items-start justify-between mb-3">
-        <div className="flex items-center space-x-3 flex-1 min-w-0">
-          <div className="w-10 h-10 bg-gradient-to-r from-blue-500 to-blue-600 rounded-full flex items-center justify-center flex-shrink-0">
-            <BookOpen className="w-4 h-4 text-white" />
-          </div>
-          <div className="flex-1 min-w-0">
-            <h3 className="font-semibold text-gray-900 text-sm truncate">
-              {course?.title || 'N/A'}
-            </h3>
-            {/* <p className="text-xs text-gray-500">ID: {course?.id || index + 1}</p> */}
-            <p className="text-xs text-gray-500">ID: {startIndex + index + 1}</p>
-          </div>
-        </div>
-        <button 
-            onClick={() => onExpand?.(isExpanded ? null : course.id)}
-            className="p-1 text-gray-400 hover:text-gray-600 flex-shrink-0"
-            >
-            <MoreVertical className="w-5 h-5" />
-            </button>
-      </div>
-
-      <div className="space-y-2 mb-3">
-        <div className="flex items-center space-x-2">
-          <User className="w-4 h-4 text-gray-400 flex-shrink-0" />
-          <span className="text-sm text-gray-600 truncate">
-            {course?.instructor_name || 'N/A'}
-          </span>
-        </div>
-
-        <div className="flex items-center space-x-2">
-          {getCourseTypeIcon(course?.course_type)}
-          <span className={getCourseTypeBadge(course?.course_type)}>
-            {course?.course_type?.charAt(0).toUpperCase() + course?.course_type?.slice(1) || 'N/A'}
-          </span>
-        </div>
-
-        {isExpanded && (
-          <div className="space-y-2 pt-2 border-t border-gray-100">
-            <div className="flex items-center space-x-2">
-              <Clock className="w-4 h-4 text-gray-400 flex-shrink-0" />
-              <span className="text-sm text-gray-600">
-                {course?.duration || 'N/A'}
-              </span>
-            </div>
-
-            <div className="flex items-center space-x-2">
-              <div className={`w-3 h-3 rounded-full flex-shrink-0 ${course?.is_active ? 'bg-green-500' : 'bg-red-500'}`}></div>
-              <span className={`text-sm font-medium ${course?.is_active ? 'text-green-700' : 'text-red-700'}`}>
-                {course?.is_active ? 'Active' : 'Inactive'}
-              </span>
-            </div>
-
-            {course?.created_date && (
-              <div className="flex items-center space-x-2">
-                <Calendar className="w-4 h-4 text-gray-400 flex-shrink-0" />
-                <span className="text-sm text-gray-600">
-                     {formatDate(course?.created_date)}
-                </span>
-              </div>
-            )}
-          </div>
-        )}
-      </div>
-
-      {isExpanded && (
-        <div className="flex space-x-2 pt-3 border-t border-gray-100">
-          <button
-            onClick={() => onEdit?.(course)}
-            className="flex-1 bg-blue-500 hover:bg-blue-600 text-white px-3 py-2 rounded-lg text-sm font-medium transition-colors flex items-center justify-center space-x-1"
-          >
-            <Edit className="w-4 h-4" />
-            <span>Edit</span>
-          </button>
-          <button
-            onClick={() => onDelete?.(course)}
-            className="flex-1 bg-red-500 hover:bg-red-600 text-white px-3 py-2 rounded-lg text-sm font-medium transition-colors flex items-center justify-center space-x-1"
-          >
-            <Trash2 className="w-4 h-4" />
-            <span>Delete</span>
-          </button>
-        </div>
-      )}
-    </div>
-  );
-};
-
-
+<div className="p-4 sm:p-6">
+  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+    {paginatedCourses.map((course, index) => (
+      <MobileCard
+        startIndex={0}
+        key={course.id || index}
+        course={course}
+        index={index}
+        // startIndex={startIndex}
+        onEdit={handleEdit}
+        onDelete={handleDeleteClick}
+        onExpand={setExpandedCard}
+        isExpanded={expandedCard === course.id}
+      />
+    ))}
+  </div>
+</div>
   // Empty state
   if (!paginatedCourses || paginatedCourses.length === 0) {
     return (
@@ -1539,13 +1488,22 @@ const MobileCard = ({ course, index, onEdit, onDelete, onExpand, isExpanded }) =
       mode="create"
     />
     
-    <TrainingCourseForm 
+    {/* <TrainingCourseForm 
       showModal={showUpdateModal}
       setShowModal={setShowUpdateModal}
       onCourseUpdated={handleCourseUpdated}
       editingCourse={editingCourse}
       mode="update"
-    />      
+    />       */}
+
+<TrainingCourseForm 
+  showModal={showUpdateModal}
+  setShowModal={handleCloseUpdateModal}
+  onCourseUpdated={handleCourseUpdated}
+  editingCourse={editingCourse}
+  mode="update"
+  key={editingCourse?.id || 'update-form'} // Force re-render when editing course changes
+/>
 
 
       {/* Delete Confirmation Modal */}
