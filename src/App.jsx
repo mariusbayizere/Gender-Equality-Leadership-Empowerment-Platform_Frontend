@@ -30,9 +30,8 @@ import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import GELEPAdminDashboard from "@/components/User/GELEPAdminDashboard";
 import Login from "@/components/Authantication/Login";
 import ModernTrainingCourseManagement from '@/components/TrainingCourse/ModernTrainingCourseManagement.jsx';
-// import TrainingCourseForm from '@/components/TrainingCourse/TrainingCourseForm.jsx';
 import ModernProgressTrackingManagements from '@/components/Progress_Tracking/progress_trackingManagment.jsx';
-
+import MentorshipRelationshipsManagement from '@/components/Mentorship/MentorshipRelationshipsManagement.jsx';
 
 // Temporary Error Components (replace with your actual components)
 const ServerErrorPage = () => (
@@ -180,6 +179,10 @@ function App() {
         //     path: "/home",
         //     element: <Homepage />,
         // },
+        {
+            path : "/mentorship",
+            element: <MentorshipRelationshipsManagement />,
+        },
         {
             path: "/about",
             element: <ModernProgressTrackingManagements />,
