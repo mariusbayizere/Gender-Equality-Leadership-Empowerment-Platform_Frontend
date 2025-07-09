@@ -3,17 +3,11 @@ import { Edit, List, Trash2, User, Clock, Target, MoreVertical, AlertCircle, X, 
 import { formatDate } from './formatDate';
 import { apiService } from './api_file'; // Import the API service
 import ProgressTrackingForm from './ProgressTrackingForm'; 
-// Column definitions
-const columns = [
-  { key: 'id', label: '#ID' },
-  { key: 'user_info', label: 'User' },
-  { key: 'course_info', label: 'Course' },
-  { key: 'progress_percentage', label: 'Progress' },
-  { key: 'status', label: 'Status' },
-  { key: 'session_count', label: 'Sessions' },
-  { key: 'completion_date', label: 'Due Date' },
-  { key: 'actions', label: 'Actions' }
-];
+import { getStatusBadge, getStatusIcon } from './getStatusBadge'
+import { columns } from './columns';
+import { DeleteConfirmation } from './DeleteConfirmation'; // Import the DeleteConfirmation component
+import { MobileCard } from './MobileCard'; // Import the MobileCard component}
+
 
 // API Configuration
 const API_BASE_URL = 'http://localhost:3000/api/v1';
@@ -30,85 +24,7 @@ const API_ENDPOINTS = {
 
 
 // Delete Confirmation Modal Component
-const DeleteConfirmation = ({ isOpen, entryToDelete, onConfirm, onCancel, loading }) => {
-  useEffect(() => {
-    const handleEscape = (e) => {
-      if (e.key === 'Escape' && isOpen) {
-        onCancel();
-      }
-    };
 
-    if (isOpen) {
-      document.addEventListener('keydown', handleEscape);
-      document.body.style.overflow = 'hidden';
-    }
-
-    return () => {
-      document.removeEventListener('keydown', handleEscape);
-      document.body.style.overflow = 'unset';
-    };
-  }, [isOpen, onCancel]);
-
-  if (!isOpen) return null;
-
-  return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black bg-opacity-50">
-      <div 
-        className="bg-white rounded-2xl shadow-2xl w-full max-w-md mx-auto transform transition-all"
-        onClick={(e) => e.stopPropagation()}
-      >
-        <div className="flex items-center justify-between p-6 border-b border-gray-100">
-          <div className="flex items-center space-x-3">
-            <div className="flex-shrink-0 w-10 h-10 bg-red-100 rounded-full flex items-center justify-center">
-              <AlertCircle className="w-5 h-5 text-red-600" />
-            </div>
-            <h3 className="text-xl font-semibold text-gray-900">Delete Progress Entry</h3>
-          </div>
-          <button
-            onClick={onCancel}
-            className="text-gray-400 hover:text-gray-600 transition-colors p-1 rounded-full hover:bg-gray-100"
-            disabled={loading}
-          >
-            <X className="w-6 h-6" />
-          </button>
-        </div>
-        <div className="p-6">
-          <p className="text-gray-700 mb-2">
-            Are you sure you want to delete the progress entry for{' '}
-            <span className="font-semibold text-gray-900">
-              {entryToDelete?.user_info?.name || 'this user'}
-            </span>
-            ?
-          </p>
-          <p className="text-sm text-gray-500">This action cannot be undone.</p>
-        </div>
-        <div className="flex flex-col sm:flex-row gap-3 p-6 pt-0">
-          <button
-            onClick={() => onConfirm(entryToDelete?.id)}
-            disabled={loading}
-            className="w-full sm:flex-1 px-4 py-3 sm:py-2.5 text-white bg-red-600 rounded-xl hover:bg-red-700 transition-colors font-medium text-base sm:text-sm disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
-          >
-            {loading ? (
-              <>
-                <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
-                Deleting...
-              </>
-            ) : (
-              'Delete Entry'
-            )}
-          </button>
-          <button
-            onClick={onCancel}
-            disabled={loading}
-            className="w-full sm:flex-1 px-4 py-3 sm:py-2.5 text-gray-700 bg-gray-100 rounded-xl hover:bg-gray-200 transition-colors font-medium text-base sm:text-sm disabled:opacity-50 disabled:cursor-not-allowed"
-          >
-            Cancel
-          </button>
-        </div>
-      </div>
-    </div>
-  );
-};
 
 // Loading Component
 const LoadingSpinner = () => (
@@ -135,38 +51,6 @@ const ErrorMessage = ({ message, onRetry }) => (
   </div>
 );
 
-// Status badge helper
-const getStatusBadge = (status) => {
-  const baseClasses = "inline-flex px-3 py-1.5 text-xs font-semibold rounded-full";
-  switch (status) {
-    case 'completed':
-      return `${baseClasses} bg-green-100 text-green-700`;
-    case 'in_progress':
-      return `${baseClasses} bg-blue-100 text-blue-700`;
-    case 'not_started':
-      return `${baseClasses} bg-gray-100 text-gray-700`;
-    case 'paused':
-      return `${baseClasses} bg-yellow-100 text-yellow-700`;
-    default:
-      return `${baseClasses} bg-gray-100 text-gray-700`;
-  }
-};
-
-// Status icon helper
-const getStatusIcon = (status) => {
-  switch (status) {
-    case 'completed':
-      return <CheckCircle className="w-4 h-4 text-green-600" />;
-    case 'in_progress':
-      return <Activity className="w-4 h-4 text-blue-600" />;
-    case 'not_started':
-      return <Clock className="w-4 h-4 text-gray-600" />;
-    case 'paused':
-      return <Clock className="w-4 h-4 text-yellow-600" />;
-    default:
-      return <Activity className="w-4 h-4 text-gray-600" />;
-  }
-};
 
 // Progress bar component
 const ProgressBar = ({ percentage }) => (
@@ -181,171 +65,6 @@ const ProgressBar = ({ percentage }) => (
 
 
 // Mobile Card Component
-const MobileCard = ({ entry, index, onEdit, onDelete, onExpand, isExpanded, startIndex }) => {
-
-  const [showProgressForm, setShowProgressForm] = useState(false);
-  const [editingProgress, setEditingProgress] = useState(null);
-  const [formMode, setFormMode] = useState('create');
-
-  // Handler to open progress form for creating new progress
-  const handleCreateProgress = () => {
-    setEditingProgress(null);
-    setFormMode('create');
-    setShowProgressForm(true);
-  };
-
-  // Handler to open progress form for editing existing progress
-  const handleEditProgress = (progressData) => {
-    console.log('Mobile card edit progress data:', progressData); // Debug log
-    setEditingProgress(progressData);
-    setFormMode('update');
-    setShowProgressForm(true);
-  };
-
-  // Add handlers for mobile card
-  const handleProgressUpdated = (updatedProgress) => {
-    console.log('Mobile card progress updated:', updatedProgress);
-    setShowProgressForm(false);
-    setEditingProgress(null);
-    // You might want to call a parent function here to update the main list
-  };
-
-  const handleProgressCreated = (newProgress) => {
-    console.log('Mobile card progress created:', newProgress);
-    setShowProgressForm(false);
-    setEditingProgress(null);
-    // You might want to call a parent function here to update the main list
-  };
-
-  return (
-    <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4 hover:shadow-md transition-shadow">
-      <div className="flex items-start justify-between mb-3">
-        <div className="flex items-center space-x-3 flex-1 min-w-0">
-          <div className="w-10 h-10 bg-gradient-to-r from-blue-500 to-blue-600 rounded-full flex items-center justify-center flex-shrink-0">
-            <TrendingUp className="w-4 h-4 text-white" />
-          </div>
-          <div className="flex-1 min-w-0">
-            <h3 className="font-semibold text-gray-900 text-sm truncate">
-              {entry?.user_info?.name || 'N/A'}
-            </h3>
-            <p className="text-xs text-gray-500">ID: {startIndex + index + 1}</p>
-          </div>
-        </div>
-        <button 
-          onClick={() => onExpand?.(isExpanded ? null : entry.id)}
-          className="p-1 text-gray-400 hover:text-gray-600 flex-shrink-0"
-        >
-          <MoreVertical className="w-5 h-5" />
-        </button>
-      </div>
-
-      <div className="space-y-2 mb-3">
-        <div className="flex items-center space-x-2">
-          <User className="w-4 h-4 text-gray-400 flex-shrink-0" />
-          <span className="text-sm text-gray-600 truncate">
-            {entry?.course_info?.title || 'N/A'}
-          </span>
-        </div>
-
-        <div className="flex items-center space-x-2">
-          {getStatusIcon(entry?.status)}
-          <span className={getStatusBadge(entry?.status)}>
-            {entry?.status?.replace('_', ' ').toUpperCase() || 'N/A'}
-          </span>
-        </div>
-
-        <div className="space-y-1">
-          <div className="flex items-center justify-between">
-            <span className="text-sm text-gray-600">Progress</span>
-            <span className="text-sm font-medium text-gray-900">
-              {entry?.progress_percentage || 0}%
-            </span>
-          </div>
-          <ProgressBar percentage={entry?.progress_percentage || 0} />
-        </div>
-
-        {isExpanded && (
-          <div className="space-y-2 pt-2 border-t border-gray-100">
-            <div className="flex items-center space-x-2">
-              <BarChart className="w-4 h-4 text-gray-400 flex-shrink-0" />
-              <span className="text-sm text-gray-600">
-                {entry?.session_count || 1} sessions
-              </span>
-            </div>
-
-            <div className="flex items-center space-x-2">
-              <Calendar className="w-4 h-4 text-gray-400 flex-shrink-0" />
-              <span className="text-sm text-gray-600">
-                {/* Due: {formatDate(entry?.completion_date)} */}
-                Due {formatDate(entry?.completion_date)}
-              </span>
-            </div>
-
-            {entry?.goals && entry.goals.length > 0 && (
-              <div className="space-y-1">
-                <div className="flex items-center space-x-2">
-                  <Target className="w-4 h-4 text-gray-400 flex-shrink-0" />
-                  <span className="text-sm text-gray-600">Goals:</span>
-                </div>
-                <div className="ml-6 space-y-1">
-                  {entry.goals.slice(0, 2).map((goal, idx) => (
-                    <div key={idx} className="text-xs text-gray-500">
-                      • {goal}
-                    </div>
-                  ))}
-                  {entry.goals.length > 2 && (
-                    <div className="text-xs text-gray-400">
-                      +{entry.goals.length - 2} more
-                    </div>
-                  )}
-                </div>
-              </div>
-            )}
-
-            {entry?.feedback && (
-              <div className="space-y-1">
-                <span className="text-sm text-gray-600">Feedback:</span>
-                <p className="text-xs text-gray-500 italic">
-                  "{entry.feedback}"
-                </p>
-              </div>
-            )}
-          </div>
-        )}
-      </div>
-
-      <ProgressTrackingForm
-        showModal={showProgressForm}
-        setShowModal={setShowProgressForm}
-        onProgressCreated={handleProgressCreated}
-        onProgressUpdated={handleProgressUpdated}
-        editingProgress={editingProgress}
-        mode={formMode}
-      />
-
-      {isExpanded && (
-        <div className="flex space-x-2 pt-3 border-t border-gray-100">
-          <button
-            onClick={() => handleEditProgress(entry)} 
-            className="flex-1 bg-blue-500 hover:bg-blue-600 text-white px-3 py-2 rounded-lg text-sm font-medium transition-colors flex items-center justify-center space-x-1"
-          >
-            <Edit className="w-4 h-4" />
-            <span>Edit</span>
-          </button>
-          <button
-            onClick={() => onDelete?.(entry)}
-            className="flex-1 bg-red-500 hover:bg-red-600 text-white px-3 py-2 rounded-lg text-sm font-medium transition-colors flex items-center justify-center space-x-1"
-          >
-            <Trash2 className="w-4 h-4" />
-            <span>Delete</span>
-          </button>
-        </div>
-
-      )}
-    </div>
-  );
-};
-
 
 const ModernProgressTrackingManagement = () => {
   // State management
@@ -502,13 +221,14 @@ const ModernProgressTrackingManagement = () => {
     setShowProgressForm(true);
   };
 
-  // Handler to open progress form for editing existing progress
   const handleEditProgress = (progressData) => {
     setEditingProgress(progressData);
     setFormMode('update');
     setShowProgressForm(true);
   };
 
+
+// new one
   const handleDeleteClick = (entry) => {
     setDeleteModal({
       isOpen: true,
@@ -827,134 +547,7 @@ const ModernProgressTrackingManagement = () => {
       </div>    
 
         {/* Main Content */}
-        {/* <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
-          {viewMode === 'table' ? (
-            <>
-              <div className="overflow-x-auto">
-                <table className="w-full">
-                  <thead className="bg-gray-50 border-b border-gray-200">
-                    <tr>
-                      {columns.map((column) => (
-                        visibleColumns[column.key] && (
-                          <th
-                            key={column.key}
-                            className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider cursor-pointer hover:bg-gray-100 transition-colors"
-                            onClick={() => column.key !== 'actions' && handleSort(column.key)}
-                          >
-                            <div className="flex items-center space-x-1">
-                              <span>{column.label}</span>
-                              {column.key !== 'actions' && (
-                                <div className="flex flex-col">
-                                  <div className={`w-0 h-0 border-l-2 border-r-2 border-b-2 border-transparent border-b-gray-400 ${
-                                    sortConfig.key === column.key && sortConfig.direction === 'asc' ? 'border-b-blue-600' : ''
-                                  }`}></div>
-                                  <div className={`w-0 h-0 border-l-2 border-r-2 border-t-2 border-transparent border-t-gray-400 ${
-                                    sortConfig.key === column.key && sortConfig.direction === 'desc' ? 'border-t-blue-600' : ''
-                                  }`}></div>
-                                </div>
-                              )}
-                            </div>
-                          </th>
-                        )
-                      ))}
-                    </tr>
-                  </thead>
-                  <tbody className="bg-white divide-y divide-gray-200">
-                    {paginatedEntries.map((entry, index) => (
-                      <tr key={entry.id} className="hover:bg-gray-50 transition-colors">
-                        {visibleColumns.id && (
-                          <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                            {startIndex + index + 1}
-                          </td>
-                        )}
-                        {visibleColumns.user_info && (
-                          <td className="px-6 py-4 whitespace-nowrap">
-                            <div className="flex items-center">
-                              <div className="flex-shrink-0 h-10 w-10">
-                                <div className="h-10 w-10 rounded-full bg-gradient-to-r from-blue-500 to-blue-600 flex items-center justify-center">
-                                  <User className="h-5 w-5 text-white" />
-                                </div>
-                              </div>
-                              <div className="ml-4">
-                                <div className="text-sm font-medium text-gray-900">
-                                  {entry?.user_info?.name || 'N/A'}
-                                </div>
-                                <div className="text-sm text-gray-500">
-                                  {entry?.user_info?.email || 'N/A'}
-                                </div>
-                              </div>
-                            </div>
-                          </td>
-                        )}
-                        {visibleColumns.course_info && (
-                          <td className="px-6 py-4 whitespace-nowrap">
-                            <div className="text-sm font-medium text-gray-900">
-                              {entry?.course_info?.title || 'N/A'}
-                            </div>
-                            <div className="text-sm text-gray-500">
-                              {entry?.course_info?.type || 'N/A'}
-                            </div>
-                          </td>
-                        )}
-                        {visibleColumns.progress_percentage && (
-                          <td className="px-6 py-4 whitespace-nowrap">
-                            <div className="flex items-center">
-                              <div className="w-full bg-gray-200 rounded-full h-2.5 mr-3">
-                                <div 
-                                  className="bg-blue-600 h-2.5 rounded-full transition-all duration-500"
-                                  style={{ width: `${entry?.progress_percentage || 0}%` }}
-                                ></div>
-                              </div>
-                              <span className="text-sm font-medium text-gray-900 min-w-max">
-                                {entry?.progress_percentage || 0}%
-                              </span>
-                            </div>
-                          </td>
-                        )}
-                        {visibleColumns.status && (
-                          <td className="px-6 py-4 whitespace-nowrap">
-                            <div className="flex items-center space-x-2">
-                              {getStatusIcon(entry?.status)}
-                              <span className={getStatusBadge(entry?.status)}>
-                                {entry?.status?.replace('_', ' ').toUpperCase() || 'N/A'}
-                              </span>
-                            </div>
-                          </td>
-                        )}
-                        {visibleColumns.session_count && (
-                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                            {entry?.session_count || 0}
-                          </td>
-                        )}
-                        {visibleColumns.completion_date && (
-                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                            {formatDate(entry?.completion_date)}
-                          </td>
-                        )}
-                        {visibleColumns.actions && (
-                          <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                            <div className="flex items-center space-x-2">
-                              <button
-                                onClick={() => handleEditProgress(entry)}
-                                className="text-blue-600 hover:text-blue-800 p-1 rounded-full hover:bg-blue-50 transition-colors"
-                              >
-                                <Edit className="w-4 h-4" />
-                              </button>
-                              <button
-                                onClick={() => handleDeleteClick(entry)}
-                                className="text-red-600 hover:text-red-800 p-1 rounded-full hover:bg-red-50 transition-colors"
-                              >
-                                <Trash2 className="w-4 h-4" />
-                              </button>
-                            </div>
-                          </td>
-                        )}
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div> */}
-              <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+  <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
   {viewMode === 'table' ? (
     <>
       {/* Remove overflow-x-auto and add overflow-hidden */}
