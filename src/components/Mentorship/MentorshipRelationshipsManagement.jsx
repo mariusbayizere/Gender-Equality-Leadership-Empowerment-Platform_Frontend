@@ -3,93 +3,12 @@ import React, { useState, useEffect } from 'react';
 import { Edit, List, Trash2, User, Clock, Target, MoreVertical, AlertCircle, X, Plus, Search, RefreshCw, Grid3X3, Menu, Calendar, TrendingUp, CheckCircle, Activity, BarChart, Users, Heart } from 'lucide-react';
 import MentorshipRelationshipForm from './MentorshipRelationshipForm';
 import { apiService } from './api_route';
-// Column definitions
-const columns = [
-  { key: 'id', label: '# ID' },
-  { key: 'mentor_info', label: 'Mentor' },
-  { key: 'mentee_info', label: 'Mentee' },
-  { key: 'status', label: 'Status' },
-  { key: 'program_status', label: 'Program Status' },
-  { key: 'matching_criteria', label: 'Matching Criteria' },
-  { key: 'actions', label: 'Actions' }
-];
+import { DeleteConfirmation} from './DeleteConfirmation';
+import { columns } from './columns';
+import { getStatusBadge, getStatusIcon } from './getStatusBadge'
+import { MobileCard } from './MobileCard';
 
 
-
-// Delete Confirmation Modal Component
-const DeleteConfirmation = ({ isOpen, relationshipToDelete, onConfirm, onCancel }) => {
-  useEffect(() => {
-    const handleEscape = (e) => {
-      if (e.key === 'Escape' && isOpen) {
-        onCancel();
-      }
-    };
-
-    if (isOpen) {
-      document.addEventListener('keydown', handleEscape);
-      document.body.style.overflow = 'hidden';
-    }
-
-    return () => {
-      document.removeEventListener('keydown', handleEscape);
-      document.body.style.overflow = 'unset';
-    };
-  }, [isOpen, onCancel]);
-
-  if (!isOpen) return null;
-
-  return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black bg-opacity-50">
-      <div 
-        className="bg-white rounded-2xl shadow-2xl w-full max-w-md mx-auto transform transition-all"
-        onClick={(e) => e.stopPropagation()}
-      >
-        <div className="flex items-center justify-between p-6 border-b border-gray-100">
-          <div className="flex items-center space-x-3">
-            <div className="flex-shrink-0 w-10 h-10 bg-red-100 rounded-full flex items-center justify-center">
-              <AlertCircle className="w-5 h-5 text-red-600" />
-            </div>
-            <h3 className="text-xl font-semibold text-gray-900">Delete Mentorship Relationship</h3>
-          </div>
-          <button
-            onClick={onCancel}
-            className="text-gray-400 hover:text-gray-600 transition-colors p-1 rounded-full hover:bg-gray-100"
-          >
-            <X className="w-6 h-6" />
-          </button>
-        </div>
-        <div className="p-6">
-          <p className="text-gray-700 mb-2">
-            Are you sure you want to delete the mentorship relationship between{' '}
-            <span className="font-semibold text-gray-900">
-              {relationshipToDelete?.mentor_info?.name || 'this mentor'}
-            </span>
-            {' and '}
-            <span className="font-semibold text-gray-900">
-              {relationshipToDelete?.mentee_info?.name || 'this mentee'}
-            </span>
-            ?
-          </p>
-          <p className="text-sm text-gray-500">This action cannot be undone.</p>
-        </div>
-        <div className="flex flex-col sm:flex-row gap-3 p-6 pt-0">
-          <button
-            onClick={() => onConfirm(relationshipToDelete?.id)}
-            className="w-full sm:flex-1 px-4 py-3 sm:py-2.5 text-white bg-red-600 rounded-xl hover:bg-red-700 transition-colors font-medium text-base sm:text-sm"
-          >
-            Delete Relationship
-          </button>
-          <button
-            onClick={onCancel}
-            className="w-full sm:flex-1 px-4 py-3 sm:py-2.5 text-gray-700 bg-gray-100 rounded-xl hover:bg-gray-200 transition-colors font-medium text-base sm:text-sm"
-          >
-            Cancel
-          </button>
-        </div>
-      </div>
-    </div>
-  );
-};
 
 // Loading Component
 const LoadingSpinner = () => (
@@ -134,175 +53,9 @@ const SuccessMessage = ({ message, onClose }) => (
   </div>
 );
 
-// Status badge helper
-const getStatusBadge = (status) => {
-  const baseClasses = "inline-flex px-3 py-1.5 text-xs font-semibold rounded-full";
-  switch (status) {
-    case 'active':
-      return `${baseClasses} bg-green-100 text-green-700`;
-    case 'completed':
-      return `${baseClasses} bg-blue-100 text-blue-700`;
-    case 'paused':
-      return `${baseClasses} bg-yellow-100 text-yellow-700`;
-    default:
-      return `${baseClasses} bg-gray-100 text-gray-700`;
-  }
-};
-
-// Status icon helper
-const getStatusIcon = (status) => {
-  switch (status) {
-    case 'active':
-      return <Activity className="w-4 h-4 text-green-600" />;
-    case 'completed':
-      return <CheckCircle className="w-4 h-4 text-blue-600" />;
-    case 'paused':
-      return <Clock className="w-4 h-4 text-yellow-600" />;
-    default:
-      return <Activity className="w-4 h-4 text-gray-600" />;
-  }
-};
 
 // Mobile Card Component
-const MobileCard = ({ relationship, index, onEdit, onDelete, onExpand, isExpanded, startIndex }) => {
-  const formatDate = (dateString) => {
-    return new Date(dateString).toLocaleDateString();
-  };
 
-  const [showModal, setShowModal] = useState(false);
-  const [formMode, setFormMode] = useState('create');
-  const [editingRelationship, setEditingRelationship] = useState(null);
-
-  const handleCreateNew = () => {
-    setFormMode('create');
-    setEditingRelationship(null);
-    setShowModal(true);
-  };
-
-  const handleEdit = (relationship) => {
-    setFormMode('update');
-    setEditingRelationship(relationship);
-    setShowModal(true);
-  };
-
-  const handleRelationshipCreated = (newRelationship) => {
-    console.log('Created:', newRelationship);
-    // Handle success
-  };
-
-  const handleRelationshipUpdated = (updatedRelationship) => {
-    console.log('Updated:', updatedRelationship);
-    // Handle success
-  };
-
-  return (
-    <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4 hover:shadow-md transition-shadow">
-      <div className="flex items-start justify-between mb-3">
-        <div className="flex items-center space-x-3 flex-1 min-w-0">
-          <div className="w-10 h-10 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full flex items-center justify-center flex-shrink-0">
-            <Heart className="w-4 h-4 text-white" />
-          </div>
-          <div className="flex-1 min-w-0">
-            <h3 className="font-semibold text-gray-900 text-sm truncate">
-              {relationship?.mentor_info?.name || 'N/A'} → {relationship?.mentee_info?.name || 'N/A'}
-            </h3>
-            <p className="text-xs text-gray-500">ID: {startIndex + index + 1}</p>
-          </div>
-        </div>
-        <button 
-          onClick={() => onExpand?.(isExpanded ? null : relationship.id)}
-          className="p-1 text-gray-400 hover:text-gray-600 flex-shrink-0"
-        >
-          <MoreVertical className="w-5 h-5" />
-        </button>
-      </div>
-
-      <div className="space-y-2 mb-3">
-        <div className="flex items-center space-x-2">
-          <Users className="w-4 h-4 text-gray-400 flex-shrink-0" />
-          <span className="text-sm text-gray-600 truncate">
-            {relationship?.matching_criteria || 'N/A'}
-          </span>
-        </div>
-
-        <div className="flex items-center space-x-2">
-          {getStatusIcon(relationship?.status)}
-          <span className={getStatusBadge(relationship?.status)}>
-            {relationship?.status?.toUpperCase() || 'N/A'}
-          </span>
-        </div>
-
-        <div className="flex items-center space-x-2">
-          {getStatusIcon(relationship?.program_status)}
-          <span className={getStatusBadge(relationship?.program_status)}>
-            {relationship?.program_status?.toUpperCase() || 'N/A'}
-          </span>
-        </div>
-
-        {isExpanded && (
-          <div className="space-y-2 pt-2 border-t border-gray-100">
-            <div className="space-y-1">
-              <div className="flex items-center space-x-2">
-                <User className="w-4 h-4 text-gray-400 flex-shrink-0" />
-                <span className="text-sm text-gray-600">Mentor Details:</span>
-              </div>
-              <div className="ml-6 space-y-1">
-                <div className="text-xs text-gray-500">
-                  {relationship?.mentor_info?.email || 'N/A'}
-                </div>
-                <div className="text-xs text-gray-500">
-                  {relationship?.mentor_info?.expertise || 'N/A'}
-                </div>
-              </div>
-            </div>
-
-            <div className="space-y-1">
-              <div className="flex items-center space-x-2">
-                <User className="w-4 h-4 text-gray-400 flex-shrink-0" />
-                <span className="text-sm text-gray-600">Mentee Details:</span>
-              </div>
-              <div className="ml-6 space-y-1">
-                <div className="text-xs text-gray-500">
-                  {relationship?.mentee_info?.email || 'N/A'}
-                </div>
-                <div className="text-xs text-gray-500">
-                  {relationship?.mentee_info?.level || 'N/A'}
-                </div>
-              </div>
-            </div>
-          </div>
-        )}
-      </div>
-        <MentorshipRelationshipForm
-        showModal={showModal}
-        setShowModal={setShowModal}
-        onRelationshipCreated={handleRelationshipCreated}
-        onRelationshipUpdated={handleRelationshipUpdated}
-        editingRelationship={editingRelationship}
-        mode={formMode}/>
-
-      {isExpanded && (
-        <div className="flex space-x-2 pt-3 border-t border-gray-100">
-          <button
-            // onClick={() => onEdit?.(relationship)}
-            onClick={() => handleEdit(relationship)}
-            className="flex-1 bg-blue-500 hover:bg-blue-600 text-white px-3 py-2 rounded-lg text-sm font-medium transition-colors flex items-center justify-center space-x-1"
-          >
-            <Edit className="w-4 h-4" />
-            <span>Edit</span>
-          </button>
-          <button
-            onClick={() => onDelete?.(relationship)}
-            className="flex-1 bg-red-500 hover:bg-red-600 text-white px-3 py-2 rounded-lg text-sm font-medium transition-colors flex items-center justify-center space-x-1"
-          >
-            <Trash2 className="w-4 h-4" />
-            <span>Delete</span>
-          </button>
-        </div>
-      )}
-    </div>
-  );
-};
 
 const MentorshipRelationshipsManagement = () => {
 
@@ -797,150 +550,164 @@ const MentorshipRelationshipsManagement = () => {
           </div>   
 
         {/* Main Content */}
-        <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
-          {viewMode === 'table' ? (
-            /* Table View */
-            <div className="overflow-x-auto">
-              <table className="w-full">
-                <thead className="bg-gray-50 border-b border-gray-200">
-                  <tr>
-                    {columns.map((column) => (
-                      visibleColumns[column.key] && (
-                        <th
-                          key={column.key}
-                          className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100 transition-colors"
-                          onClick={() => column.key !== 'actions' && handleSort(column.key)}
-                        >
-                          <div className="flex items-center space-x-1">
-                            <span>{column.label}</span>
-                            {column.key !== 'actions' && (
-                              <div className="flex flex-col">
-                                <div className={`w-0 h-0 border-l-2 border-r-2 border-b-2 border-transparent border-b-gray-400 ${
-                                  sortConfig.key === column.key && sortConfig.direction === 'asc' ? 'border-b-blue-600' : ''
-                                }`} />
-                                <div className={`w-0 h-0 border-l-2 border-r-2 border-t-2 border-transparent border-t-gray-400 ${
-                                  sortConfig.key === column.key && sortConfig.direction === 'desc' ? 'border-t-blue-600' : ''
-                                }`} />
-                              </div>
-                            )}
-                          </div>
-                        </th>
-                      )
-                    ))}
-                  </tr>
-                </thead>
-                <tbody className="bg-white divide-y divide-gray-200">
-                  {paginatedRelationships.map((relationship, index) => (
-                    <tr key={relationship.id} className="hover:bg-gray-50 transition-colors">
-                      {visibleColumns.id && (
-                        <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                          {startIndex + index + 1}
-                        </td>
+
+<div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+  {viewMode === 'table' ? (
+    <>
+      {/* Remove overflow-x-auto and add overflow-hidden */}
+      <div className="overflow-hidden">
+        <table className="w-full table-fixed"> {/* Add table-fixed for consistent column widths */}
+          <thead className="bg-gray-50 border-b border-gray-200">
+            <tr>
+              {columns.map((column) => (
+                visibleColumns[column.key] && (
+                  <th
+                    key={column.key}
+                    className={`px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider cursor-pointer hover:bg-gray-100 transition-colors ${
+                      // Add specific widths for each column
+                      column.key === 'id' ? 'w-16' :
+                      column.key === 'mentor_info' ? 'w-64' :
+                      column.key === 'mentee_info' ? 'w-64' :
+                      column.key === 'status' ? 'w-32' :
+                      column.key === 'program_status' ? 'w-32' :
+                      column.key === 'matching_criteria' ? 'w-48' :
+                      column.key === 'actions' ? 'w-24' : 'w-auto'
+                    }`}
+                    onClick={() => column.key !== 'actions' && handleSort(column.key)}
+                  >
+                    <div className="flex items-center space-x-1">
+                      <span className="truncate">{column.label}</span>
+                      {column.key !== 'actions' && (
+                        <div className="flex flex-col">
+                          <div className={`w-0 h-0 border-l-2 border-r-2 border-b-2 border-transparent border-b-gray-400 ${
+                            sortConfig.key === column.key && sortConfig.direction === 'asc' ? 'border-b-blue-600' : ''
+                          }`} />
+                          <div className={`w-0 h-0 border-l-2 border-r-2 border-t-2 border-transparent border-t-gray-400 ${
+                            sortConfig.key === column.key && sortConfig.direction === 'desc' ? 'border-t-blue-600' : ''
+                          }`} />
+                        </div>
                       )}
-                      {visibleColumns.mentor_info && (
-                        <td className="px-6 py-4 whitespace-nowrap">
-                          <div className="flex items-center">
-                            <div className="flex-shrink-0 h-10 w-10">
-                              <div className="h-10 w-10 rounded-full bg-blue-100 flex items-center justify-center">
-                                <User className="h-5 w-5 text-blue-600" />
-                              </div>
-                            </div>
-                            <div className="ml-4">
-                              <div className="text-sm font-medium text-gray-900">
-                                {relationship.mentor_info?.name || 'N/A'}
-                              </div>
-                              <div className="text-sm text-gray-500">
-                                {relationship.mentor_info?.email || 'N/A'}
-                              </div>
-                            </div>
-                          </div>
-                        </td>
-                      )}
-                      {visibleColumns.mentee_info && (
-                        <td className="px-6 py-4 whitespace-nowrap">
-                          <div className="flex items-center">
-                            <div className="flex-shrink-0 h-10 w-10">
-                              <div className="h-10 w-10 rounded-full bg-green-100 flex items-center justify-center">
-                                <User className="h-5 w-5 text-green-600" />
-                              </div>
-                            </div>
-                            <div className="ml-4">
-                              <div className="text-sm font-medium text-gray-900">
-                                {relationship.mentee_info?.name || 'N/A'}
-                              </div>
-                              <div className="text-sm text-gray-500">
-                                {relationship.mentee_info?.email || 'N/A'}
-                              </div>
-                            </div>
-                          </div>
-                        </td>
-                      )}
-                      {visibleColumns.status && (
-                        <td className="px-6 py-4 whitespace-nowrap">
-                          <span className={getStatusBadge(relationship.status)}>
-                            {relationship.status?.toUpperCase() || 'N/A'}
-                          </span>
-                        </td>
-                      )}
-                      {visibleColumns.program_status && (
-                        <td className="px-6 py-4 whitespace-nowrap">
-                          <span className={getStatusBadge(relationship.program_status)}>
-                            {relationship.program_status?.toUpperCase() || 'N/A'}
-                          </span>
-                        </td>
-                      )}
-                      {visibleColumns.matching_criteria && (
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                          {relationship.matching_criteria || 'N/A'}
-                        </td>
-                      )}
-                      {visibleColumns.actions && (
-                        <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                          <div className="flex items-center space-x-2">
-                            <button
-                              onClick={() => handleEdit(relationship)}
-                              className="text-blue-600 hover:text-blue-900 p-1 rounded-full hover:bg-blue-50 transition-colors"
-                              title="Edit"
-                            >
-                              <Edit className="w-4 h-4" />
-                            </button>
-                            <button
-                              onClick={() => handleDeleteClick(relationship)}
-                              className="text-red-600 hover:text-red-900 p-1 rounded-full hover:bg-red-50 transition-colors"
-                              title="Delete"
-                            >
-                              <Trash2 className="w-4 h-4" />
-                            </button>
-                          </div>
-                        </td>
-                      )}
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          ) : (
-            /* Cards View */
-            <div className="p-4 sm:p-6">
-              <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-                {paginatedRelationships.map((relationship, index) => (
-                  <MobileCard
-                    key={relationship.id}
-                    relationship={relationship}
-                    index={index}
-                    startIndex={startIndex}
-                    onEdit={handleEdit}
-                    onDelete={handleDeleteClick}
-                    onExpand={setExpandedCard}
-                    isExpanded={expandedCard === relationship.id}
-                  />
-                ))}
-              </div>
-            </div>
-          )}
-          
-          <PaginationControls />
-        </div>
+                    </div>
+                  </th>
+                )
+              ))}
+            </tr>
+          </thead>
+          <tbody className="bg-white divide-y divide-gray-200">
+            {paginatedRelationships.map((relationship, index) => (
+              <tr key={relationship.id} className="hover:bg-gray-50 transition-colors">
+                {visibleColumns.id && (
+                  <td className="px-6 py-4 text-sm font-medium text-gray-900 truncate">
+                    {startIndex + index + 1}
+                  </td>
+                )}
+                {visibleColumns.mentor_info && (
+                  <td className="px-6 py-4">
+                    <div className="flex items-center">
+                      <div className="flex-shrink-0 h-10 w-10">
+                        <div className="h-10 w-10 rounded-full bg-blue-100 flex items-center justify-center">
+                          <User className="h-5 w-5 text-blue-600" />
+                        </div>
+                      </div>
+                      <div className="ml-4 min-w-0 flex-1">
+                        <div className="text-sm font-medium text-gray-900 truncate">
+                          {relationship.mentor_info?.name || 'N/A'}
+                        </div>
+                        <div className="text-sm text-gray-500 truncate">
+                          {relationship.mentor_info?.email || 'N/A'}
+                        </div>
+                      </div>
+                    </div>
+                  </td>
+                )}
+                {visibleColumns.mentee_info && (
+                  <td className="px-6 py-4">
+                    <div className="flex items-center">
+                      <div className="flex-shrink-0 h-10 w-10">
+                        <div className="h-10 w-10 rounded-full bg-green-100 flex items-center justify-center">
+                          <User className="h-5 w-5 text-green-600" />
+                        </div>
+                      </div>
+                      <div className="ml-4 min-w-0 flex-1">
+                        <div className="text-sm font-medium text-gray-900 truncate">
+                          {relationship.mentee_info?.name || 'N/A'}
+                        </div>
+                        <div className="text-sm text-gray-500 truncate">
+                          {relationship.mentee_info?.email || 'N/A'}
+                        </div>
+                      </div>
+                    </div>
+                  </td>
+                )}
+                {visibleColumns.status && (
+                  <td className="px-6 py-4">
+                    <span className={`inline-flex px-2 py-1 text-xs font-medium rounded-full truncate ${getStatusBadge(relationship.status)}`}>
+                      {relationship.status?.toUpperCase() || 'N/A'}
+                    </span>
+                  </td>
+                )}
+                {visibleColumns.program_status && (
+                  <td className="px-6 py-4">
+                    <span className={`inline-flex px-2 py-1 text-xs font-medium rounded-full truncate ${getStatusBadge(relationship.program_status)}`}>
+                      {relationship.program_status?.toUpperCase() || 'N/A'}
+                    </span>
+                  </td>
+                )}
+                {visibleColumns.matching_criteria && (
+                  <td className="px-6 py-4 text-sm text-gray-900">
+                    <div className="truncate" title={relationship.matching_criteria || 'N/A'}>
+                      {relationship.matching_criteria || 'N/A'}
+                    </div>
+                  </td>
+                )}
+                {visibleColumns.actions && (
+                  <td className="px-6 py-4 text-sm font-medium">
+                    <div className="flex items-center space-x-2">
+                      <button
+                        onClick={() => handleEdit(relationship)}
+                        className="text-blue-600 hover:text-blue-900 p-1 rounded-full hover:bg-blue-50 transition-colors"
+                        title="Edit"
+                      >
+                        <Edit className="w-4 h-4" />
+                      </button>
+                      <button
+                        onClick={() => handleDeleteClick(relationship)}
+                        className="text-red-600 hover:text-red-900 p-1 rounded-full hover:bg-red-50 transition-colors"
+                        title="Delete"
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </button>
+                    </div>
+                  </td>
+                )}
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </>
+  ) : (
+    <div className="p-4 sm:p-6">
+      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        {paginatedRelationships.map((relationship, index) => (
+          <MobileCard
+            key={relationship.id}
+            relationship={relationship}
+            index={index}
+            startIndex={startIndex}
+            onEdit={handleEdit}
+            onDelete={handleDeleteClick}
+            onExpand={setExpandedCard}
+            isExpanded={expandedCard === relationship.id}
+          />
+        ))}
+      </div>
+    </div>
+  )}
+  
+  <PaginationControls />
+</div>
+
       </div>
     <MentorshipRelationshipForm
         showModal={showModal}
