@@ -32,6 +32,7 @@ import Login from "@/components/Authantication/Login";
 import ModernTrainingCourseManagement from '@/components/TrainingCourse/ModernTrainingCourseManagement.jsx';
 import ModernProgressTrackingManagements from '@/components/Progress_Tracking/progress_trackingManagment.jsx';
 import MentorshipRelationshipsManagement from '@/components/Mentorship/MentorshipRelationshipsManagement.jsx';
+import NetworkConnectionsManagement from '@/components/NetworkConnections/NetworkConnectionsManagement.jsx';
 
 // Temporary Error Components (replace with your actual components)
 const ServerErrorPage = () => (
@@ -179,6 +180,10 @@ function App() {
         //     path: "/home",
         //     element: <Homepage />,
         // },
+        {
+            path: "/connections",
+            element: <NetworkConnectionsManagement />,
+        },
         {
             path : "/mentorship",
             element: <MentorshipRelationshipsManagement />,
