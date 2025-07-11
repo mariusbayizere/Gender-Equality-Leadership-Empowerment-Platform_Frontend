@@ -1,3 +1,496 @@
+// import React, { useState, useEffect } from 'react';
+// import { Edit, List, Trash2, Users, User, Clock, Hash, MoreVertical, AlertCircle, X, Plus, Search, RefreshCw, Grid3X3, Menu, Calendar, UserPlus, UserCheck, UserX, MessageSquare, CheckCircle, XCircle, Shield } from 'lucide-react';
+
+// // Connection Status Constants
+// const CONNECTION_STATUS = {
+//   PENDING: 'pending',
+//   ACCEPTED: 'accepted',
+//   REJECTED: 'rejected',
+//   BLOCKED: 'blocked'
+// };
+
+// // Column definitions
+// const columns = [
+//   { key: 'id', label: '# ID' },
+//   { key: 'requester_name', label: 'Requester' },
+//   { key: 'recipient_name', label: 'Recipient' },
+//   { key: 'status', label: 'Status' },
+//   { key: 'message', label: 'Message' },
+//   { key: 'created_date', label: 'Created' },
+//   { key: 'actions', label: 'Actions' }
+// ];
+
+// // API Configuration
+// const API_BASE_URL = 'http://localhost:3000/api/v1';
+// const API_ENDPOINTS = {
+//   networks: `${API_BASE_URL}/connections`,
+//   allNetworks: `${API_BASE_URL}/connections/all`,
+//   networkById: (id) => `${API_BASE_URL}/connections/${id}`,
+//   userById: (id) => `${API_BASE_URL}/users/${id}` 
+// };
+
+// // API Service functions
+// const apiService = {
+//   // Get auth token
+//   getAuthToken: () => {
+//     return localStorage.getItem('token') || '';
+//   },
+
+//   // Get headers with auth
+//   getHeaders: () => ({
+//     'Content-Type': 'application/json',
+//     'Authorization': `Bearer ${apiService.getAuthToken()}`
+//   }),
+
+//   // Fetch all networks
+//   fetchNetworks: async () => {
+//     try {
+//       const response = await fetch(API_ENDPOINTS.allNetworks, {
+//         method: 'GET',
+//         headers: apiService.getHeaders()
+//       });
+      
+//       if (!response.ok) {
+//         throw new Error(`HTTP error! status: ${response.status}`);
+//       }
+      
+//       const data = await response.json();
+//       return data;
+//     } catch (error) {
+//       console.error('Error fetching networks:', error);
+//       throw error;
+//     }
+//   },
+
+//   fetchUserById: async (userId) => {
+//     try {
+//       const response = await fetch(API_ENDPOINTS.userById(userId), {
+//         method: 'GET',
+//         headers: apiService.getHeaders()
+//       });
+      
+//       if (!response.ok) {
+//         throw new Error(`HTTP error! status: ${response.status}`);
+//       }
+      
+//       const userData = await response.json();
+//       return userData;
+//     } catch (error) {
+//       console.error('Error fetching user:', error);
+//       return null;
+//     }
+//   },
+
+//   fetchUsersByIds: async (userIds) => {
+//     try {
+//       const uniqueIds = [...new Set(userIds)]; // Remove duplicates
+//       const userPromises = uniqueIds.map(id => apiService.fetchUserById(id));
+//       const users = await Promise.all(userPromises);
+      
+//       // Create a map of userId -> user data
+//       const userMap = {};
+//       users.forEach((user, index) => {
+//         if (user) {
+//           userMap[uniqueIds[index]] = user;
+//         }
+//       });
+      
+//       return userMap;
+//     } catch (error) {
+//       console.error('Error fetching users:', error);
+//       return {};
+//     }
+//   },
+
+//   // Delete network connection
+//   deleteConnection: async (connectionId) => {
+//     try {
+//       const response = await fetch(API_ENDPOINTS.networkById(connectionId), {
+//         method: 'DELETE',
+//         headers: apiService.getHeaders()
+//       });
+      
+//       if (!response.ok) {
+//         throw new Error(`HTTP error! status: ${response.status}`);
+//       }
+      
+//       return true;
+//     } catch (error) {
+//       console.error('Error deleting connection:', error);
+//       throw error;
+//     }
+//   },
+
+//   // Update connection status
+//   updateConnectionStatus:  async (connectionId, status) => {
+//     try {
+//       const response = await fetch(API_ENDPOINTS.networkById(connectionId), {
+//         method: 'PATCH',
+//         headers: apiService.getHeaders(),
+//         body: JSON.stringify({ status })
+//       });
+      
+//       if (!response.ok) {
+//         throw new Error(`HTTP error! status: ${response.status}`);
+//       }
+      
+//       return await response.json();
+//     } catch (error) {
+//       console.error('Error updating connection status:', error);
+//       throw error;
+//     }
+//   }
+// };
+
+// // Format date helper
+// // const formatDate = (dateString) => {
+// //   if (!dateString) return 'N/A';
+// //   return new Date(dateString).toLocaleDateString();
+// // };
+// const formatDate = (dateValue) => {
+//   if (!dateValue) return 'N/A';
+
+//   try {
+//     // Handle Firestore timestamp objects
+//     if (typeof dateValue === 'object' && dateValue._seconds !== undefined) {
+//       const millis = dateValue._seconds * 1000 + Math.floor((dateValue._nanoseconds || 0) / 1e6);
+//       return new Date(millis).toLocaleDateString();
+//     }
+
+//     // Handle Firestore timestamp objects with toDate method
+//     if (typeof dateValue === 'object' && typeof dateValue.toDate === 'function') {
+//       return dateValue.toDate().toLocaleDateString();
+//     }
+
+//     // Handle Date objects
+//     if (dateValue instanceof Date) {
+//       return dateValue.toLocaleDateString();
+//     }
+
+//     // Handle ISO string dates (your case)
+//     if (typeof dateValue === 'string') {
+//       const date = new Date(dateValue);
+//       return isNaN(date.getTime()) ? 'Invalid Date' : date.toLocaleDateString();
+//     }
+
+//     // Handle timestamp numbers
+//     if (typeof dateValue === 'number') {
+//       return new Date(dateValue).toLocaleDateString();
+//     }
+
+//     return 'N/A';
+//   } catch (error) {
+//     console.error('Error formatting date:', error);
+//     return 'Invalid Date';
+//   }
+// };
+
+
+
+
+// // Delete Confirmation Modal Component
+// const DeleteConfirmation = ({ isOpen, connectionToDelete, onConfirm, onCancel }) => {
+//   useEffect(() => {
+//     const handleEscape = (e) => {
+//       if (e.key === 'Escape' && isOpen) {
+//         onCancel();
+//       }
+//     };
+
+//     if (isOpen) {
+//       document.addEventListener('keydown', handleEscape);
+//       document.body.style.overflow = 'hidden';
+//     }
+
+//     return () => {
+//       document.removeEventListener('keydown', handleEscape);
+//       document.body.style.overflow = 'unset';
+//     };
+//   }, [isOpen, onCancel]);
+
+//   if (!isOpen) return null;
+
+//   return (
+//     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black bg-opacity-50">
+//       <div 
+//         className="bg-white rounded-2xl shadow-2xl w-full max-w-md mx-auto transform transition-all"
+//         onClick={(e) => e.stopPropagation()}
+//       >
+//         <div className="flex items-center justify-between p-6 border-b border-gray-100">
+//           <div className="flex items-center space-x-3">
+//             <div className="flex-shrink-0 w-10 h-10 bg-red-100 rounded-full flex items-center justify-center">
+//               <AlertCircle className="w-5 h-5 text-red-600" />
+//             </div>
+//             <h3 className="text-xl font-semibold text-gray-900">Remove Connection</h3>
+//           </div>
+//           <button
+//             onClick={onCancel}
+//             className="text-gray-400 hover:text-gray-600 transition-colors p-1 rounded-full hover:bg-gray-100"
+//           >
+//             <X className="w-6 h-6" />
+//           </button>
+//         </div>
+//         <div className="p-6">
+//           <p className="text-gray-700 mb-2">
+//             Are you sure you want to remove the connection between{' '}
+//             <span className="font-semibold text-gray-900">
+//               {connectionToDelete?.requester_name || 'User'}
+//             </span>
+//             {' and '}
+//             <span className="font-semibold text-gray-900">
+//               {connectionToDelete?.recipient_name || 'User'}
+//             </span>
+//             ?
+//           </p>
+//           <p className="text-sm text-gray-500">This action cannot be undone.</p>
+//         </div>
+//         <div className="flex flex-col sm:flex-row gap-3 p-6 pt-0">
+//           <button
+//             onClick={() => onConfirm(connectionToDelete?.id)}
+//             className="w-full sm:flex-1 px-4 py-3 sm:py-2.5 text-white bg-red-600 rounded-xl hover:bg-red-700 transition-colors font-medium text-base sm:text-sm"
+//           >
+//             Remove Connection
+//           </button>
+//           <button
+//             onClick={onCancel}
+//             className="w-full sm:flex-1 px-4 py-3 sm:py-2.5 text-gray-700 bg-gray-100 rounded-xl hover:bg-gray-200 transition-colors font-medium text-base sm:text-sm"
+//           >
+//             Cancel
+//           </button>
+//         </div>
+//       </div>
+//     </div>
+//   );
+// };
+
+// // Loading Component
+// const LoadingSpinner = () => (
+//   <div className="flex items-center justify-center p-8">
+//     <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+//   </div>
+// );
+
+// // Error Component
+// const ErrorMessage = ({ message, onRetry }) => (
+//   <div className="bg-red-50 border border-red-200 rounded-lg p-4 m-4">
+//     <div className="flex items-center">
+//       <AlertCircle className="w-5 h-5 text-red-600 mr-2" />
+//       <p className="text-red-800">{message}</p>
+//     </div>
+//     {onRetry && (
+//       <button
+//         onClick={onRetry}
+//         className="mt-2 bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg text-sm"
+//       >
+//         Try Again
+//       </button>
+//     )}
+//   </div>
+// );
+
+// // Status icon helper
+// const getStatusIcon = (status) => {
+//   switch (status) {
+//     case CONNECTION_STATUS.PENDING:
+//       return <Clock className="w-4 h-4 text-yellow-600" />;
+//     case CONNECTION_STATUS.ACCEPTED:
+//       return <CheckCircle className="w-4 h-4 text-green-600" />;
+//     case CONNECTION_STATUS.REJECTED:
+//       return <XCircle className="w-4 h-4 text-red-600" />;
+//     case CONNECTION_STATUS.BLOCKED:
+//       return <Shield className="w-4 h-4 text-gray-600" />;
+//     default:
+//       return <Clock className="w-4 h-4 text-gray-600" />;
+//   }
+// };
+
+// // Status badge helper
+// const getStatusBadge = (status) => {
+//   const baseClasses = "inline-flex px-3 py-1.5 text-xs font-semibold rounded-full";
+//   switch (status) {
+//     case CONNECTION_STATUS.PENDING:
+//       return `${baseClasses} bg-yellow-100 text-yellow-700`;
+//     case CONNECTION_STATUS.ACCEPTED:
+//       return `${baseClasses} bg-green-100 text-green-700`;
+//     case CONNECTION_STATUS.REJECTED:
+//       return `${baseClasses} bg-red-100 text-red-700`;
+//     case CONNECTION_STATUS.BLOCKED:
+//       return `${baseClasses} bg-gray-100 text-gray-700`;
+//     default:
+//       return `${baseClasses} bg-gray-100 text-gray-700`;
+//   }
+// };
+
+// // Mobile Card Component
+// const MobileCard = ({ connection, index, onEdit, onDelete, onExpand, isExpanded, startIndex }) => {
+
+
+//   const [connections, setConnections] = useState([]);
+//   const [usersData, setUsersData] = useState({}); 
+//   const [itemsPerPage] = useState(8);
+
+//     const fetchConnections = async () => {
+//     try {
+//       setLoading(true);
+//       setError(null);
+//       const data = await apiService.fetchNetworks();
+//       setConnections(data);
+      
+//       // Extract unique user IDs from connections
+//       const userIds = [];
+//       data.forEach(connection => {
+//         if (connection.requester_id) userIds.push(connection.requester_id);
+//         if (connection.recipient_id) userIds.push(connection.recipient_id);
+//       });
+      
+//       // Fetch user data for all unique IDs
+//       if (userIds.length > 0) {
+//         const userData = await apiService.fetchUsersByIds(userIds);
+//         // setUsersData(userData);
+//         const userArray = Object.values(userData);
+//         setUsersData(userArray); 
+//       }
+//     } catch (error) {
+//       setError(`Failed to fetch connections: ${error.message}`);
+//       setConnections([]);
+//     } finally {
+//       setLoading(false);
+//     }
+//   };
+
+// const getUserName = (userId) => {
+//   console.log("the User id is received", userId);
+//   // Make sure usersData is an array before using .find()
+//   if (!Array.isArray(usersData)) {
+//     console.error("usersData is not an array:", usersData);
+//     return 'Unknown User';
+//   }
+//   const user = usersData.find(user => user.id === userId);
+//   console.log("the User is found", user);
+//   if (user) {
+//     return `${user.firstName} ${user.lastName}`;
+//   }
+//   return 'Unknown User';
+// };
+
+//   const toggleColumn = (key) => {
+//     setVisibleColumns(prev => ({
+//       ...prev,
+//       [key]: !prev[key]
+//     }));
+//   };
+
+//   const handleSort = (key) => {
+//     let direction = 'asc';
+//     if (sortConfig.key === key && sortConfig.direction === 'asc') {
+//       direction = 'desc';
+//     }
+//     setSortConfig({ key, direction });
+
+//     const sorted = [...filteredConnections].sort((a, b) => {
+//       if (a[key] < b[key]) return direction === 'asc' ? -1 : 1;
+//       if (a[key] > b[key]) return direction === 'asc' ? 1 : -1;
+//       return 0;
+//     });
+//     setFilteredConnections(sorted);
+//   };
+
+
+
+
+//   return (
+//     <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4 hover:shadow-md transition-shadow">
+//       <div className="flex items-start justify-between mb-3">
+//         <div className="flex items-center space-x-3 flex-1 min-w-0">
+//           <div className="w-10 h-10 bg-gradient-to-r from-blue-500 to-blue-600 rounded-full flex items-center justify-center flex-shrink-0">
+//             <Users className="w-4 h-4 text-white" />
+//           </div>
+//           <div className="flex-1 min-w-0">
+//             <h3 className="font-semibold text-gray-900 text-sm truncate">
+//               {connection?.requester_name || 'Unknown'} → {connection?.recipient_name || 'Unknown'}
+//             </h3>
+//             <p className="text-xs text-gray-500">ID: {startIndex + index + 1}</p>
+//           </div>
+//         </div>
+//         <button 
+//           onClick={() => onExpand?.(isExpanded ? null : connection.id)}
+//           className="p-1 text-gray-400 hover:text-gray-600 flex-shrink-0"
+//         >
+//           <MoreVertical className="w-5 h-5" />
+//         </button>
+//       </div>
+
+//       <div className="space-y-2 mb-3">
+//         <div className="flex items-center space-x-2">
+//           {getStatusIcon(connection?.status)}
+//           <span className={getStatusBadge(connection?.status)}>
+//             {connection?.status?.charAt(0).toUpperCase() + connection?.status?.slice(1) || 'N/A'}
+//           </span>
+//         </div>
+
+//         {isExpanded && (
+//           <div className="space-y-2 pt-2 border-t border-gray-100">
+//             <div className="flex items-center space-x-2">
+//               <User className="w-4 h-4 text-gray-400 flex-shrink-0" />
+//               <span className="text-sm text-gray-600">
+//                 {/* From: {connection?.requester_name || 'N/A'} */}
+//                 From: {getUserName(connection?.requester_id) || 'N/A'}
+//               </span>
+//             </div>
+
+//             <div className="flex items-center space-x-2">
+//               <User className="w-4 h-4 text-gray-400 flex-shrink-0" />
+//               <span className="text-sm text-gray-600">
+//                 {/* To: {connection?.recipient_name || 'N/A'} */}
+//                  To: {getUserName(connection?.recipient_id) || 'N/A'}
+                
+//               </span>
+//             </div>
+
+//             {connection?.message && (
+//               <div className="flex items-start space-x-2">
+//                 <MessageSquare className="w-4 h-4 text-gray-400 flex-shrink-0 mt-0.5" />
+//                 <span className="text-sm text-gray-600">
+//                   {connection.message}
+//                 </span>
+//               </div>
+//             )}
+
+//             {connection?.created_date && (
+//               <div className="flex items-center space-x-2">
+//                 <Calendar className="w-4 h-4 text-gray-400 flex-shrink-0" />
+//                 <span className="text-sm text-gray-600">
+//                   {/* {formatDate(connection.created_date)} */}
+//                   {formatDate(connection.createdAt) || '7/1/2025'}
+//                 </span>
+//               </div>
+//             )}
+//           </div>
+//         )}
+//       </div>
+
+//       {isExpanded && (
+//         <div className="flex space-x-2 pt-3 border-t border-gray-100">
+//           <button
+//             onClick={() => onEdit?.(connection)}
+//             className="flex-1 bg-blue-500 hover:bg-blue-600 text-white px-3 py-2 rounded-lg text-sm font-medium transition-colors flex items-center justify-center space-x-1"
+//           >
+//             <Edit className="w-4 h-4" />
+//             <span>Edit</span>
+//           </button>
+//           <button
+//             onClick={() => onDelete?.(connection)}
+//             className="flex-1 bg-red-500 hover:bg-red-600 text-white px-3 py-2 rounded-lg text-sm font-medium transition-colors flex items-center justify-center space-x-1"
+//           >
+//             <Trash2 className="w-4 h-4" />
+//             <span>Remove</span>
+//           </button>
+//         </div>
+//       )}
+//     </div>
+//   );
+// };
+
 import React, { useState, useEffect } from 'react';
 import { Edit, List, Trash2, Users, User, Clock, Hash, MoreVertical, AlertCircle, X, Plus, Search, RefreshCw, Grid3X3, Menu, Calendar, UserPlus, UserCheck, UserX, MessageSquare, CheckCircle, XCircle, Shield } from 'lucide-react';
 
@@ -25,7 +518,8 @@ const API_BASE_URL = 'http://localhost:3000/api/v1';
 const API_ENDPOINTS = {
   networks: `${API_BASE_URL}/connections`,
   allNetworks: `${API_BASE_URL}/connections/all`,
-  networkById: (id) => `${API_BASE_URL}/connections/${id}`
+  networkById: (id) => `${API_BASE_URL}/connections/${id}`,
+  userById: (id) => `${API_BASE_URL}/users/${id}` 
 };
 
 // API Service functions
@@ -58,6 +552,46 @@ const apiService = {
     } catch (error) {
       console.error('Error fetching networks:', error);
       throw error;
+    }
+  },
+
+  fetchUserById: async (userId) => {
+    try {
+      const response = await fetch(API_ENDPOINTS.userById(userId), {
+        method: 'GET',
+        headers: apiService.getHeaders()
+      });
+      
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      
+      const userData = await response.json();
+      return userData;
+    } catch (error) {
+      console.error('Error fetching user:', error);
+      return null;
+    }
+  },
+
+  fetchUsersByIds: async (userIds) => {
+    try {
+      const uniqueIds = [...new Set(userIds)]; // Remove duplicates
+      const userPromises = uniqueIds.map(id => apiService.fetchUserById(id));
+      const users = await Promise.all(userPromises);
+      
+      // Create a map of userId -> user data
+      const userMap = {};
+      users.forEach((user, index) => {
+        if (user) {
+          userMap[uniqueIds[index]] = user;
+        }
+      });
+      
+      return userMap;
+    } catch (error) {
+      console.error('Error fetching users:', error);
+      return {};
     }
   },
 
@@ -102,9 +636,42 @@ const apiService = {
 };
 
 // Format date helper
-const formatDate = (dateString) => {
-  if (!dateString) return 'N/A';
-  return new Date(dateString).toLocaleDateString();
+const formatDate = (dateValue) => {
+  if (!dateValue) return 'N/A';
+
+  try {
+    // Handle Firestore timestamp objects
+    if (typeof dateValue === 'object' && dateValue._seconds !== undefined) {
+      const millis = dateValue._seconds * 1000 + Math.floor((dateValue._nanoseconds || 0) / 1e6);
+      return new Date(millis).toLocaleDateString();
+    }
+
+    // Handle Firestore timestamp objects with toDate method
+    if (typeof dateValue === 'object' && typeof dateValue.toDate === 'function') {
+      return dateValue.toDate().toLocaleDateString();
+    }
+
+    // Handle Date objects
+    if (dateValue instanceof Date) {
+      return dateValue.toLocaleDateString();
+    }
+
+    // Handle ISO string dates (your case)
+    if (typeof dateValue === 'string') {
+      const date = new Date(dateValue);
+      return isNaN(date.getTime()) ? 'Invalid Date' : date.toLocaleDateString();
+    }
+
+    // Handle timestamp numbers
+    if (typeof dateValue === 'number') {
+      return new Date(dateValue).toLocaleDateString();
+    }
+
+    return 'N/A';
+  } catch (error) {
+    console.error('Error formatting date:', error);
+    return 'Invalid Date';
+  }
 };
 
 // Delete Confirmation Modal Component
@@ -240,8 +807,37 @@ const getStatusBadge = (status) => {
   }
 };
 
-// Mobile Card Component
-const MobileCard = ({ connection, index, onEdit, onDelete, onExpand, isExpanded, startIndex }) => {
+// FIXED: Updated getUserName function to match your working version
+const getUserName = (userId, usersData) => {
+  console.log("the User id is received", userId);
+  console.log("usersData:", usersData);
+  
+  // Make sure usersData is an array before using .find()
+  if (!Array.isArray(usersData)) {
+    console.error("usersData is not an array:", usersData);
+    return 'Unknown User';
+  }
+  
+  const user = usersData.find(user => user.id === userId);
+  console.log("the User is found", user);
+  
+  if (user) {
+    return `${user.firstName} ${user.lastName}`;
+  }
+  return 'Unknown User';
+};
+
+// Mobile Card Component - Fixed version
+const MobileCard = ({ 
+  connection, 
+  index, 
+  onEdit, 
+  onDelete, 
+  onExpand, 
+  isExpanded, 
+  startIndex,
+  usersData
+}) => {
   return (
     <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4 hover:shadow-md transition-shadow">
       <div className="flex items-start justify-between mb-3">
@@ -251,7 +847,7 @@ const MobileCard = ({ connection, index, onEdit, onDelete, onExpand, isExpanded,
           </div>
           <div className="flex-1 min-w-0">
             <h3 className="font-semibold text-gray-900 text-sm truncate">
-              {connection?.requester_name || 'Unknown'} → {connection?.recipient_name || 'Unknown'}
+              {getUserName(connection?.requester_id, usersData)} → {getUserName(connection?.recipient_id, usersData)}
             </h3>
             <p className="text-xs text-gray-500">ID: {startIndex + index + 1}</p>
           </div>
@@ -277,14 +873,14 @@ const MobileCard = ({ connection, index, onEdit, onDelete, onExpand, isExpanded,
             <div className="flex items-center space-x-2">
               <User className="w-4 h-4 text-gray-400 flex-shrink-0" />
               <span className="text-sm text-gray-600">
-                From: {connection?.requester_name || 'N/A'}
+                From: {getUserName(connection?.requester_id, usersData)}
               </span>
             </div>
 
             <div className="flex items-center space-x-2">
               <User className="w-4 h-4 text-gray-400 flex-shrink-0" />
               <span className="text-sm text-gray-600">
-                To: {connection?.recipient_name || 'N/A'}
+                To: {getUserName(connection?.recipient_id, usersData)}
               </span>
             </div>
 
@@ -301,7 +897,7 @@ const MobileCard = ({ connection, index, onEdit, onDelete, onExpand, isExpanded,
               <div className="flex items-center space-x-2">
                 <Calendar className="w-4 h-4 text-gray-400 flex-shrink-0" />
                 <span className="text-sm text-gray-600">
-                  {formatDate(connection.created_date)}
+                  {formatDate(connection.createdAt) || formatDate(connection.created_date) || '7/1/2025'}
                 </span>
               </div>
             )}
@@ -337,6 +933,7 @@ const NetworkManagement = () => {
   const [filteredConnections, setFilteredConnections] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
+    const [usersData, setUsersData] = useState({}); 
   const [itemsPerPage] = useState(8);
   const [sortConfig, setSortConfig] = useState({ key: null, direction: 'asc' });
   const [expandedCard, setExpandedCard] = useState(null);
@@ -394,12 +991,41 @@ const NetworkManagement = () => {
     return () => window.removeEventListener('resize', handleResize);
   }, []);
 
+  // const fetchConnections = async () => {
+  //   try {
+  //     setLoading(true);
+  //     setError(null);
+  //     const data = await apiService.fetchNetworks();
+  //     setConnections(data);
+  //   } catch (error) {
+  //     setError(`Failed to fetch connections: ${error.message}`);
+  //     setConnections([]);
+  //   } finally {
+  //     setLoading(false);
+  //   }
+  // };
+  
   const fetchConnections = async () => {
     try {
       setLoading(true);
       setError(null);
       const data = await apiService.fetchNetworks();
       setConnections(data);
+      
+      // Extract unique user IDs from connections
+      const userIds = [];
+      data.forEach(connection => {
+        if (connection.requester_id) userIds.push(connection.requester_id);
+        if (connection.recipient_id) userIds.push(connection.recipient_id);
+      });
+      
+      // Fetch user data for all unique IDs
+      if (userIds.length > 0) {
+        const userData = await apiService.fetchUsersByIds(userIds);
+        // setUsersData(userData);
+        const userArray = Object.values(userData);
+        setUsersData(userArray); 
+      }
     } catch (error) {
       setError(`Failed to fetch connections: ${error.message}`);
       setConnections([]);
@@ -407,6 +1033,21 @@ const NetworkManagement = () => {
       setLoading(false);
     }
   };
+
+const getUserName = (userId) => {
+  console.log("the User id is received", userId);
+  // Make sure usersData is an array before using .find()
+  if (!Array.isArray(usersData)) {
+    console.error("usersData is not an array:", usersData);
+    return 'Unknown User';
+  }
+  const user = usersData.find(user => user.id === userId);
+  console.log("the User is found", user);
+  if (user) {
+    return `${user.firstName} ${user.lastName}`;
+  }
+  return 'Unknown User';
+};
 
   const toggleColumn = (key) => {
     setVisibleColumns(prev => ({
@@ -768,12 +1409,14 @@ const NetworkManagement = () => {
                       )}
                       {visibleColumns.requester_name && (
                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                          {connection.requester_id || 'N/A'}
+                          {/* {connection.requester_id || 'N/A'} */}
+                          From: {getUserName(connection?.requester_id) || 'N/A'}
                         </td>
                       )}
                       {visibleColumns.recipient_name && (
                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                          {connection.recipient_id || 'N/A'}
+                          {/* {connection.recipient_id || 'N/A'} */}
+                          To: {getUserName(connection?.recipient_id) || 'N/A'}
                         </td>
                       )}
                       {visibleColumns.status && (
@@ -793,7 +1436,9 @@ const NetworkManagement = () => {
                       )}
                       {visibleColumns.created_date && (
                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                          {formatDate(connection.created_date)}
+                          {/* {formatDate(connection.created_date)} */}
+                        {formatDate(connection.createdAt) || '7/1/2025'}
+
                         </td>
                       )}
                       {visibleColumns.actions && (
@@ -837,6 +1482,7 @@ const NetworkManagement = () => {
                     onExpand={setExpandedCard}
                     isExpanded={expandedCard === connection.id}
                     startIndex={startIndex}
+                    usersData={usersData} 
                   />
                 ))}
               </div>
