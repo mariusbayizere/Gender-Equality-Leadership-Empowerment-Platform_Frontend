@@ -34,6 +34,8 @@ import ModernProgressTrackingManagements from '@/components/Progress_Tracking/pr
 import MentorshipRelationshipsManagement from '@/components/Mentorship/MentorshipRelationshipsManagement.jsx';
 import NetworkConnectionsManagement from '@/components/NetworkConnections/NetworkConnectionsManagement.jsx';
 import  ModernForumManagement from '@/components/Forums/ModernForumManagement.jsx';
+import JobOpportunitiesManagement from './components/JobOpportunities/JobOpportunitiesManagement';
+
 
 // Temporary Error Components (replace with your actual components)
 const ServerErrorPage = () => (
@@ -184,6 +186,10 @@ function App() {
         {
             path: "/connections",
             element: <NetworkConnectionsManagement />,
+        },
+        {
+            path: "/job-opportunities",
+            element: <JobOpportunitiesManagement />,
         },
         {
             path: "/forums",
