@@ -33,6 +33,7 @@ import ModernTrainingCourseManagement from '@/components/TrainingCourse/ModernTr
 import ModernProgressTrackingManagements from '@/components/Progress_Tracking/progress_trackingManagment.jsx';
 import MentorshipRelationshipsManagement from '@/components/Mentorship/MentorshipRelationshipsManagement.jsx';
 import NetworkConnectionsManagement from '@/components/NetworkConnections/NetworkConnectionsManagement.jsx';
+import  ModernForumManagement from '@/components/Forums/ModernForumManagement.jsx';
 
 // Temporary Error Components (replace with your actual components)
 const ServerErrorPage = () => (
@@ -183,6 +184,10 @@ function App() {
         {
             path: "/connections",
             element: <NetworkConnectionsManagement />,
+        },
+        {
+            path: "/forums",
+            element: <ModernForumManagement />,
         },
         {
             path : "/mentorship",
