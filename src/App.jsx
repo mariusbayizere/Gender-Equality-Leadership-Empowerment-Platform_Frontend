@@ -35,6 +35,7 @@ import MentorshipRelationshipsManagement from '@/components/Mentorship/Mentorshi
 import NetworkConnectionsManagement from '@/components/NetworkConnections/NetworkConnectionsManagement.jsx';
 import  ModernForumManagement from '@/components/Forums/ModernForumManagement.jsx';
 import JobOpportunitiesManagement from './components/JobOpportunities/JobOpportunitiesManagement';
+import EventManagement from './components/Events/EventManagement.jsx';
 
 
 // Temporary Error Components (replace with your actual components)
@@ -186,6 +187,10 @@ function App() {
         {
             path: "/connections",
             element: <NetworkConnectionsManagement />,
+        },
+        {
+            path: "/events",
+            element: <EventManagement />,
         },
         {
             path: "/job-opportunities",
