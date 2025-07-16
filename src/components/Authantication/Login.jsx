@@ -1,5 +1,260 @@
+// import React, { useState } from 'react';
+// import { Eye, EyeOff, Mail, Lock, AlertCircle, CheckCircle, RefreshCw, ArrowRight } from 'lucide-react';
+
+// const Login = () => {
+//   const [formData, setFormData] = useState({
+//     email: '',
+//     password: ''
+//   });
+//   const [showPassword, setShowPassword] = useState(false);
+//   const [errors, setErrors] = useState({});
+//   const [isSubmitting, setIsSubmitting] = useState(false);
+//   const [submitStatus, setSubmitStatus] = useState(null);
+//   const [submitMessage, setSubmitMessage] = useState('');
+
+//   // Validation function
+//   const validateForm = () => {
+//     const newErrors = {};
+    
+//     if (!formData.email.trim()) {
+//       newErrors.email = 'Email is required';
+//     } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
+//       newErrors.email = 'Please enter a valid email address';
+//     }
+    
+//     if (!formData.password) {
+//       newErrors.password = 'Password is required';
+//     }
+    
+//     return newErrors;
+//   };
+
+//   // Handle input changes
+//   const handleChange = (e) => {
+//     const { name, value } = e.target;
+//     setFormData(prev => ({
+//       ...prev,
+//       [name]: value
+//     }));
+    
+//     // Clear errors when user starts typing
+//     if (errors[name]) {
+//       setErrors(prev => ({
+//         ...prev,
+//         [name]: ''
+//       }));
+//     }
+//   };
+
+//   // Handle form submission
+//   const handleSubmit = async (e) => {
+//     e.preventDefault();
+    
+//     const validationErrors = validateForm();
+    
+//     if (Object.keys(validationErrors).length > 0) {
+//       setErrors(validationErrors);
+//       return;
+//     }
+    
+//     setIsSubmitting(true);
+//     setErrors({});
+//     setSubmitStatus(null);
+//     setSubmitMessage('');
+    
+//     try {
+//       const response = await fetch('http://localhost:3000/api/v1/auth/login', {
+//         method: 'POST',
+//         headers: {
+//           'Content-Type': 'application/json',
+//         },
+//         body: JSON.stringify(formData)
+//       });
+
+//       const data = await response.json();
+
+//       if (!response.ok) {
+//         throw new Error(data.error || 'Login failed');
+//       }
+
+//       // Store token and user data
+//       localStorage.setItem('token', data.token);
+//       localStorage.setItem('user', JSON.stringify(data.user));
+      
+//       setSubmitStatus('success');
+//       setSubmitMessage('Login successful! Redirecting...');
+      
+//       // Redirect after successful login
+//       setTimeout(() => {
+//         window.location.href = '/dashboard'; // Change this to your dashboard route
+//       }, 2000);
+
+//     } catch (error) {
+//       setSubmitStatus('error');
+//       setSubmitMessage(error.message || 'Login failed. Please try again.');
+//       console.error('Login error:', error);
+//     } finally {
+//       setIsSubmitting(false);
+//     }
+//   };
+
+//   return (
+//     <div className="min-h-screen bg-gradient-to-br from-green-50 via-white to-green-50 flex items-center justify-center p-4">
+//       <div className="w-full max-w-md">
+//         {/* Header */}
+//         <div className="text-center mb-8">
+//           <div className="bg-green-600 w-16 h-16 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-lg">
+//             <Lock className="w-8 h-8 text-white" />
+//           </div>
+//           <h1 className="text-3xl font-bold text-gray-900 mb-2">Welcome Back</h1>
+//           <p className="text-gray-600">Sign in to your account to continue</p>
+//         </div>
+
+//         {/* Login Form */}
+//         <div className="bg-white rounded-2xl shadow-xl p-8 border border-gray-100">
+//           <div className="space-y-6">
+//             {/* Email Input */}
+//             <div>
+//               <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">
+//                 Email Address
+//               </label>
+//               <div className="relative">
+//                 <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+//                 <input
+//                   type="email"
+//                   id="email"
+//                   name="email"
+//                   value={formData.email}
+//                   onChange={handleChange}
+//                   className={`w-full pl-10 pr-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-colors ${
+//                     errors.email ? 'border-red-500 bg-red-50' : 'border-gray-300'
+//                   }`}
+//                   placeholder="Enter your email"
+//                 />
+//               </div>
+//               {errors.email && (
+//                 <div className="flex items-center mt-1 text-red-600 text-sm">
+//                   <AlertCircle className="w-4 h-4 mr-1" />
+//                   {errors.email}
+//                 </div>
+//               )}
+//             </div>
+
+//             {/* Password Input */}
+//             <div>
+//               <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-2">
+//                 Password
+//               </label>
+//               <div className="relative">
+//                 <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+//                 <input
+//                   type={showPassword ? 'text' : 'password'}
+//                   id="password"
+//                   name="password"
+//                   value={formData.password}
+//                   onChange={handleChange}
+//                   className={`w-full pl-10 pr-12 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-colors ${
+//                     errors.password ? 'border-red-500 bg-red-50' : 'border-gray-300'
+//                   }`}
+//                   placeholder="Enter your password"
+//                 />
+//                 <button
+//                   type="button"
+//                   onClick={() => setShowPassword(!showPassword)}
+//                   className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
+//                 >
+//                   {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+//                 </button>
+//               </div>
+//               {errors.password && (
+//                 <div className="flex items-center mt-1 text-red-600 text-sm">
+//                   <AlertCircle className="w-4 h-4 mr-1" />
+//                   {errors.password}
+//                 </div>
+//               )}
+//             </div>
+
+//             {/* Remember Me & Forgot Password */}
+//             <div className="flex items-center justify-between">
+//               <div className="flex items-center">
+//                 <input
+//                   type="checkbox"
+//                   id="remember"
+//                   className="h-4 w-4 text-green-600 focus:ring-green-500 border-gray-300 rounded"
+//                 />
+//                 <label htmlFor="remember" className="ml-2 block text-sm text-gray-700">
+//                   Remember me
+//                 </label>
+//               </div>
+//               <a href="/forgot-password" className="text-sm text-green-600 hover:text-green-500">
+//                 Forgot password?
+//               </a>
+//             </div>
+
+//             {/* Submit Status */}
+//             {submitStatus && (
+//               <div className={`flex items-center p-3 rounded-lg ${
+//                 submitStatus === 'success' ? 'bg-green-50 text-green-700' : 'bg-red-50 text-red-700'
+//               }`}>
+//                 {submitStatus === 'success' ? (
+//                   <CheckCircle className="w-5 h-5 mr-2" />
+//                 ) : (
+//                   <AlertCircle className="w-5 h-5 mr-2" />
+//                 )}
+//                 <span className="text-sm">{submitMessage}</span>
+//               </div>
+//             )}
+
+//             {/* Submit Button */}
+//             <button
+//               type="submit"
+//               onClick={handleSubmit}
+//               disabled={isSubmitting}
+//               className={`w-full py-3 px-4 rounded-lg text-white font-medium transition-all duration-200 flex items-center justify-center space-x-2 ${
+//                 isSubmitting 
+//                   ? 'bg-gray-400 cursor-not-allowed' 
+//                   : 'bg-green-600 hover:bg-green-700 active:bg-green-800 shadow-lg hover:shadow-xl'
+//               }`}
+//             >
+//               {isSubmitting ? (
+//                 <>
+//                   <RefreshCw className="w-4 h-4 animate-spin" />
+//                   <span>Signing in...</span>
+//                 </>
+//               ) : (
+//                 <>
+//                   <span>Sign In</span>
+//                   <ArrowRight className="w-4 h-4" />
+//                 </>
+//               )}
+//             </button>
+//           </div>
+
+//           {/* Sign Up Link */}
+//           <div className="mt-6 text-center">
+//             <p className="text-gray-600">
+//               Don't have an account?{' '}
+//               <a href="/register" className="text-green-600 hover:text-green-500 font-medium">
+//                 Create one here
+//               </a>
+//             </p>
+//           </div>
+//         </div>
+
+//         {/* Footer */}
+//         <div className="text-center mt-8 text-sm text-gray-500">
+//           <p>© 2024 Gender Equality Leadership Platform. All rights reserved.</p>
+//         </div>
+//       </div>
+//     </div>
+//   );
+// };
+
+// export default Login;
+
+
 import React, { useState } from 'react';
-import { Eye, EyeOff, Mail, Lock, AlertCircle, CheckCircle, RefreshCw, ArrowRight } from 'lucide-react';
+import { Eye, EyeOff, Mail, Lock, AlertCircle, CheckCircle, RefreshCw } from 'lucide-react';
 
 const Login = () => {
   const [formData, setFormData] = useState({
@@ -11,6 +266,7 @@ const Login = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitStatus, setSubmitStatus] = useState(null);
   const [submitMessage, setSubmitMessage] = useState('');
+  const [rememberMe, setRememberMe] = useState(false);
 
   // Validation function
   const validateForm = () => {
@@ -78,15 +334,15 @@ const Login = () => {
       }
 
       // Store token and user data
-      localStorage.setItem('token', data.token);
-      localStorage.setItem('user', JSON.stringify(data.user));
+      // localStorage.setItem('token', data.token);
+      // localStorage.setItem('user', JSON.stringify(data.user));
       
       setSubmitStatus('success');
       setSubmitMessage('Login successful! Redirecting...');
       
       // Redirect after successful login
       setTimeout(() => {
-        window.location.href = '/dashboard'; // Change this to your dashboard route
+        window.location.href = '/dashboard';
       }, 2000);
 
     } catch (error) {
@@ -98,152 +354,263 @@ const Login = () => {
     }
   };
 
+  const handleGoogleLogin = () => {
+    // Handle Google login
+    console.log('Google login clicked');
+  };
+
+  const handleFacebookLogin = () => {
+    // Handle Facebook login
+    console.log('Facebook login clicked');
+  };
+
   return (
-    <div className="min-h-screen bg-gradient-to-br from-green-50 via-white to-green-50 flex items-center justify-center p-4">
-      <div className="w-full max-w-md">
-        {/* Header */}
-        <div className="text-center mb-8">
-          <div className="bg-green-600 w-16 h-16 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-lg">
-            <Lock className="w-8 h-8 text-white" />
-          </div>
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">Welcome Back</h1>
-          <p className="text-gray-600">Sign in to your account to continue</p>
-        </div>
-
-        {/* Login Form */}
-        <div className="bg-white rounded-2xl shadow-xl p-8 border border-gray-100">
-          <div className="space-y-6">
-            {/* Email Input */}
-            <div>
-              <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">
-                Email Address
-              </label>
-              <div className="relative">
-                <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
-                <input
-                  type="email"
-                  id="email"
-                  name="email"
-                  value={formData.email}
-                  onChange={handleChange}
-                  className={`w-full pl-10 pr-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-colors ${
-                    errors.email ? 'border-red-500 bg-red-50' : 'border-gray-300'
-                  }`}
-                  placeholder="Enter your email"
-                />
-              </div>
-              {errors.email && (
-                <div className="flex items-center mt-1 text-red-600 text-sm">
-                  <AlertCircle className="w-4 h-4 mr-1" />
-                  {errors.email}
+    // <div className="min-h-screen bg-gradient-to-br from-blue-600 via-blue-700 to-blue-800 flex items-center justify-center p-4">
+    <div className="min-h-screen bg-white flex items-center justify-center p-4">
+      <div className="flex w-full max-w-4xl bg-white rounded-2xl shadow-2xl overflow-hidden">
+        {/* Left Side - Login Form */}
+        <div className="w-full lg:w-1/2 p-8 lg:p-12">
+          <div className="max-w-sm mx-auto">
+            {/* Logo and Header */}
+            <div className="mb-8">
+              {/* <div className="flex items-center mb-6">
+                <div className="w-8 h-8 bg-orange-500 rounded-full flex items-center justify-center mr-3">
+                  <span className="text-white font-bold text-sm">N</span>
                 </div>
-              )}
+                <span className="text-xl font-bold text-gray-900">NovaSyncer</span>
+              </div> */}
+              <h1 className="text-2xl font-bold text-gray-900 mb-2">Log in to your Account</h1>
+              <p className="text-gray-600 text-sm">Welcome back! Select method to log in:</p>
             </div>
 
-            {/* Password Input */}
-            <div>
-              <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-2">
-                Password
-              </label>
-              <div className="relative">
-                <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
-                <input
-                  type={showPassword ? 'text' : 'password'}
-                  id="password"
-                  name="password"
-                  value={formData.password}
-                  onChange={handleChange}
-                  className={`w-full pl-10 pr-12 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-colors ${
-                    errors.password ? 'border-red-500 bg-red-50' : 'border-gray-300'
-                  }`}
-                  placeholder="Enter your password"
-                />
-                <button
-                  type="button"
-                  onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
-                >
-                  {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
-                </button>
-              </div>
-              {errors.password && (
-                <div className="flex items-center mt-1 text-red-600 text-sm">
-                  <AlertCircle className="w-4 h-4 mr-1" />
-                  {errors.password}
-                </div>
-              )}
+            {/* Social Login Buttons */}
+            <div className="space-y-3 mb-6">
+              <button
+                onClick={handleGoogleLogin}
+                className="w-full flex items-center justify-center px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
+              >
+                <svg className="w-5 h-5 mr-3" viewBox="0 0 24 24">
+                  <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+                  <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+                  <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
+                  <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
+                </svg>
+                <span className="text-gray-700 font-medium">Google</span>
+              </button>
+              
+              <button
+                onClick={handleFacebookLogin}
+                className="w-full flex items-center justify-center px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
+              >
+                <svg className="w-5 h-5 mr-3" viewBox="0 0 24 24">
+                  <path fill="#1877F2" d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
+                </svg>
+                <span className="text-gray-700 font-medium">Facebook</span>
+              </button>
             </div>
 
-            {/* Remember Me & Forgot Password */}
-            <div className="flex items-center justify-between">
-              <div className="flex items-center">
-                <input
-                  type="checkbox"
-                  id="remember"
-                  className="h-4 w-4 text-green-600 focus:ring-green-500 border-gray-300 rounded"
-                />
-                <label htmlFor="remember" className="ml-2 block text-sm text-gray-700">
-                  Remember me
+            {/* Divider */}
+            <div className="relative mb-6">
+              <div className="absolute inset-0 flex items-center">
+                <div className="w-full border-t border-gray-300"></div>
+              </div>
+              <div className="relative flex justify-center text-sm">
+                <span className="px-2 bg-white text-gray-500">or continue with email</span>
+              </div>
+            </div>
+
+            {/* Email/Password Form */}
+            <div className="space-y-4">
+              {/* Email Input */}
+              <div>
+                <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
+                  Email
                 </label>
+                <div className="relative">
+                  <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+                  <input
+                    type="email"
+                    id="email"
+                    name="email"
+                    value={formData.email}
+                    onChange={handleChange}
+                    className={`w-full pl-10 pr-4 py-2.5 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors text-sm ${
+                      errors.email ? 'border-red-500 bg-red-50' : 'border-gray-300'
+                    }`}
+                    placeholder="Enter your email"
+                  />
+                </div>
+                {errors.email && (
+                  <div className="flex items-center mt-1 text-red-600 text-xs">
+                    <AlertCircle className="w-3 h-3 mr-1" />
+                    {errors.email}
+                  </div>
+                )}
               </div>
-              <a href="/forgot-password" className="text-sm text-green-600 hover:text-green-500">
-                Forgot password?
-              </a>
+
+              {/* Password Input */}
+              <div>
+                <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-1">
+                  Password
+                </label>
+                <div className="relative">
+                  <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+                  <input
+                    type={showPassword ? 'text' : 'password'}
+                    id="password"
+                    name="password"
+                    value={formData.password}
+                    onChange={handleChange}
+                    className={`w-full pl-10 pr-12 py-2.5 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors text-sm ${
+                      errors.password ? 'border-red-500 bg-red-50' : 'border-gray-300'
+                    }`}
+                    placeholder="Enter your password"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                  >
+                    {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                  </button>
+                </div>
+                {errors.password && (
+                  <div className="flex items-center mt-1 text-red-600 text-xs">
+                    <AlertCircle className="w-3 h-3 mr-1" />
+                    {errors.password}
+                  </div>
+                )}
+              </div>
+
+              {/* Remember Me & Forgot Password */}
+              <div className="flex items-center justify-between">
+                <div className="flex items-center">
+                  <input
+                    type="checkbox"
+                    id="remember"
+                    checked={rememberMe}
+                    onChange={(e) => setRememberMe(e.target.checked)}
+                    className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                  />
+                  <label htmlFor="remember" className="ml-2 block text-sm text-gray-700">
+                    Remember me
+                  </label>
+                </div>
+                <a href="/forgot-password" className="text-sm text-blue-600 hover:text-blue-500">
+                  Forgot Password?
+                </a>
+              </div>
+
+              {/* Submit Status */}
+              {submitStatus && (
+                <div className={`flex items-center p-3 rounded-lg text-sm ${
+                  submitStatus === 'success' ? 'bg-green-50 text-green-700' : 'bg-red-50 text-red-700'
+                }`}>
+                  {submitStatus === 'success' ? (
+                    <CheckCircle className="w-4 h-4 mr-2" />
+                  ) : (
+                    <AlertCircle className="w-4 h-4 mr-2" />
+                  )}
+                  <span>{submitMessage}</span>
+                </div>
+              )}
+
+              {/* Submit Button */}
+              <button
+                type="button"
+                onClick={handleSubmit}
+                disabled={isSubmitting}
+                className={`w-full py-2 px-4 rounded-lg text-white font-medium transition-all duration-200 flex items-center justify-center space-x-2 ${
+                  isSubmitting 
+                    ? 'bg-gray-400 cursor-not-allowed' 
+                    : 'bg-blue-600 hover:bg-blue-700 active:bg-blue-800'
+                }`}
+              >
+                {isSubmitting ? (
+                  <>
+                    <RefreshCw className="w-4 h-4 animate-spin" />
+                    <span>Logging in...</span>
+                  </>
+                ) : (
+                  <span>Log In</span>
+                )}
+              </button>
             </div>
 
-            {/* Submit Status */}
-            {submitStatus && (
-              <div className={`flex items-center p-3 rounded-lg ${
-                submitStatus === 'success' ? 'bg-green-50 text-green-700' : 'bg-red-50 text-red-700'
-              }`}>
-                {submitStatus === 'success' ? (
-                  <CheckCircle className="w-5 h-5 mr-2" />
-                ) : (
-                  <AlertCircle className="w-5 h-5 mr-2" />
-                )}
-                <span className="text-sm">{submitMessage}</span>
-              </div>
-            )}
-
-            {/* Submit Button */}
-            <button
-              type="submit"
-              onClick={handleSubmit}
-              disabled={isSubmitting}
-              className={`w-full py-3 px-4 rounded-lg text-white font-medium transition-all duration-200 flex items-center justify-center space-x-2 ${
-                isSubmitting 
-                  ? 'bg-gray-400 cursor-not-allowed' 
-                  : 'bg-green-600 hover:bg-green-700 active:bg-green-800 shadow-lg hover:shadow-xl'
-              }`}
-            >
-              {isSubmitting ? (
-                <>
-                  <RefreshCw className="w-4 h-4 animate-spin" />
-                  <span>Signing in...</span>
-                </>
-              ) : (
-                <>
-                  <span>Sign In</span>
-                  <ArrowRight className="w-4 h-4" />
-                </>
-              )}
-            </button>
-          </div>
-
-          {/* Sign Up Link */}
-          <div className="mt-6 text-center">
-            <p className="text-gray-600">
-              Don't have an account?{' '}
-              <a href="/register" className="text-green-600 hover:text-green-500 font-medium">
-                Create one here
-              </a>
-            </p>
+            {/* Sign Up Link */}
+            <div className="mt-6 text-center">
+              <p className="text-gray-600 text-sm">
+                Don't have an account?{' '}
+                <a href="/register" className="text-blue-600 hover:text-blue-500 font-medium">
+                  Create an account
+                </a>
+              </p>
+            </div>
           </div>
         </div>
 
-        {/* Footer */}
-        <div className="text-center mt-8 text-sm text-gray-500">
-          <p>© 2024 Gender Equality Leadership Platform. All rights reserved.</p>
+        {/* Right Side - Illustration */}
+        <div className="hidden lg:flex lg:w-1/2 bg-gradient-to-br from-blue-600 via-blue-700 to-blue-800 items-center justify-center p-8">
+          <div className="text-center text-white max-w-md">
+            <div className="mb-8">
+              <div className="relative">
+                {/* Main illustration container */}
+                <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-8 mx-auto w-72 h-72 flex items-center justify-center">
+                  <div className="space-y-6">
+                    {/* Profile icons */}
+                    <div className="flex justify-center space-x-6">
+                      <div className="w-14 h-14 bg-orange-500 rounded-full flex items-center justify-center shadow-lg">
+                        <span className="text-white font-bold text-lg">A</span>
+                      </div>
+                      <div className="w-14 h-14 bg-blue-500 rounded-full flex items-center justify-center shadow-lg">
+                        <span className="text-white font-bold text-lg">B</span>
+                      </div>
+                    </div>
+                    
+                    {/* Google icon */}
+                    <div className="flex justify-center">
+                      <div className="w-20 h-20 bg-white rounded-full flex items-center justify-center shadow-xl">
+                        <svg className="w-10 h-10" viewBox="0 0 24 24">
+                          <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+                          <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+                          <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
+                          <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
+                        </svg>
+                      </div>
+                    </div>
+                    
+                    {/* Chat interface mockup */}
+                    <div className="bg-white/20 rounded-lg p-4 text-left">
+                      <div className="space-y-3">
+                        <div className="flex items-center space-x-3">
+                          <div className="w-8 h-8 bg-white/30 rounded-full"></div>
+                          <div className="h-2 bg-white/30 rounded flex-1"></div>
+                        </div>
+                        <div className="flex items-center space-x-3">
+                          <div className="w-8 h-8 bg-white/30 rounded-full"></div>
+                          <div className="h-2 bg-white/30 rounded flex-1"></div>
+                        </div>
+                        <div className="flex items-center space-x-3">
+                          <div className="w-8 h-8 bg-white/30 rounded-full"></div>
+                          <div className="h-2 bg-white/30 rounded w-3/4"></div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+            <h2 className="text-2xl font-bold mb-4">Connect with every application.</h2>
+            <p className="text-blue-100 mb-8">Everything you need in an easily customizable dashboard.</p>
+            
+            {/* Pagination dots */}
+            <div className="flex justify-center space-x-2">
+              <div className="w-2 h-2 bg-white rounded-full"></div>
+              <div className="w-2 h-2 bg-white/50 rounded-full"></div>
+              <div className="w-2 h-2 bg-white/50 rounded-full"></div>
+            </div>
+          </div>
         </div>
       </div>
     </div>
