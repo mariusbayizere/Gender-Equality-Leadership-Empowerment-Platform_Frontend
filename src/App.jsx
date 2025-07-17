@@ -36,6 +36,8 @@ import NetworkConnectionsManagement from '@/components/NetworkConnections/Networ
 import  ModernForumManagement from '@/components/Forums/ModernForumManagement.jsx';
 import JobOpportunitiesManagement from './components/JobOpportunities/JobOpportunitiesManagement';
 import EventManagement from './components/Events/EventManagement.jsx';
+import SignUp from './components/Authantication/SignUp.jsx';
+import UpdatePassword from './components/Authantication/UpdatePassword.jsx';
 
 
 // Temporary Error Components (replace with your actual components)
@@ -217,8 +219,16 @@ function App() {
             element: <Login />,
         },
         {
+            path: "/signup",
+            element: <SignUp />,
+        },
+        {
             path: "/user",
             element: <GELEPAdminDashboard />,
+        },
+        {
+            path: "/update-password",
+            element: <UpdatePassword />,
         }
     ]);
 
