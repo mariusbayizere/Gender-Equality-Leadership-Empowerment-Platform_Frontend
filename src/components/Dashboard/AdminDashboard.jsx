@@ -6,10 +6,11 @@
 //   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
 //   const [userCount, setUserCount] = useState(0);
 //   const [eventCount, setEventCount] = useState(0);
+//   const [mentorshipCount, setMentorshipCount] = useState(0);
 //   const [loading, setLoading] = useState(true);
 //   const [error, setError] = useState(null);
 
-//   // Fetch user count and event count from API
+//   // Fetch user count, event count, and mentorship count from API
 //   useEffect(() => {
 //     const fetchCounts = async () => {
 //       try {
@@ -32,6 +33,11 @@
 //           headers
 //         });
 
+//         // Fetch mentorship count
+//         const mentorshipResponse = await fetch('http://localhost:3000/api/v1/mentorship/count', {
+//           headers
+//         });
+
 //         if (!userResponse.ok) {
 //           throw new Error('Failed to fetch user count');
 //         }
@@ -40,17 +46,24 @@
 //           throw new Error('Failed to fetch event count');
 //         }
 
+//         if (!mentorshipResponse.ok) {
+//           throw new Error('Failed to fetch mentorship count');
+//         }
+
 //         const userData = await userResponse.json();
 //         const eventData = await eventResponse.json();
+//         const mentorshipData = await mentorshipResponse.json();
         
-//         setUserCount(userData.totalUsers);
-//         setEventCount(eventData.totalEvents);
+//         setUserCount(userData.totalUsers || 0);
+//         setEventCount(eventData.totalEvents || 0);
+//         setMentorshipCount(mentorshipData.totalMentorshipRelationships || 0);
 //       } catch (err) {
 //         setError(err.message);
 //         console.error('Error fetching counts:', err);
 //         // Fallback to hardcoded values on error
 //         setUserCount(2847);
 //         setEventCount(156);
+//         setMentorshipCount(428);
 //       } finally {
 //         setLoading(false);
 //       }
@@ -72,7 +85,7 @@
 //   const stats = [
 //     { 
 //       title: 'Total Users', 
-//       value: loading ? 'Loading...' : userCount.toLocaleString(), 
+//       value: loading ? 'Loading...' : (userCount || 0).toLocaleString(), 
 //       change: '+12%', 
 //       icon: Users,
 //       color: 'bg-white',
@@ -81,7 +94,7 @@
 //     },
 //     { 
 //       title: 'Active Events', 
-//       value: loading ? 'Loading...' : eventCount.toLocaleString(), 
+//       value: loading ? 'Loading...' : (eventCount || 0).toLocaleString(), 
 //       change: '+8%', 
 //       icon: Calendar, 
 //       color: 'bg-white',
@@ -90,7 +103,7 @@
 //     },
 //     { 
 //       title: 'Mentorship Pairs', 
-//       value: '428', 
+//       value: loading ? 'Loading...' : (mentorshipCount || 0).toLocaleString(), 
 //       change: '+23%', 
 //       icon: UserCheck, 
 //       color: 'bg-white',
@@ -320,6 +333,9 @@
 
 // export default AdminDashboard;
 
+
+
+
 import React, { useState, useEffect } from 'react';
 import { Users, Calendar, MessageSquare, UserCheck, BarChart3, TrendingUp,Activity,Bell,Settings,Search,Menu,X,Eye,UserPlus, CalendarPlus,FileText,Target,LogOut,ChevronLeft,User} from 'lucide-react';
 
@@ -328,10 +344,11 @@ const AdminDashboard = () => {
   const [userCount, setUserCount] = useState(0);
   const [eventCount, setEventCount] = useState(0);
   const [mentorshipCount, setMentorshipCount] = useState(0);
+  const [forumCount, setForumCount] = useState(0);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  // Fetch user count, event count, and mentorship count from API
+  // Fetch user count, event count, mentorship count, and forum count from API
   useEffect(() => {
     const fetchCounts = async () => {
       try {
@@ -359,6 +376,11 @@ const AdminDashboard = () => {
           headers
         });
 
+        // Fetch forum count
+        const forumResponse = await fetch('http://localhost:3000/api/v1/forums/count', {
+          headers
+        });
+
         if (!userResponse.ok) {
           throw new Error('Failed to fetch user count');
         }
@@ -371,13 +393,19 @@ const AdminDashboard = () => {
           throw new Error('Failed to fetch mentorship count');
         }
 
+        if (!forumResponse.ok) {
+          throw new Error('Failed to fetch forum count');
+        }
+
         const userData = await userResponse.json();
         const eventData = await eventResponse.json();
         const mentorshipData = await mentorshipResponse.json();
+        const forumData = await forumResponse.json();
         
         setUserCount(userData.totalUsers || 0);
         setEventCount(eventData.totalEvents || 0);
         setMentorshipCount(mentorshipData.totalMentorshipRelationships || 0);
+        setForumCount(forumData.totalForumPosts || 0);
       } catch (err) {
         setError(err.message);
         console.error('Error fetching counts:', err);
@@ -385,6 +413,7 @@ const AdminDashboard = () => {
         setUserCount(2847);
         setEventCount(156);
         setMentorshipCount(428);
+        setForumCount(1234);
       } finally {
         setLoading(false);
       }
@@ -433,7 +462,7 @@ const AdminDashboard = () => {
     },
     { 
       title: 'Forum Posts', 
-      value: '1,234', 
+      value: loading ? 'Loading...' : (forumCount || 0).toLocaleString(), 
       change: '+15%', 
       icon: MessageSquare, 
       color: 'bg-white',
