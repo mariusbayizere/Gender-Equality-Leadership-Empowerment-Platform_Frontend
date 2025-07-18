@@ -1,9 +1,46 @@
 
-// import React, { useState } from 'react';
+// import React, { useState, useEffect } from 'react';
 // import { Users, Calendar, MessageSquare, UserCheck, BarChart3, TrendingUp,Activity,Bell,Settings,Search,Menu,X,Eye,UserPlus, CalendarPlus,FileText,Target,LogOut,ChevronLeft,User} from 'lucide-react';
 
 // const AdminDashboard = () => {
 //   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
+//   const [userCount, setUserCount] = useState(0);
+//   const [loading, setLoading] = useState(true);
+//   const [error, setError] = useState(null);
+
+//   // Fetch user count from API
+//   useEffect(() => {
+//     const fetchUserCount = async () => {
+//       try {
+//         setLoading(true);
+//         // Get the auth token from localStorage or wherever you store it
+//         const token = localStorage.getItem('authToken'); // Adjust based on your auth implementation
+        
+//         const response = await fetch('http://localhost:3000/api/v1/users/count', {
+//           headers: {
+//             'Authorization': `Bearer ${token}`,
+//             'Content-Type': 'application/json'
+//           }
+//         });
+
+//         if (!response.ok) {
+//           throw new Error('Failed to fetch user count');
+//         }
+
+//         const data = await response.json();
+//         setUserCount(data.totalUsers);
+//       } catch (err) {
+//         setError(err.message);
+//         console.error('Error fetching user count:', err);
+//         // Fallback to hardcoded value on error
+//         setUserCount(2847);
+//       } finally {
+//         setLoading(false);
+//       }
+//     };
+
+//     fetchUserCount();
+//   }, []);
 
 //   const sidebarItems = [
 //     { name: 'Dashboard', icon: BarChart3, active: true },
@@ -18,11 +55,10 @@
 //   const stats = [
 //     { 
 //       title: 'Total Users', 
-//       value: '2,847', 
+//       value: loading ? 'Loading...' : userCount.toLocaleString(), 
 //       change: '+12%', 
 //       icon: Users,
 //       color: 'bg-white',
-//     //   color: 'bg-gradient-to-br from-blue-50 to-blue-100',
 //       iconColor: 'bg-gradient-to-br from-blue-500 to-blue-600',
 //       trend: 'up'
 //     },
@@ -31,7 +67,6 @@
 //       value: '156', 
 //       change: '+8%', 
 //       icon: Calendar, 
-//     //   color: 'bg-gradient-to-br from-emerald-50 to-emerald-100',
 //       color: 'bg-white',
 //       iconColor: 'bg-gradient-to-br from-emerald-500 to-emerald-600',
 //       trend: 'up'
@@ -41,7 +76,6 @@
 //       value: '428', 
 //       change: '+23%', 
 //       icon: UserCheck, 
-//     //   color: 'bg-gradient-to-br from-violet-50 to-violet-100',
 //       color: 'bg-white',
 //       iconColor: 'bg-gradient-to-br from-violet-500 to-violet-600',
 //       trend: 'up'
@@ -51,7 +85,6 @@
 //       value: '1,234', 
 //       change: '+15%', 
 //       icon: MessageSquare, 
-//     //   color: 'bg-gradient-to-br from-amber-50 to-amber-100',
 //       color: 'bg-white',
 //       iconColor: 'bg-gradient-to-br from-amber-500 to-amber-600',
 //       trend: 'up'
@@ -74,7 +107,7 @@
 //   ];
 
 //   return (
-//     <div className="flex h-screen bg-gray-50">
+//     <div className="flex h-screen bg-gray-50 font-outfit">
 //       {/* Sidebar */}
 //       <div className={`${isSidebarOpen ? 'w-64' : 'w-20'} bg-white shadow-lg transition-all duration-300 ease-in-out flex flex-col`}>
 //         <div className="p-4 border-b border-gray-200">
@@ -98,9 +131,10 @@
 //               href="#"
 //               className={`flex items-center px-4 py-3 mx-2 rounded-lg transition-colors ${
 //                 item.active 
-//                   ? 'bg-indigo-50 text-blue-700 border-r-2 border-blue-500' 
+//                   ? 'text-white' 
 //                   : 'text-gray-600 hover:bg-gray-50'
 //               }`}
+//               style={item.active ? { backgroundColor: '#1E90FF' } : {}}
 //             >
 //               <item.icon size={20} />
 //               {isSidebarOpen && <span className="ml-3 font-medium">{item.name}</span>}
@@ -157,6 +191,13 @@
 
 //         {/* Main Dashboard Content */}
 //         <main className="p-6">
+//           {/* Error Message */}
+//           {error && (
+//             <div className="mb-4 p-4 bg-red-50 border border-red-200 rounded-lg">
+//               <p className="text-red-700 text-sm">Error loading user count: {error}</p>
+//             </div>
+//           )}
+
 //           {/* Stats Cards */}
 //           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
 //             {stats.map((stat, index) => (
@@ -264,11 +305,65 @@
 
 
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Users, Calendar, MessageSquare, UserCheck, BarChart3, TrendingUp,Activity,Bell,Settings,Search,Menu,X,Eye,UserPlus, CalendarPlus,FileText,Target,LogOut,ChevronLeft,User} from 'lucide-react';
 
 const AdminDashboard = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
+  const [userCount, setUserCount] = useState(0);
+  const [eventCount, setEventCount] = useState(0);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  // Fetch user count and event count from API
+  useEffect(() => {
+    const fetchCounts = async () => {
+      try {
+        setLoading(true);
+        // Get the auth token from localStorage or wherever you store it
+        const token = localStorage.getItem('authToken'); // Adjust based on your auth implementation
+        
+        const headers = {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        };
+
+        // Fetch user count
+        const userResponse = await fetch('http://localhost:3000/api/v1/users/count', {
+          headers
+        });
+
+        // Fetch event count
+        const eventResponse = await fetch('http://localhost:3000/api/v1/events/count', {
+          headers
+        });
+
+        if (!userResponse.ok) {
+          throw new Error('Failed to fetch user count');
+        }
+
+        if (!eventResponse.ok) {
+          throw new Error('Failed to fetch event count');
+        }
+
+        const userData = await userResponse.json();
+        const eventData = await eventResponse.json();
+        
+        setUserCount(userData.totalUsers);
+        setEventCount(eventData.totalEvents);
+      } catch (err) {
+        setError(err.message);
+        console.error('Error fetching counts:', err);
+        // Fallback to hardcoded values on error
+        setUserCount(2847);
+        setEventCount(156);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchCounts();
+  }, []);
 
   const sidebarItems = [
     { name: 'Dashboard', icon: BarChart3, active: true },
@@ -283,20 +378,18 @@ const AdminDashboard = () => {
   const stats = [
     { 
       title: 'Total Users', 
-      value: '2,847', 
+      value: loading ? 'Loading...' : userCount.toLocaleString(), 
       change: '+12%', 
       icon: Users,
       color: 'bg-white',
-    //   color: 'bg-gradient-to-br from-blue-50 to-blue-100',
       iconColor: 'bg-gradient-to-br from-blue-500 to-blue-600',
       trend: 'up'
     },
     { 
       title: 'Active Events', 
-      value: '156', 
+      value: loading ? 'Loading...' : eventCount.toLocaleString(), 
       change: '+8%', 
       icon: Calendar, 
-    //   color: 'bg-gradient-to-br from-emerald-50 to-emerald-100',
       color: 'bg-white',
       iconColor: 'bg-gradient-to-br from-emerald-500 to-emerald-600',
       trend: 'up'
@@ -306,7 +399,6 @@ const AdminDashboard = () => {
       value: '428', 
       change: '+23%', 
       icon: UserCheck, 
-    //   color: 'bg-gradient-to-br from-violet-50 to-violet-100',
       color: 'bg-white',
       iconColor: 'bg-gradient-to-br from-violet-500 to-violet-600',
       trend: 'up'
@@ -316,7 +408,6 @@ const AdminDashboard = () => {
       value: '1,234', 
       change: '+15%', 
       icon: MessageSquare, 
-    //   color: 'bg-gradient-to-br from-amber-50 to-amber-100',
       color: 'bg-white',
       iconColor: 'bg-gradient-to-br from-amber-500 to-amber-600',
       trend: 'up'
@@ -423,6 +514,13 @@ const AdminDashboard = () => {
 
         {/* Main Dashboard Content */}
         <main className="p-6">
+          {/* Error Message */}
+          {error && (
+            <div className="mb-4 p-4 bg-red-50 border border-red-200 rounded-lg">
+              <p className="text-red-700 text-sm">Error loading data: {error}</p>
+            </div>
+          )}
+
           {/* Stats Cards */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
             {stats.map((stat, index) => (
