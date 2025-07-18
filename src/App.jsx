@@ -38,6 +38,7 @@ import JobOpportunitiesManagement from './components/JobOpportunities/JobOpportu
 import EventManagement from './components/Events/EventManagement.jsx';
 import SignUp from './components/Authantication/SignUp.jsx';
 import UpdatePassword from './components/Authantication/UpdatePassword.jsx';
+import AdminDashboard from './components/Dashboard/AdminDashboard.jsx';
 
 
 // Temporary Error Components (replace with your actual components)
@@ -189,6 +190,10 @@ function App() {
         {
             path: "/connections",
             element: <NetworkConnectionsManagement />,
+        },
+        {
+            path: "/admin",
+            element: <AdminDashboard />,
         },
         {
             path: "/events",
