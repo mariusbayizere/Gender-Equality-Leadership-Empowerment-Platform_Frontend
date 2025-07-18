@@ -5,41 +5,58 @@
 // const AdminDashboard = () => {
 //   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
 //   const [userCount, setUserCount] = useState(0);
+//   const [eventCount, setEventCount] = useState(0);
 //   const [loading, setLoading] = useState(true);
 //   const [error, setError] = useState(null);
 
-//   // Fetch user count from API
+//   // Fetch user count and event count from API
 //   useEffect(() => {
-//     const fetchUserCount = async () => {
+//     const fetchCounts = async () => {
 //       try {
 //         setLoading(true);
 //         // Get the auth token from localStorage or wherever you store it
 //         const token = localStorage.getItem('authToken'); // Adjust based on your auth implementation
         
-//         const response = await fetch('http://localhost:3000/api/v1/users/count', {
-//           headers: {
-//             'Authorization': `Bearer ${token}`,
-//             'Content-Type': 'application/json'
-//           }
+//         const headers = {
+//           'Authorization': `Bearer ${token}`,
+//           'Content-Type': 'application/json'
+//         };
+
+//         // Fetch user count
+//         const userResponse = await fetch('http://localhost:3000/api/v1/users/count', {
+//           headers
 //         });
 
-//         if (!response.ok) {
+//         // Fetch event count
+//         const eventResponse = await fetch('http://localhost:3000/api/v1/events/count', {
+//           headers
+//         });
+
+//         if (!userResponse.ok) {
 //           throw new Error('Failed to fetch user count');
 //         }
 
-//         const data = await response.json();
-//         setUserCount(data.totalUsers);
+//         if (!eventResponse.ok) {
+//           throw new Error('Failed to fetch event count');
+//         }
+
+//         const userData = await userResponse.json();
+//         const eventData = await eventResponse.json();
+        
+//         setUserCount(userData.totalUsers);
+//         setEventCount(eventData.totalEvents);
 //       } catch (err) {
 //         setError(err.message);
-//         console.error('Error fetching user count:', err);
-//         // Fallback to hardcoded value on error
+//         console.error('Error fetching counts:', err);
+//         // Fallback to hardcoded values on error
 //         setUserCount(2847);
+//         setEventCount(156);
 //       } finally {
 //         setLoading(false);
 //       }
 //     };
 
-//     fetchUserCount();
+//     fetchCounts();
 //   }, []);
 
 //   const sidebarItems = [
@@ -64,7 +81,7 @@
 //     },
 //     { 
 //       title: 'Active Events', 
-//       value: '156', 
+//       value: loading ? 'Loading...' : eventCount.toLocaleString(), 
 //       change: '+8%', 
 //       icon: Calendar, 
 //       color: 'bg-white',
@@ -194,7 +211,7 @@
 //           {/* Error Message */}
 //           {error && (
 //             <div className="mb-4 p-4 bg-red-50 border border-red-200 rounded-lg">
-//               <p className="text-red-700 text-sm">Error loading user count: {error}</p>
+//               <p className="text-red-700 text-sm">Error loading data: {error}</p>
 //             </div>
 //           )}
 
@@ -303,8 +320,6 @@
 
 // export default AdminDashboard;
 
-
-
 import React, { useState, useEffect } from 'react';
 import { Users, Calendar, MessageSquare, UserCheck, BarChart3, TrendingUp,Activity,Bell,Settings,Search,Menu,X,Eye,UserPlus, CalendarPlus,FileText,Target,LogOut,ChevronLeft,User} from 'lucide-react';
 
@@ -312,10 +327,11 @@ const AdminDashboard = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const [userCount, setUserCount] = useState(0);
   const [eventCount, setEventCount] = useState(0);
+  const [mentorshipCount, setMentorshipCount] = useState(0);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  // Fetch user count and event count from API
+  // Fetch user count, event count, and mentorship count from API
   useEffect(() => {
     const fetchCounts = async () => {
       try {
@@ -338,6 +354,11 @@ const AdminDashboard = () => {
           headers
         });
 
+        // Fetch mentorship count
+        const mentorshipResponse = await fetch('http://localhost:3000/api/v1/mentorship/count', {
+          headers
+        });
+
         if (!userResponse.ok) {
           throw new Error('Failed to fetch user count');
         }
@@ -346,17 +367,24 @@ const AdminDashboard = () => {
           throw new Error('Failed to fetch event count');
         }
 
+        if (!mentorshipResponse.ok) {
+          throw new Error('Failed to fetch mentorship count');
+        }
+
         const userData = await userResponse.json();
         const eventData = await eventResponse.json();
+        const mentorshipData = await mentorshipResponse.json();
         
-        setUserCount(userData.totalUsers);
-        setEventCount(eventData.totalEvents);
+        setUserCount(userData.totalUsers || 0);
+        setEventCount(eventData.totalEvents || 0);
+        setMentorshipCount(mentorshipData.totalMentorshipRelationships || 0);
       } catch (err) {
         setError(err.message);
         console.error('Error fetching counts:', err);
         // Fallback to hardcoded values on error
         setUserCount(2847);
         setEventCount(156);
+        setMentorshipCount(428);
       } finally {
         setLoading(false);
       }
@@ -378,7 +406,7 @@ const AdminDashboard = () => {
   const stats = [
     { 
       title: 'Total Users', 
-      value: loading ? 'Loading...' : userCount.toLocaleString(), 
+      value: loading ? 'Loading...' : (userCount || 0).toLocaleString(), 
       change: '+12%', 
       icon: Users,
       color: 'bg-white',
@@ -387,7 +415,7 @@ const AdminDashboard = () => {
     },
     { 
       title: 'Active Events', 
-      value: loading ? 'Loading...' : eventCount.toLocaleString(), 
+      value: loading ? 'Loading...' : (eventCount || 0).toLocaleString(), 
       change: '+8%', 
       icon: Calendar, 
       color: 'bg-white',
@@ -396,7 +424,7 @@ const AdminDashboard = () => {
     },
     { 
       title: 'Mentorship Pairs', 
-      value: '428', 
+      value: loading ? 'Loading...' : (mentorshipCount || 0).toLocaleString(), 
       change: '+23%', 
       icon: UserCheck, 
       color: 'bg-white',
