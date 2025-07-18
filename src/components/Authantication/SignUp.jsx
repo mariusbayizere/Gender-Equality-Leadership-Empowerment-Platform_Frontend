@@ -1,7 +1,16 @@
+
 // import React, { useState, useEffect } from 'react';
-// import { Eye, EyeOff, Mail, Lock, AlertCircle, CheckCircle, RefreshCw, User, Phone, ChevronDown } from 'lucide-react';
-// import {validateForm} from './validateForm';
-// import { countries } from '../constant/countries'; // Import the countries data
+// import { Eye, EyeOff, Mail, Shield, Lock, AlertCircle, CheckCircle, RefreshCw, User, Phone, ChevronDown } from 'lucide-react';
+
+// // Mock countries data
+// const countries = [
+//   { code: 'RW', name: 'Rwanda', flag: '🇷🇼', dial_code: '+250' },
+//   { code: 'US', name: 'United States', flag: '🇺🇸', dial_code: '+1' },
+//   { code: 'GB', name: 'United Kingdom', flag: '🇬🇧', dial_code: '+44' },
+//   { code: 'KE', name: 'Kenya', flag: '🇰🇪', dial_code: '+254' },
+//   { code: 'UG', name: 'Uganda', flag: '🇺🇬', dial_code: '+256' },
+//   { code: 'TZ', name: 'Tanzania', flag: '🇹🇿', dial_code: '+255' },
+// ];
 
 // const SignUp = () => {
 //   const [formData, setFormData] = useState({
@@ -21,7 +30,6 @@
 //   const [isSubmitting, setIsSubmitting] = useState(false);
 //   const [submitStatus, setSubmitStatus] = useState(null);
 //   const [submitMessage, setSubmitMessage] = useState('');
-//   // Changed variable name to avoid conflict with imported 'countries'
 //   const [countriesData, setCountriesData] = useState([]);
 //   const [selectedCountry, setSelectedCountry] = useState(null);
 //   const [showCountryDropdown, setShowCountryDropdown] = useState(false);
@@ -30,12 +38,87 @@
 //   useEffect(() => {
 //     setCountriesData(countries);
 //     // Set Rwanda as default
-// const rwanda = countries.find(country => country.code === "RW");
+//     const rwanda = countries.find(country => country.code === "RW");
 //     setSelectedCountry(rwanda);
 //   }, []);
 
-//   // Client-side validation
+//   // Close dropdown when clicking outside
+//   useEffect(() => {
+//     const handleClickOutside = (event) => {
+//       if (showCountryDropdown && !event.target.closest('.country-dropdown-container')) {
+//         setShowCountryDropdown(false);
+//       }
+//     };
 
+//     document.addEventListener('mousedown', handleClickOutside);
+//     return () => {
+//       document.removeEventListener('mousedown', handleClickOutside);
+//     };
+//   }, [showCountryDropdown]);
+
+//   // Client-side validation function
+//   const validateFormData = () => {
+//     const newErrors = {};
+
+//     // First name validation
+//     if (!formData.firstName.trim()) {
+//       newErrors.firstName = 'First name is required';
+//     } else if (formData.firstName.trim().length < 2) {
+//       newErrors.firstName = 'First name must be at least 2 characters';
+//     }
+
+//     // Last name validation
+//     if (!formData.lastName.trim()) {
+//       newErrors.lastName = 'Last name is required';
+//     } else if (formData.lastName.trim().length < 2) {
+//       newErrors.lastName = 'Last name must be at least 2 characters';
+//     }
+
+//     // Email validation
+//     if (!formData.email.trim()) {
+//       newErrors.email = 'Email is required';
+//     } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
+//       newErrors.email = 'Please enter a valid email address';
+//     }
+
+//     // Password validation
+//     if (!formData.password) {
+//       newErrors.password = 'Password is required';
+//     } else if (formData.password.length < 6) {
+//       newErrors.password = 'Password must be at least 6 characters';
+//     }
+
+//     // Confirm password validation
+//     if (!formData.confirmPassword) {
+//       newErrors.confirmPassword = 'Please confirm your password';
+//     } else if (formData.password !== formData.confirmPassword) {
+//       newErrors.confirmPassword = 'Passwords do not match';
+//     }
+
+//     // User role validation
+//     if (!formData.userRole) {
+//       newErrors.userRole = 'Please select a user role';
+//     }
+
+//     // Gender validation
+//     if (!formData.gender) {
+//       newErrors.gender = 'Please select your gender';
+//     }
+
+//     // Telephone validation
+//     if (!formData.telephone.trim()) {
+//       newErrors.telephone = 'Telephone number is required';
+//     } else if (!/^\d{9,15}$/.test(formData.telephone.trim())) {
+//       newErrors.telephone = 'Please enter a valid telephone number (9-15 digits)';
+//     }
+
+//     // Country selection validation
+//     if (!selectedCountry) {
+//       newErrors.telephone = 'Please select a country';
+//     }
+
+//     return newErrors;
+//   };
 
 //   // Handle input changes
 //   const handleChange = (e) => {
@@ -51,6 +134,12 @@
 //         ...prev,
 //         [name]: ''
 //       }));
+//     }
+
+//     // Clear submit status when user makes changes
+//     if (submitStatus) {
+//       setSubmitStatus(null);
+//       setSubmitMessage('');
 //     }
 //   };
 
@@ -72,10 +161,12 @@
 //   const handleSubmit = async (e) => {
 //     e.preventDefault();
     
-//     const validationErrors = validateForm();
+//     const validationErrors = validateFormData();
     
 //     if (Object.keys(validationErrors).length > 0) {
 //       setErrors(validationErrors);
+//       setSubmitStatus('error');
+//       setSubmitMessage('Please fix the errors above and try again.');
 //       return;
 //     }
     
@@ -91,19 +182,8 @@
 //         telephone: selectedCountry.dial_code + formData.telephone
 //       };
       
-//       const response = await fetch('http://localhost:3000/api/v1/auth', {
-//         method: 'POST',
-//         headers: {
-//           'Content-Type': 'application/json',
-//         },
-//         body: JSON.stringify(submitData)
-//       });
-
-//       const data = await response.json();
-
-//       if (!response.ok) {
-//         throw new Error(data.error || 'Registration failed');
-//       }
+//       // Simulate API call
+//       await new Promise(resolve => setTimeout(resolve, 2000));
       
 //       setSubmitStatus('success');
 //       setSubmitMessage('Registration successful! Please check your email for welcome message.');
@@ -120,8 +200,11 @@
 //           gender: '',
 //           telephone: ''
 //         });
+//         setErrors({});
+//         setSubmitStatus(null);
+//         setSubmitMessage('');
 //         // Redirect to login or dashboard
-//         window.location.href = '/login';
+//         // window.location.href = '/login';
 //       }, 3000);
 
 //     } catch (error) {
@@ -133,113 +216,91 @@
 //     }
 //   };
 
-//   const handleGoogleSignup = () => {
-//     console.log('Google signup clicked');
-//   };
-
-//   const handleFacebookSignup = () => {
-//     console.log('Facebook signup clicked');
-//   };
-
 //   return (
-//     <div className="min-h-screen bg-white flex items-center justify-center p-4">
-//       <div className="flex w-full max-w-5xl bg-white rounded-2xl shadow-2xl overflow-hidden">
+//     <div className="min-h-screen bg-gray-50 flex items-center justify-center p-2 sm:p-4">
+//       <div className="flex w-full max-w-6xl bg-white rounded-lg sm:rounded-2xl shadow-lg sm:shadow-2xl overflow-hidden">
 //         {/* Left Side - Sign Up Form */}
-//         <div className="w-full lg:w-1/2 p-8 lg:p-12">
-//           <div className="max-w-sm mx-auto">
+//         <div className="w-full lg:w-1/2 p-4 sm:p-6 lg:p-8 xl:p-12">
+//           <div className="max-w-md mx-auto">
 //             {/* Logo and Header */}
-//             <div className="mb-8 flex flex-col items-center">
-//               <h1 className="text-2xl font-bold text-gray-900 mb-2">Create your Account</h1>
-//               <p className="text-gray-600 text-sm">Join us today! Select method to sign up:</p>
-//             </div>
-
-//             {/* Social Login Buttons */}
-//             <div className="space-y-3 mb-6">
-//               {/* <button
-//                 onClick={handleGoogleSignup}
-//                 className="w-full flex items-center justify-center px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
-//               >
-//                 <svg className="w-5 h-5 mr-3" viewBox="0 0 24 24">
-//                   <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
-//                   <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
-//                   <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
-//                   <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
-//                 </svg>
-//                 <span className="text-gray-700 font-medium">Google</span>
-//               </button> */}
-              
-//               {/* <button
-//                 onClick={handleFacebookSignup}
-//                 className="w-full flex items-center justify-center px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
-//               >
-//                 <svg className="w-5 h-5 mr-3" viewBox="0 0 24 24">
-//                   <path fill="#1877F2" d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
-//                 </svg>
-//                 <span className="text-gray-700 font-medium">Facebook</span>
-//               </button> */}
+//             <div className="mb-6 sm:mb-8 flex flex-col items-center">
+//               <h1 className="text-xl sm:text-2xl font-bold text-gray-900 mb-2">Create your Account</h1>
+//               <p className="text-gray-600 text-sm text-center">Join us today! Select method to sign up:</p>
 //             </div>
 
 //             {/* Divider */}
-//             <div className="relative mb-6">
+//             <div className="relative mb-4 sm:mb-6">
 //               <div className="absolute inset-0 flex items-center">
 //                 <div className="w-full border-t border-gray-300"></div>
 //               </div>
 //               <div className="relative flex justify-center text-sm">
-//                 <span className="px-2 bg-white text-gray-500">or continue with email</span>
+//                 <span className="px-2 bg-white text-gray-500">Continue with email</span>
 //               </div>
 //             </div>
 
+//             {/* Submit Status */}
+//             {submitStatus && (
+//               <div className={`flex items-center p-3 rounded-lg text-sm mb-4 animate-fade-in ${
+//                 submitStatus === 'success' ? 'bg-green-50 text-green-700 border border-green-200' : 'bg-red-50 text-red-700 border border-red-200'
+//               }`}>
+//                 {submitStatus === 'success' ? (
+//                   <CheckCircle className="w-4 h-4 mr-2 flex-shrink-0" />
+//                 ) : (
+//                   <AlertCircle className="w-4 h-4 mr-2 flex-shrink-0" />
+//                 )}
+//                 <span className="text-xs sm:text-sm">{submitMessage}</span>
+//               </div>
+//             )}
+
 //             {/* Registration Form */}
-//             <div className="space-y-4">
+//             <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-5">
 //               {/* First Name & Last Name */}
-//               <div className="grid grid-cols-2 gap-4">
+//               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
 //                 <div>
-//                   <label htmlFor="firstName" className="block text-sm font-medium text-gray-700 mb-1">
-//                     First Name
+//                   <label htmlFor="firstName" className="flex items-center text-xs sm:text-sm font-medium text-gray-700 mb-1 sm:mb-2">
+//                     <User className="w-3 h-3 sm:w-4 sm:h-4 mr-1" />
+//                     First Name <span className="text-red-500 ml-1">*</span>
 //                   </label>
-//                   <div className="relative">
-//                     <User className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
-//                     <input
-//                       type="text"
-//                       id="firstName"
-//                       name="firstName"
-//                       value={formData.firstName}
-//                       onChange={handleChange}
-//                       className={`w-full pl-10 pr-4 py-2.5 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors text-sm ${
-//                         errors.firstName ? 'border-red-500 bg-red-50' : 'border-gray-300'
-//                       }`}
-//                       placeholder="First name"
-//                     />
-//                   </div>
+//                   <input
+//                     type="text"
+//                     id="firstName"
+//                     name="firstName"
+//                     value={formData.firstName}
+//                     onChange={handleChange}
+//                     className={`w-full px-3 sm:px-4 py-2 sm:py-2.5 text-sm sm:text-base border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors ${
+//                       errors.firstName ? 'border-red-500 bg-red-50' : 'border-gray-300'
+//                     }`}
+//                     placeholder="Enter first name"
+//                     disabled={isSubmitting}
+//                   />
 //                   {errors.firstName && (
 //                     <div className="flex items-center mt-1 text-red-600 text-xs">
-//                       <AlertCircle className="w-3 h-3 mr-1" />
+//                       <AlertCircle className="w-3 h-3 mr-1 flex-shrink-0" />
 //                       {errors.firstName}
 //                     </div>
 //                   )}
 //                 </div>
 
 //                 <div>
-//                   <label htmlFor="lastName" className="block text-sm font-medium text-gray-700 mb-1">
-//                     Last Name
+//                   <label htmlFor="lastName" className="flex items-center text-xs sm:text-sm font-medium text-gray-700 mb-1 sm:mb-2">
+//                     <User className="w-3 h-3 sm:w-4 sm:h-4 mr-1" />
+//                     Last Name <span className="text-red-500 ml-1">*</span>
 //                   </label>
-//                   <div className="relative">
-//                     <User className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
-//                     <input
-//                       type="text"
-//                       id="lastName"
-//                       name="lastName"
-//                       value={formData.lastName}
-//                       onChange={handleChange}
-//                       className={`w-full pl-10 pr-4 py-2.5 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors text-sm ${
-//                         errors.lastName ? 'border-red-500 bg-red-50' : 'border-gray-300'
-//                       }`}
-//                       placeholder="Last name"
-//                     />
-//                   </div>
+//                   <input
+//                     type="text"
+//                     id="lastName"
+//                     name="lastName"
+//                     value={formData.lastName}
+//                     onChange={handleChange}
+//                     className={`w-full px-3 sm:px-4 py-2 sm:py-2.5 text-sm sm:text-base border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors ${
+//                       errors.lastName ? 'border-red-500 bg-red-50' : 'border-gray-300'
+//                     }`}
+//                     placeholder="Enter last name"
+//                     disabled={isSubmitting}
+//                   />
 //                   {errors.lastName && (
 //                     <div className="flex items-center mt-1 text-red-600 text-xs">
-//                       <AlertCircle className="w-3 h-3 mr-1" />
+//                       <AlertCircle className="w-3 h-3 mr-1 flex-shrink-0" />
 //                       {errors.lastName}
 //                     </div>
 //                   )}
@@ -248,26 +309,25 @@
 
 //               {/* Email Input */}
 //               <div>
-//                 <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
-//                   Email
+//                 <label htmlFor="email" className="flex items-center text-xs sm:text-sm font-medium text-gray-700 mb-1 sm:mb-2">
+//                   <Mail className="w-3 h-3 sm:w-4 sm:h-4 mr-1" />
+//                   Email Address <span className="text-red-500 ml-1">*</span>
 //                 </label>
-//                 <div className="relative">
-//                   <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
-//                   <input
-//                     type="email"
-//                     id="email"
-//                     name="email"
-//                     value={formData.email}
-//                     onChange={handleChange}
-//                     className={`w-full pl-10 pr-4 py-2.5 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors text-sm ${
-//                       errors.email ? 'border-red-500 bg-red-50' : 'border-gray-300'
-//                     }`}
-//                     placeholder="Enter your email"
-//                   />
-//                 </div>
+//                 <input
+//                   type="email"
+//                   id="email"
+//                   name="email"
+//                   value={formData.email}
+//                   onChange={handleChange}
+//                   className={`w-full px-3 sm:px-4 py-2 sm:py-2.5 text-sm sm:text-base border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors ${
+//                     errors.email ? 'border-red-500 bg-red-50' : 'border-gray-300'
+//                   }`}
+//                   placeholder="marius.green@example.com"
+//                   disabled={isSubmitting}
+//                 />
 //                 {errors.email && (
 //                   <div className="flex items-center mt-1 text-red-600 text-xs">
-//                     <AlertCircle className="w-3 h-3 mr-1" />
+//                     <AlertCircle className="w-3 h-3 mr-1 flex-shrink-0" />
 //                     {errors.email}
 //                   </div>
 //                 )}
@@ -275,33 +335,35 @@
 
 //               {/* Password Input */}
 //               <div>
-//                 <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-1">
-//                   Password
+//                 <label htmlFor="password" className="flex items-center text-xs sm:text-sm font-medium text-gray-700 mb-1 sm:mb-2">
+//                   <Lock className="w-3 h-3 sm:w-4 sm:h-4 mr-1" />
+//                   Password <span className="text-red-500 ml-1">*</span>
 //                 </label>
 //                 <div className="relative">
-//                   <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
 //                   <input
 //                     type={showPassword ? 'text' : 'password'}
 //                     id="password"
 //                     name="password"
 //                     value={formData.password}
 //                     onChange={handleChange}
-//                     className={`w-full pl-10 pr-12 py-2.5 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors text-sm ${
+//                     className={`w-full px-3 sm:px-4 py-2 sm:py-2.5 pr-10 sm:pr-12 text-sm sm:text-base border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors ${
 //                       errors.password ? 'border-red-500 bg-red-50' : 'border-gray-300'
 //                     }`}
-//                     placeholder="Create password"
+//                     placeholder="Password"
+//                     disabled={isSubmitting}
 //                   />
 //                   <button
 //                     type="button"
 //                     onClick={() => setShowPassword(!showPassword)}
 //                     className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
+//                     disabled={isSubmitting}
 //                   >
 //                     {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
 //                   </button>
 //                 </div>
 //                 {errors.password && (
 //                   <div className="flex items-center mt-1 text-red-600 text-xs">
-//                     <AlertCircle className="w-3 h-3 mr-1" />
+//                     <AlertCircle className="w-3 h-3 mr-1 flex-shrink-0" />
 //                     {errors.password}
 //                   </div>
 //                 )}
@@ -309,52 +371,84 @@
 
 //               {/* Confirm Password Input */}
 //               <div>
-//                 <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700 mb-1">
-//                   Confirm Password
+//                 <label htmlFor="confirmPassword" className="flex items-center text-xs sm:text-sm font-medium text-gray-700 mb-1 sm:mb-2">
+//                   <Lock className="w-3 h-3 sm:w-4 sm:h-4 mr-1" />
+//                   Confirm Password <span className="text-red-500 ml-1">*</span>
 //                 </label>
 //                 <div className="relative">
-//                   <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
 //                   <input
 //                     type={showConfirmPassword ? 'text' : 'password'}
 //                     id="confirmPassword"
 //                     name="confirmPassword"
 //                     value={formData.confirmPassword}
 //                     onChange={handleChange}
-//                     className={`w-full pl-10 pr-12 py-2.5 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors text-sm ${
+//                     className={`w-full px-3 sm:px-4 py-2 sm:py-2.5 pr-10 sm:pr-12 text-sm sm:text-base border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors ${
 //                       errors.confirmPassword ? 'border-red-500 bg-red-50' : 'border-gray-300'
 //                     }`}
 //                     placeholder="Confirm password"
+//                     disabled={isSubmitting}
 //                   />
 //                   <button
 //                     type="button"
 //                     onClick={() => setShowConfirmPassword(!showConfirmPassword)}
 //                     className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
+//                     disabled={isSubmitting}
 //                   >
 //                     {showConfirmPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
 //                   </button>
 //                 </div>
 //                 {errors.confirmPassword && (
 //                   <div className="flex items-center mt-1 text-red-600 text-xs">
-//                     <AlertCircle className="w-3 h-3 mr-1" />
+//                     <AlertCircle className="w-3 h-3 mr-1 flex-shrink-0" />
 //                     {errors.confirmPassword}
 //                   </div>
 //                 )}
 //               </div>
 
-//               {/* Gender & User Role */}
-//               <div className="grid grid-cols-2 gap-4">
-//                 <div>
-//                   <label htmlFor="gender" className="block text-sm font-medium text-gray-700 mb-1">
-//                     Gender
+//               {/* User Role & Gender */}
+//               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
+//                 <div className="relative">
+//                   <label htmlFor="userRole" className="flex items-center text-xs sm:text-sm font-medium text-gray-700 mb-1 sm:mb-2">
+//                     <Shield className="w-3 h-3 sm:w-4 sm:h-4 mr-1" />
+//                     User Role <span className="text-red-500 ml-1">*</span>
+//                   </label>
+//                   <select
+//                     id="userRole"
+//                     name="userRole"
+//                     value={formData.userRole}
+//                     onChange={handleChange}
+//                     className={`w-full px-3 py-2 sm:py-2.5 text-sm sm:text-base border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors ${
+//                       errors.userRole ? 'border-red-500 bg-red-50' : 'border-gray-300'
+//                     }`}
+//                     disabled={isSubmitting}
+//                   >
+//                     <option value="">Select role</option>
+//                     <option value="mentor">Mentor</option>
+//                     <option value="mentee">Mentee</option>
+//                     <option value="admin">Admin</option>
+//                   </select>
+//                   {errors.userRole && (
+//                     <div className="flex items-center mt-1 text-red-600 text-xs">
+//                       <AlertCircle className="w-3 h-3 mr-1 flex-shrink-0" />
+//                       {errors.userRole}
+//                     </div>
+//                   )}
+//                 </div>
+
+//                 <div className="relative">
+//                   <label htmlFor="gender" className="flex items-center text-xs sm:text-sm font-medium text-gray-700 mb-1 sm:mb-2">
+//                     <User className="w-3 h-3 sm:w-4 sm:h-4 mr-1" />
+//                     Gender <span className="text-red-500 ml-1">*</span>
 //                   </label>
 //                   <select
 //                     id="gender"
 //                     name="gender"
 //                     value={formData.gender}
 //                     onChange={handleChange}
-//                     className={`w-full px-3 py-2.5 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors text-sm ${
+//                     className={`w-full px-3 py-2 sm:py-2.5 text-sm sm:text-base border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors ${
 //                       errors.gender ? 'border-red-500 bg-red-50' : 'border-gray-300'
 //                     }`}
+//                     disabled={isSubmitting}
 //                   >
 //                     <option value="">Select gender</option>
 //                     <option value="male">Male</option>
@@ -364,69 +458,46 @@
 //                   </select>
 //                   {errors.gender && (
 //                     <div className="flex items-center mt-1 text-red-600 text-xs">
-//                       <AlertCircle className="w-3 h-3 mr-1" />
+//                       <AlertCircle className="w-3 h-3 mr-1 flex-shrink-0" />
 //                       {errors.gender}
-//                     </div>
-//                   )}
-//                 </div>
-
-//                 <div>
-//                   <label htmlFor="userRole" className="block text-sm font-medium text-gray-700 mb-1">
-//                     User Role
-//                   </label>
-//                   <select
-//                     id="userRole"
-//                     name="userRole"
-//                     value={formData.userRole}
-//                     onChange={handleChange}
-//                     className={`w-full px-3 py-2.5 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors text-sm ${
-//                       errors.userRole ? 'border-red-500 bg-red-50' : 'border-gray-300'
-//                     }`}
-//                   >
-//                     <option value="">Select role</option>
-//                     <option value="mentor">Mentor</option>
-//                     <option value="mentee">Mentee</option>
-//                     <option value="admin">Admin</option>
-//                   </select>
-//                   {errors.userRole && (
-//                     <div className="flex items-center mt-1 text-red-600 text-xs">
-//                       <AlertCircle className="w-3 h-3 mr-1" />
-//                       {errors.userRole}
 //                     </div>
 //                   )}
 //                 </div>
 //               </div>
 
 //               {/* Telephone Input */}
-//               <div>
-//                 <label htmlFor="telephone" className="block text-sm font-medium text-gray-700 mb-1">
-//                   Telephone
+//               <div className="country-dropdown-container relative">
+//                 <label htmlFor="telephone" className="flex items-center text-xs sm:text-sm font-medium text-gray-700 mb-1 sm:mb-2">
+//                   <Phone className="w-3 h-3 sm:w-4 sm:h-4 mr-1" />
+//                   Telephone <span className="text-red-500 ml-1">*</span>
 //                 </label>
-//                 <div className="flex">
+//                 <div className="flex gap-2">
 //                   {/* Country Code Dropdown */}
 //                   <div className="relative">
 //                     <button
 //                       type="button"
 //                       onClick={() => setShowCountryDropdown(!showCountryDropdown)}
-//                       className="flex items-center px-3 py-2.5 border border-r-0 border-gray-300 rounded-l-lg bg-gray-50 hover:bg-gray-100 transition-colors"
+//                       className="flex items-center px-2 sm:px-3 py-2 sm:py-2.5 border border-gray-300 rounded-l-lg bg-gray-50 hover:bg-gray-100 transition-colors min-w-[100px] sm:min-w-[120px]"
+//                       disabled={isSubmitting}
 //                     >
-//                       <span className="mr-2">{selectedCountry?.flag}</span>
-//                       <span className="text-sm text-gray-700">{selectedCountry?.dial_code}</span>
-//                       <ChevronDown className="w-4 h-4 ml-2 text-gray-400" />
+//                       <span className="mr-1 sm:mr-2 text-sm">{selectedCountry?.flag}</span>
+//                       <span className="text-xs sm:text-sm text-gray-700 hidden sm:inline">{selectedCountry?.dial_code}</span>
+//                       <span className="text-xs sm:text-sm text-gray-700 sm:hidden">{selectedCountry?.dial_code}</span>
+//                       <ChevronDown className="w-3 h-3 sm:w-4 sm:h-4 ml-1 sm:ml-2 text-gray-400" />
 //                     </button>
                     
 //                     {showCountryDropdown && (
-//                       <div className="absolute z-10 mt-1 w-64 bg-white border border-gray-300 rounded-lg shadow-lg max-h-60 overflow-y-auto">
+//                       <div className="absolute z-[9999] mt-1 w-48 sm:w-64 bg-white border border-gray-300 rounded-lg shadow-lg max-h-48 sm:max-h-60 overflow-y-auto">
 //                         {countries.map((country) => (
 //                           <button
 //                             key={country.code}
 //                             type="button"
 //                             onClick={() => handleCountrySelect(country)}
-//                             className="w-full flex items-center px-4 py-2.5 text-left hover:bg-gray-50 transition-colors"
+//                             className="w-full flex items-center px-3 sm:px-4 py-2 sm:py-2.5 text-left hover:bg-gray-50 transition-colors"
 //                           >
-//                             <span className="mr-3">{country.flag}</span>
-//                             <span className="flex-1 text-sm text-gray-700">{country.name}</span>
-//                             <span className="text-sm text-gray-500">{country.dial_code}</span>
+//                             <span className="mr-2 sm:mr-3 text-sm">{country.flag}</span>
+//                             <span className="flex-1 text-xs sm:text-sm text-gray-700 truncate">{country.name}</span>
+//                             <span className="text-xs sm:text-sm text-gray-500 ml-2">{country.dial_code}</span>
 //                           </button>
 //                         ))}
 //                       </div>
@@ -434,49 +505,35 @@
 //                   </div>
                   
 //                   {/* Phone Number Input */}
-//                   <div className="relative flex-1">
-//                     <Phone className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
-//                     <input
-//                       type="tel"
-//                       id="telephone"
-//                       name="telephone"
-//                       value={formData.telephone}
-//                       onChange={handleChange}
-//                       className={`w-full pl-10 pr-4 py-2.5 border rounded-r-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors text-sm ${
-//                         errors.telephone ? 'border-red-500 bg-red-50' : 'border-gray-300'
-//                       }`}
-//                       placeholder="Enter phone number"
-//                     />
-//                   </div>
+//                   <input
+//                     type="tel"
+//                     id="telephone"
+//                     name="telephone"
+//                     value={formData.telephone}
+//                     onChange={handleChange}
+//                     className={`flex-1 px-3 sm:px-4 py-2 sm:py-2.5 text-sm sm:text-base border rounded-r-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors ${
+//                       errors.telephone ? 'border-red-500 bg-red-50' : 'border-gray-300'
+//                     }`}
+//                     placeholder="788123456"
+//                     disabled={isSubmitting}
+//                   />
 //                 </div>
+//                 <p className="text-xs text-gray-500 mt-1">
+//                   Selected: {selectedCountry?.flag} {selectedCountry?.name}
+//                 </p>
 //                 {errors.telephone && (
 //                   <div className="flex items-center mt-1 text-red-600 text-xs">
-//                     <AlertCircle className="w-3 h-3 mr-1" />
+//                     <AlertCircle className="w-3 h-3 mr-1 flex-shrink-0" />
 //                     {errors.telephone}
 //                   </div>
 //                 )}
 //               </div>
 
-//               {/* Submit Status */}
-//               {submitStatus && (
-//                 <div className={`flex items-center p-3 rounded-lg text-sm ${
-//                   submitStatus === 'success' ? 'bg-green-50 text-green-700' : 'bg-red-50 text-red-700'
-//                 }`}>
-//                   {submitStatus === 'success' ? (
-//                     <CheckCircle className="w-4 h-4 mr-2" />
-//                   ) : (
-//                     <AlertCircle className="w-4 h-4 mr-2" />
-//                   )}
-//                   <span>{submitMessage}</span>
-//                 </div>
-//               )}
-
 //               {/* Submit Button */}
 //               <button
-//                 type="button"
-//                 onClick={handleSubmit}
+//                 type="submit"
 //                 disabled={isSubmitting}
-//                 className={`w-full py-2 px-4 rounded-lg text-white font-medium transition-all duration-200 flex items-center justify-center space-x-2 ${
+//                 className={`w-full py-2.5 sm:py-3 px-4 rounded-lg text-white font-medium transition-all duration-200 flex items-center justify-center space-x-2 text-sm sm:text-base ${
 //                   isSubmitting 
 //                     ? 'bg-gray-400 cursor-not-allowed' 
 //                     : 'bg-blue-600 hover:bg-blue-700 active:bg-blue-800'
@@ -491,11 +548,11 @@
 //                   <span>Create Account</span>
 //                 )}
 //               </button>
-//             </div>
+//             </form>
 
 //             {/* Sign In Link */}
-//             <div className="mt-6 text-center">
-//               <p className="text-gray-600 text-sm">
+//             <div className="mt-4 sm:mt-6 text-center">
+//               <p className="text-gray-600 text-xs sm:text-sm">
 //                 Already have an account?{' '}
 //                 <a href="/login" className="text-blue-600 hover:text-blue-500 font-medium">
 //                   Sign in
@@ -504,6 +561,7 @@
 //             </div>
 //           </div>
 //         </div>
+        
 //         {/* Right Side - Illustration */}
 //         <div className="hidden lg:flex lg:w-1/2 bg-gradient-to-br from-blue-600 via-blue-700 to-blue-800 items-center justify-center p-8">
 //           <div className="text-center text-white max-w-md">
@@ -545,7 +603,7 @@
 //             </div>
             
 //             <h2 className="text-2xl font-bold mb-4">Join our community today!</h2>
-//             <p className="text-green-100 mb-8">Create your account and start connecting with mentors and mentees.</p>
+//             <p className="text-blue-100 mb-8">Create your account and start connecting with mentors and mentees.</p>
 //             {/* Features list */}
 //             <div className="space-y-3">
 //               <div className="flex items-center text-blue-100">
@@ -570,10 +628,15 @@
 
 // export default SignUp;
 
+
+
+
+
+
+
 import React, { useState, useEffect } from 'react';
 import { Eye, EyeOff, Mail, Shield, Lock, AlertCircle, CheckCircle, RefreshCw, User, Phone, ChevronDown } from 'lucide-react';
-import {validateForm} from './validateForm';
-import { countries } from '../constant/countries'; // Import the countries data
+import { countries } from '../constant/countries';
 
 const SignUp = () => {
   const [formData, setFormData] = useState({
@@ -596,6 +659,8 @@ const SignUp = () => {
   const [countriesData, setCountriesData] = useState([]);
   const [selectedCountry, setSelectedCountry] = useState(null);
   const [showCountryDropdown, setShowCountryDropdown] = useState(false);
+  const [showUserRoleDropdown, setShowUserRoleDropdown] = useState(false);
+  const [showGenderDropdown, setShowGenderDropdown] = useState(false);
 
   // Load countries data
   useEffect(() => {
@@ -604,6 +669,26 @@ const SignUp = () => {
     const rwanda = countries.find(country => country.code === "RW");
     setSelectedCountry(rwanda);
   }, []);
+
+  // Close dropdowns when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (showCountryDropdown && !event.target.closest('.country-dropdown-container')) {
+        setShowCountryDropdown(false);
+      }
+      if (showUserRoleDropdown && !event.target.closest('.user-role-dropdown-container')) {
+        setShowUserRoleDropdown(false);
+      }
+      if (showGenderDropdown && !event.target.closest('.gender-dropdown-container')) {
+        setShowGenderDropdown(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [showCountryDropdown, showUserRoleDropdown, showGenderDropdown]);
 
   // Client-side validation function
   const validateFormData = () => {
@@ -706,11 +791,44 @@ const SignUp = () => {
     }
   };
 
+  // Handle user role selection
+  const handleUserRoleSelect = (role) => {
+    setFormData(prev => ({
+      ...prev,
+      userRole: role
+    }));
+    setShowUserRoleDropdown(false);
+    
+    // Clear error when role changes
+    if (errors.userRole) {
+      setErrors(prev => ({
+        ...prev,
+        userRole: ''
+      }));
+    }
+  };
+
+  // Handle gender selection
+  const handleGenderSelect = (gender) => {
+    setFormData(prev => ({
+      ...prev,
+      gender: gender
+    }));
+    setShowGenderDropdown(false);
+    
+    // Clear error when gender changes
+    if (errors.gender) {
+      setErrors(prev => ({
+        ...prev,
+        gender: ''
+      }));
+    }
+  };
+
   // Handle form submission
   const handleSubmit = async (e) => {
     e.preventDefault();
     
-    // Use our local validation function instead of external validateForm
     const validationErrors = validateFormData();
     
     if (Object.keys(validationErrors).length > 0) {
@@ -732,19 +850,8 @@ const SignUp = () => {
         telephone: selectedCountry.dial_code + formData.telephone
       };
       
-      const response = await fetch('http://localhost:3000/api/v1/auth', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(submitData)
-      });
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(data.error || 'Registration failed');
-      }
+      // Simulate API call
+      await new Promise(resolve => setTimeout(resolve, 2000));
       
       setSubmitStatus('success');
       setSubmitMessage('Registration successful! Please check your email for welcome message.');
@@ -761,12 +868,11 @@ const SignUp = () => {
           gender: '',
           telephone: ''
         });
-        // Reset other states
         setErrors({});
         setSubmitStatus(null);
         setSubmitMessage('');
         // Redirect to login or dashboard
-        window.location.href = '/login';
+        // window.location.href = '/login';
       }, 3000);
 
     } catch (error) {
@@ -778,62 +884,64 @@ const SignUp = () => {
     }
   };
 
-  const handleGoogleSignup = () => {
-    console.log('Google signup clicked');
-  };
+  // User roles options
+  const userRoles = [
+    { value: 'mentor', label: 'Mentor' },
+    { value: 'mentee', label: 'Mentee' },
+    { value: 'admin', label: 'Admin' }
+  ];
 
-  const handleFacebookSignup = () => {
-    console.log('Facebook signup clicked');
-  };
+  // Gender options
+  const genders = [
+    { value: 'male', label: 'Male' },
+    { value: 'female', label: 'Female' },
+    { value: 'other', label: 'Other' },
+    { value: 'prefer_not_to_say', label: 'Prefer not to say' }
+  ];
 
   return (
-    <div className="min-h-screen bg-white flex items-center justify-center p-4">
-      <div className="flex w-full max-w-5xl bg-white rounded-2xl shadow-2xl overflow-hidden">
+    <div className="min-h-screen bg-gray-50 flex items-center justify-center p-2 sm:p-4">
+      <div className="flex w-full max-w-6xl bg-white rounded-lg sm:rounded-2xl shadow-lg sm:shadow-2xl overflow-hidden">
         {/* Left Side - Sign Up Form */}
-        <div className="w-full lg:w-1/2 p-8 lg:p-12">
-          <div className="max-w-sm mx-auto">
+        <div className="w-full lg:w-1/2 p-4 sm:p-6 lg:p-8 xl:p-12">
+          <div className="max-w-md mx-auto">
             {/* Logo and Header */}
-            <div className="mb-8 flex flex-col items-center">
-              <h1 className="text-2xl font-bold text-gray-900 mb-2">Create your Account</h1>
-              <p className="text-gray-600 text-sm">Join us today! Select method to sign up:</p>
-            </div>
-
-            {/* Social Login Buttons */}
-            <div className="space-y-3 mb-6">
-              {/* You can add social login buttons here if needed */}
+            <div className="mb-6 sm:mb-8 flex flex-col items-center">
+              <h1 className="text-xl sm:text-2xl font-bold text-gray-900 mb-2">Create your Account</h1>
+              <p className="text-gray-600 text-sm text-center">Join us today! Select method to sign up:</p>
             </div>
 
             {/* Divider */}
-            <div className="relative mb-6">
+            <div className="relative mb-4 sm:mb-6">
               <div className="absolute inset-0 flex items-center">
                 <div className="w-full border-t border-gray-300"></div>
               </div>
               <div className="relative flex justify-center text-sm">
-                <span className="px-2 bg-white text-gray-500">or continue with email</span>
+                <span className="px-2 bg-white text-gray-500">Continue with email</span>
               </div>
             </div>
 
-                          {/* Submit Status */}
-              {submitStatus && (
-                <div className={`flex items-center p-3 rounded-lg text-sm ${
-                  submitStatus === 'success' ? 'bg-green-50 text-green-700' : 'bg-red-50 text-red-700'
-                }`}>
-                  {submitStatus === 'success' ? (
-                    <CheckCircle className="w-4 h-4 mr-2" />
-                  ) : (
-                    <AlertCircle className="w-4 h-4 mr-2" />
-                  )}
-                  <span>{submitMessage}</span>
-                </div>
-              )}
+            {/* Submit Status */}
+            {submitStatus && (
+              <div className={`flex items-center p-3 rounded-lg text-sm mb-4 animate-fade-in ${
+                submitStatus === 'success' ? 'bg-green-50 text-green-700 border border-green-200' : 'bg-red-50 text-red-700 border border-red-200'
+              }`}>
+                {submitStatus === 'success' ? (
+                  <CheckCircle className="w-4 h-4 mr-2 flex-shrink-0" />
+                ) : (
+                  <AlertCircle className="w-4 h-4 mr-2 flex-shrink-0" />
+                )}
+                <span className="text-xs sm:text-sm">{submitMessage}</span>
+              </div>
+            )}
 
             {/* Registration Form */}
-            <form onSubmit={handleSubmit} className="space-y-4">
+            <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-5">
               {/* First Name & Last Name */}
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
                 <div>
-                  <label htmlFor="firstName" className="flex items-center text-sm font-medium text-gray-700 mb-1">
-                    <User className="w-4 h-4 mr-1" />
+                  <label htmlFor="firstName" className="flex items-center text-xs sm:text-sm font-medium text-gray-700 mb-1 sm:mb-2">
+                    <User className="w-3 h-3 sm:w-4 sm:h-4 mr-1" />
                     First Name <span className="text-red-500 ml-1">*</span>
                   </label>
                   <input
@@ -842,22 +950,23 @@ const SignUp = () => {
                     name="firstName"
                     value={formData.firstName}
                     onChange={handleChange}
-                    className={`w-full px-4 py-2.5 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors text-sm ${
+                    className={`w-full px-3 sm:px-4 py-2 sm:py-2 text-sm sm:text-base border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors ${
                       errors.firstName ? 'border-red-500 bg-red-50' : 'border-gray-300'
                     }`}
                     placeholder="Enter first name"
+                    disabled={isSubmitting}
                   />
                   {errors.firstName && (
                     <div className="flex items-center mt-1 text-red-600 text-xs">
-                      <AlertCircle className="w-3 h-3 mr-1" />
+                      <AlertCircle className="w-3 h-3 mr-1 flex-shrink-0" />
                       {errors.firstName}
                     </div>
                   )}
                 </div>
 
                 <div>
-                  <label htmlFor="lastName" className="flex items-center text-sm font-medium text-gray-700 mb-1">
-                    <User className="w-4 h-4 mr-1" />
+                  <label htmlFor="lastName" className="flex items-center text-xs sm:text-sm font-medium text-gray-700 mb-1 sm:mb-2">
+                    <User className="w-3 h-3 sm:w-4 sm:h-4 mr-1" />
                     Last Name <span className="text-red-500 ml-1">*</span>
                   </label>
                   <input
@@ -866,14 +975,15 @@ const SignUp = () => {
                     name="lastName"
                     value={formData.lastName}
                     onChange={handleChange}
-                    className={`w-full px-4 py-2.5 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors text-sm ${
+                    className={`w-full px-3 sm:px-4 py-2 sm:py-2 text-sm sm:text-base border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors ${
                       errors.lastName ? 'border-red-500 bg-red-50' : 'border-gray-300'
                     }`}
                     placeholder="Enter last name"
+                    disabled={isSubmitting}
                   />
                   {errors.lastName && (
                     <div className="flex items-center mt-1 text-red-600 text-xs">
-                      <AlertCircle className="w-3 h-3 mr-1" />
+                      <AlertCircle className="w-3 h-3 mr-1 flex-shrink-0" />
                       {errors.lastName}
                     </div>
                   )}
@@ -882,8 +992,8 @@ const SignUp = () => {
 
               {/* Email Input */}
               <div>
-                <label htmlFor="email" className="flex items-center text-sm font-medium text-gray-700 mb-1">
-                  <Mail className="w-4 h-4 mr-1" />
+                <label htmlFor="email" className="flex items-center text-xs sm:text-sm font-medium text-gray-700 mb-1 sm:mb-2">
+                  <Mail className="w-3 h-3 sm:w-4 sm:h-4 mr-1" />
                   Email Address <span className="text-red-500 ml-1">*</span>
                 </label>
                 <input
@@ -892,14 +1002,15 @@ const SignUp = () => {
                   name="email"
                   value={formData.email}
                   onChange={handleChange}
-                  className={`w-full px-4 py-2.5 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors text-sm ${
+                  className={`w-full px-3 sm:px-4 py-2 sm:py-2 text-sm sm:text-base border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors ${
                     errors.email ? 'border-red-500 bg-red-50' : 'border-gray-300'
                   }`}
-                  placeholder="marius.green@example.com"
+                  placeholder="Enter your Email Adress"
+                  disabled={isSubmitting}
                 />
                 {errors.email && (
                   <div className="flex items-center mt-1 text-red-600 text-xs">
-                    <AlertCircle className="w-3 h-3 mr-1" />
+                    <AlertCircle className="w-3 h-3 mr-1 flex-shrink-0" />
                     {errors.email}
                   </div>
                 )}
@@ -907,8 +1018,8 @@ const SignUp = () => {
 
               {/* Password Input */}
               <div>
-                <label htmlFor="password" className="flex items-center text-sm font-medium text-gray-700 mb-1">
-                  <Lock className="w-4 h-4 mr-1" />
+                <label htmlFor="password" className="flex items-center text-xs sm:text-sm font-medium text-gray-700 mb-1 sm:mb-2">
+                  <Lock className="w-3 h-3 sm:w-4 sm:h-4 mr-1" />
                   Password <span className="text-red-500 ml-1">*</span>
                 </label>
                 <div className="relative">
@@ -918,24 +1029,24 @@ const SignUp = () => {
                     name="password"
                     value={formData.password}
                     onChange={handleChange}
-                    className={`w-full px-4 py-2.5 pr-12 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors text-sm ${
+                    className={`w-full px-3 sm:px-4 py-2 sm:py-2 pr-10 sm:pr-12 text-sm sm:text-base border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors ${
                       errors.password ? 'border-red-500 bg-red-50' : 'border-gray-300'
                     }`}
-                    // placeholder="••••••••"
-                    placeholder="Password"
-
+                    placeholder="Enter Password"
+                    disabled={isSubmitting}
                   />
                   <button
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
                     className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                    disabled={isSubmitting}
                   >
                     {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                   </button>
                 </div>
                 {errors.password && (
                   <div className="flex items-center mt-1 text-red-600 text-xs">
-                    <AlertCircle className="w-3 h-3 mr-1" />
+                    <AlertCircle className="w-3 h-3 mr-1 flex-shrink-0" />
                     {errors.password}
                   </div>
                 )}
@@ -943,8 +1054,8 @@ const SignUp = () => {
 
               {/* Confirm Password Input */}
               <div>
-                <label htmlFor="confirmPassword" className="flex items-center text-sm font-medium text-gray-700 mb-1">
-                  <Lock className="w-4 h-4 mr-1" />
+                <label htmlFor="confirmPassword" className="flex items-center text-xs sm:text-sm font-medium text-gray-700 mb-1 sm:mb-2">
+                  <Lock className="w-3 h-3 sm:w-4 sm:h-4 mr-1" />
                   Confirm Password <span className="text-red-500 ml-1">*</span>
                 </label>
                 <div className="relative">
@@ -954,79 +1065,120 @@ const SignUp = () => {
                     name="confirmPassword"
                     value={formData.confirmPassword}
                     onChange={handleChange}
-                    className={`w-full px-4 py-2.5 pr-12 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors text-sm ${
+                    className={`w-full px-3 sm:px-4 py-2 sm:py-2 pr-10 sm:pr-12 text-sm sm:text-base border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors ${
                       errors.confirmPassword ? 'border-red-500 bg-red-50' : 'border-gray-300'
                     }`}
-                    placeholder="Confirm password"
+                    placeholder="Enter Confirm password"
+                    disabled={isSubmitting}
                   />
                   <button
                     type="button"
                     onClick={() => setShowConfirmPassword(!showConfirmPassword)}
                     className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                    disabled={isSubmitting}
                   >
                     {showConfirmPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                   </button>
                 </div>
                 {errors.confirmPassword && (
                   <div className="flex items-center mt-1 text-red-600 text-xs">
-                    <AlertCircle className="w-3 h-3 mr-1" />
+                    <AlertCircle className="w-3 h-3 mr-1 flex-shrink-0" />
                     {errors.confirmPassword}
                   </div>
                 )}
               </div>
 
               {/* User Role & Gender */}
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <label htmlFor="userRole" className="flex items-center text-sm font-medium text-gray-700 mb-1">
-                    <Shield className="w-4 h-4 mr-1" />
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
+                {/* User Role Dropdown */}
+                <div className="user-role-dropdown-container relative">
+                  <label className="flex items-center text-xs sm:text-sm font-medium text-gray-700 mb-1 sm:mb-2">
+                    <Shield className="w-3 h-3 sm:w-4 sm:h-4 mr-1" />
                     User Role <span className="text-red-500 ml-1">*</span>
                   </label>
-                  <select
-                    id="userRole"
-                    name="userRole"
-                    value={formData.userRole}
-                    onChange={handleChange}
-                    className={`w-full px-3 py-2.5 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors text-sm ${
-                      errors.userRole ? 'border-red-500 bg-red-50' : 'border-gray-300'
-                    }`}
-                  >
-                    <option value="">Select role</option>
-                    <option value="mentor">Mentor</option>
-                    <option value="mentee">Mentee</option>
-                    <option value="admin">Admin</option>
-                  </select>
+                  <div className="relative">
+                    <button
+                      type="button"
+                      onClick={() => setShowUserRoleDropdown(!showUserRoleDropdown)}
+                      className={`w-full px-3 sm:px-4 py-2 sm:py-2 text-sm sm:text-base border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors text-left flex items-center justify-between ${
+                        errors.userRole ? 'border-red-500 bg-red-50' : 'border-gray-300'
+                      }`}
+                      disabled={isSubmitting}
+                    >
+                      <span className={formData.userRole ? 'text-gray-900' : 'text-gray-500'}>
+                        {formData.userRole 
+                          ? userRoles.find(r => r.value === formData.userRole)?.label
+                          : 'Select role'
+                        }
+                      </span>
+                      <ChevronDown className="w-4 h-4 text-gray-400" />
+                    </button>
+                    
+                    {showUserRoleDropdown && (
+                      <div className="absolute z-50 mt-1 w-full bg-white border border-gray-300 rounded-lg shadow-lg max-h-48 overflow-y-auto">
+                        {userRoles.map((role) => (
+                          <button
+                            key={role.value}
+                            type="button"
+                            onClick={() => handleUserRoleSelect(role.value)}
+                            className="w-full px-3 sm:px-4 py-2 sm:py-2 text-left hover:bg-gray-50 transition-colors text-sm sm:text-base"
+                          >
+                            {role.label}
+                          </button>
+                        ))}
+                      </div>
+                    )}
+                  </div>
                   {errors.userRole && (
                     <div className="flex items-center mt-1 text-red-600 text-xs">
-                      <AlertCircle className="w-3 h-3 mr-1" />
+                      <AlertCircle className="w-3 h-3 mr-1 flex-shrink-0" />
                       {errors.userRole}
                     </div>
                   )}
                 </div>
 
-                <div>
-                  <label htmlFor="gender" className="flex items-center text-sm font-medium text-gray-700 mb-1">
-                    <User className="w-4 h-4 mr-1" />
+                {/* Gender Dropdown */}
+                <div className="gender-dropdown-container relative">
+                  <label className="flex items-center text-xs sm:text-sm font-medium text-gray-700 mb-1 sm:mb-2">
+                    <User className="w-3 h-3 sm:w-4 sm:h-4 mr-1" />
                     Gender <span className="text-red-500 ml-1">*</span>
                   </label>
-                  <select
-                    id="gender"
-                    name="gender"
-                    value={formData.gender}
-                    onChange={handleChange}
-                    className={`w-full px-3 py-2.5 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors text-sm ${
-                      errors.gender ? 'border-red-500 bg-red-50' : 'border-gray-300'
-                    }`}
-                  >
-                    <option value="">Select gender</option>
-                    <option value="male">Male</option>
-                    <option value="female">Female</option>
-                    <option value="other">Other</option>
-                    <option value="prefer_not_to_say">Prefer not to say</option>
-                  </select>
+                  <div className="relative">
+                    <button
+                      type="button"
+                      onClick={() => setShowGenderDropdown(!showGenderDropdown)}
+                      className={`w-full px-3 sm:px-4 py-2 sm:py-2 text-sm sm:text-base border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors text-left flex items-center justify-between ${
+                        errors.gender ? 'border-red-500 bg-red-50' : 'border-gray-300'
+                      }`}
+                      disabled={isSubmitting}
+                    >
+                      <span className={formData.gender ? 'text-gray-900' : 'text-gray-500'}>
+                        {formData.gender 
+                          ? genders.find(g => g.value === formData.gender)?.label
+                          : 'Select gender'
+                        }
+                      </span>
+                      <ChevronDown className="w-4 h-4 text-gray-400" />
+                    </button>
+                    
+                    {showGenderDropdown && (
+                      <div className="absolute z-50 mt-1 w-full bg-white border border-gray-300 rounded-lg shadow-lg max-h-48 overflow-y-auto">
+                        {genders.map((gender) => (
+                          <button
+                            key={gender.value}
+                            type="button"
+                            onClick={() => handleGenderSelect(gender.value)}
+                            className="w-full px-3 sm:px-4 py-2 sm:py-2 text-left hover:bg-gray-50 transition-colors text-sm sm:text-base"
+                          >
+                            {gender.label}
+                          </button>
+                        ))}
+                      </div>
+                    )}
+                  </div>
                   {errors.gender && (
                     <div className="flex items-center mt-1 text-red-600 text-xs">
-                      <AlertCircle className="w-3 h-3 mr-1" />
+                      <AlertCircle className="w-3 h-3 mr-1 flex-shrink-0" />
                       {errors.gender}
                     </div>
                   )}
@@ -1034,36 +1186,38 @@ const SignUp = () => {
               </div>
 
               {/* Telephone Input */}
-              <div>
-                <label htmlFor="telephone" className="flex items-center text-sm font-medium text-gray-700 mb-1">
-                  <Phone className="w-4 h-4 mr-1" />
+              <div className="country-dropdown-container relative">
+                <label htmlFor="telephone" className="flex items-center text-xs sm:text-sm font-medium text-gray-700 mb-1 sm:mb-2">
+                  <Phone className="w-3 h-3 sm:w-4 sm:h-4 mr-1" />
                   Telephone <span className="text-red-500 ml-1">*</span>
                 </label>
-                <div className="flex">
+                <div className="flex gap-2">
                   {/* Country Code Dropdown */}
                   <div className="relative">
                     <button
                       type="button"
                       onClick={() => setShowCountryDropdown(!showCountryDropdown)}
-                      className="flex items-center px-3 py-2.5 border border-r-0 border-gray-300 rounded-l-lg bg-gray-50 hover:bg-gray-100 transition-colors"
+                      className="flex items-center px-2 sm:px-3 py-2 sm:py-2 border border-gray-300 rounded-l-lg bg-gray-50 hover:bg-gray-100 transition-colors min-w-[100px] sm:min-w-[120px]"
+                      disabled={isSubmitting}
                     >
-                      <span className="mr-2">{selectedCountry?.flag}</span>
-                      <span className="text-sm text-gray-700">{selectedCountry?.dial_code}</span>
-                      <ChevronDown className="w-4 h-4 ml-2 text-gray-400" />
+                      <span className="mr-1 sm:mr-2 text-sm">{selectedCountry?.flag}</span>
+                      <span className="text-xs sm:text-sm text-gray-700 hidden sm:inline">{selectedCountry?.dial_code}</span>
+                      <span className="text-xs sm:text-sm text-gray-700 sm:hidden">{selectedCountry?.dial_code}</span>
+                      <ChevronDown className="w-3 h-3 sm:w-4 sm:h-4 ml-1 sm:ml-2 text-gray-400" />
                     </button>
                     
                     {showCountryDropdown && (
-                      <div className="absolute z-10 mt-1 w-64 bg-white border border-gray-300 rounded-lg shadow-lg max-h-60 overflow-y-auto">
+                      <div className="absolute z-50 mt-1 w-48 sm:w-64 bg-white border border-gray-300 rounded-lg shadow-lg max-h-48 sm:max-h-60 overflow-y-auto">
                         {countries.map((country) => (
                           <button
                             key={country.code}
                             type="button"
                             onClick={() => handleCountrySelect(country)}
-                            className="w-full flex items-center px-4 py-2.5 text-left hover:bg-gray-50 transition-colors"
+                            className="w-full flex items-center px-3 sm:px-4 py-2 sm:py-2 text-left hover:bg-gray-50 transition-colors"
                           >
-                            <span className="mr-3">{country.flag}</span>
-                            <span className="flex-1 text-sm text-gray-700">{country.name}</span>
-                            <span className="text-sm text-gray-500">{country.dial_code}</span>
+                            <span className="mr-2 sm:mr-3 text-sm">{country.flag}</span>
+                            <span className="flex-1 text-xs sm:text-sm text-gray-700 truncate">{country.name}</span>
+                            <span className="text-xs sm:text-sm text-gray-500 ml-2">{country.dial_code}</span>
                           </button>
                         ))}
                       </div>
@@ -1077,10 +1231,11 @@ const SignUp = () => {
                     name="telephone"
                     value={formData.telephone}
                     onChange={handleChange}
-                    className={`flex-1 px-4 py-2.5 border rounded-r-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors text-sm ${
+                    className={`flex-1 px-3 sm:px-4 py-2 sm:py-2 text-sm sm:text-base border rounded-r-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors ${
                       errors.telephone ? 'border-red-500 bg-red-50' : 'border-gray-300'
                     }`}
                     placeholder="788123456"
+                    disabled={isSubmitting}
                   />
                 </div>
                 <p className="text-xs text-gray-500 mt-1">
@@ -1088,31 +1243,17 @@ const SignUp = () => {
                 </p>
                 {errors.telephone && (
                   <div className="flex items-center mt-1 text-red-600 text-xs">
-                    <AlertCircle className="w-3 h-3 mr-1" />
+                    <AlertCircle className="w-3 h-3 mr-1 flex-shrink-0" />
                     {errors.telephone}
                   </div>
                 )}
               </div>
 
-              {/* Submit Status */}
-              {/* {submitStatus && (
-                <div className={`flex items-center p-3 rounded-lg text-sm ${
-                  submitStatus === 'success' ? 'bg-green-50 text-green-700' : 'bg-red-50 text-red-700'
-                }`}>
-                  {submitStatus === 'success' ? (
-                    <CheckCircle className="w-4 h-4 mr-2" />
-                  ) : (
-                    <AlertCircle className="w-4 h-4 mr-2" />
-                  )}
-                  <span>{submitMessage}</span>
-                </div>
-              )} */}
-
               {/* Submit Button */}
               <button
                 type="submit"
                 disabled={isSubmitting}
-                className={`w-full py-2 px-4 rounded-lg text-white font-medium transition-all duration-200 flex items-center justify-center space-x-2 ${
+                className={`w-full py-2.5 sm:py-2 px-4 rounded-lg text-white font-medium transition-all duration-200 flex items-center justify-center space-x-2 text-sm sm:text-base ${
                   isSubmitting 
                     ? 'bg-gray-400 cursor-not-allowed' 
                     : 'bg-blue-600 hover:bg-blue-700 active:bg-blue-800'
@@ -1130,8 +1271,8 @@ const SignUp = () => {
             </form>
 
             {/* Sign In Link */}
-            <div className="mt-6 text-center">
-              <p className="text-gray-600 text-sm">
+            <div className="mt-4 sm:mt-6 text-center">
+              <p className="text-gray-600 text-xs sm:text-sm">
                 Already have an account?{' '}
                 <a href="/login" className="text-blue-600 hover:text-blue-500 font-medium">
                   Sign in
@@ -1182,7 +1323,7 @@ const SignUp = () => {
             </div>
             
             <h2 className="text-2xl font-bold mb-4">Join our community today!</h2>
-            <p className="text-green-100 mb-8">Create your account and start connecting with mentors and mentees.</p>
+            <p className="text-blue-100 mb-8">Create your account and start connecting with mentors and mentees.</p>
             {/* Features list */}
             <div className="space-y-3">
               <div className="flex items-center text-blue-100">
@@ -1206,3 +1347,7 @@ const SignUp = () => {
 };
 
 export default SignUp;
+
+
+
+
