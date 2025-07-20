@@ -1,4 +1,3 @@
-
 // import React, { useState, useEffect } from 'react';
 // import { Users, Calendar, MessageSquare, UserCheck, BarChart3, TrendingUp,Activity,Bell,Settings,Search,Menu,X,Eye,UserPlus, CalendarPlus,FileText,Target,LogOut,ChevronLeft,User} from 'lucide-react';
 
@@ -7,10 +6,11 @@
 //   const [userCount, setUserCount] = useState(0);
 //   const [eventCount, setEventCount] = useState(0);
 //   const [mentorshipCount, setMentorshipCount] = useState(0);
+//   const [forumCount, setForumCount] = useState(0);
 //   const [loading, setLoading] = useState(true);
 //   const [error, setError] = useState(null);
 
-//   // Fetch user count, event count, and mentorship count from API
+//   // Fetch user count, event count, mentorship count, and forum count from API
 //   useEffect(() => {
 //     const fetchCounts = async () => {
 //       try {
@@ -38,6 +38,11 @@
 //           headers
 //         });
 
+//         // Fetch forum count
+//         const forumResponse = await fetch('http://localhost:3000/api/v1/forums/count', {
+//           headers
+//         });
+
 //         if (!userResponse.ok) {
 //           throw new Error('Failed to fetch user count');
 //         }
@@ -50,13 +55,19 @@
 //           throw new Error('Failed to fetch mentorship count');
 //         }
 
+//         if (!forumResponse.ok) {
+//           throw new Error('Failed to fetch forum count');
+//         }
+
 //         const userData = await userResponse.json();
 //         const eventData = await eventResponse.json();
 //         const mentorshipData = await mentorshipResponse.json();
+//         const forumData = await forumResponse.json();
         
 //         setUserCount(userData.totalUsers || 0);
 //         setEventCount(eventData.totalEvents || 0);
 //         setMentorshipCount(mentorshipData.totalMentorshipRelationships || 0);
+//         setForumCount(forumData.totalForumPosts || 0);
 //       } catch (err) {
 //         setError(err.message);
 //         console.error('Error fetching counts:', err);
@@ -64,6 +75,7 @@
 //         setUserCount(2847);
 //         setEventCount(156);
 //         setMentorshipCount(428);
+//         setForumCount(1234);
 //       } finally {
 //         setLoading(false);
 //       }
@@ -112,7 +124,7 @@
 //     },
 //     { 
 //       title: 'Forum Posts', 
-//       value: '1,234', 
+//       value: loading ? 'Loading...' : (forumCount || 0).toLocaleString(), 
 //       change: '+15%', 
 //       icon: MessageSquare, 
 //       color: 'bg-white',
@@ -334,10 +346,12 @@
 // export default AdminDashboard;
 
 
-
-
 import React, { useState, useEffect } from 'react';
-import { Users, Calendar, MessageSquare, UserCheck, BarChart3, TrendingUp,Activity,Bell,Settings,Search,Menu,X,Eye,UserPlus, CalendarPlus,FileText,Target,LogOut,ChevronLeft,User} from 'lucide-react';
+import { 
+  Users, Calendar, MessageSquare, UserCheck, BarChart3, TrendingUp, Activity, Bell, Settings, 
+  Search, Menu, Eye, UserPlus, CalendarPlus, FileText, Target, LogOut, ChevronLeft, User,
+  Server, Database, Cpu, HardDrive, Clock, Zap, AlertTriangle, CheckCircle, XCircle
+} from 'lucide-react';
 
 const AdminDashboard = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
@@ -345,62 +359,70 @@ const AdminDashboard = () => {
   const [eventCount, setEventCount] = useState(0);
   const [mentorshipCount, setMentorshipCount] = useState(0);
   const [forumCount, setForumCount] = useState(0);
+  const [healthData, setHealthData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [healthLoading, setHealthLoading] = useState(true);
 
-  // Fetch user count, event count, mentorship count, and forum count from API
+  // Fetch health data from backend
+  const fetchHealthData = async () => {
+    try {
+      setHealthLoading(true);
+      const response = await fetch('http://localhost:3000/health/detailed');
+      
+      if (!response.ok) {
+        throw new Error('Failed to fetch health data');
+      }
+      
+      const data = await response.json();
+      setHealthData(data);
+    } catch (err) {
+      console.error('Error fetching health data:', err);
+      // Set fallback data if API fails
+      setHealthData({
+        status: 'Error',
+        checks: {
+          '✅ System Status': 'Unknown',
+          '✅ Database Health': 'Unknown',
+          '✅ Server Load': 'Unknown',
+          '✅ Active Sessions': 'Unknown'
+        },
+        details: {
+          timestamp: new Date().toISOString(),
+          server: { status: 'Unknown', uptime: 0, memory: { used: 'N/A', total: 'N/A' } },
+          database: { status: 'Unknown', connectionTime: null, collections: 0 },
+          system: { loadAverage: 'N/A', freeMemory: 'N/A', totalMemory: 'N/A', cpuCount: 0 }
+        }
+      });
+    } finally {
+      setHealthLoading(false);
+    }
+  };
+
+  // Fetch counts and health data
   useEffect(() => {
     const fetchCounts = async () => {
       try {
         setLoading(true);
-        // Get the auth token from localStorage or wherever you store it
-        const token = localStorage.getItem('authToken'); // Adjust based on your auth implementation
+        const token = localStorage.getItem('authToken');
         
         const headers = {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json'
         };
 
-        // Fetch user count
-        const userResponse = await fetch('http://localhost:3000/api/v1/users/count', {
-          headers
-        });
+        // Fetch all counts
+        const [userResponse, eventResponse, mentorshipResponse, forumResponse] = await Promise.all([
+          fetch('http://localhost:3000/api/v1/users/count', { headers }),
+          fetch('http://localhost:3000/api/v1/events/count', { headers }),
+          fetch('http://localhost:3000/api/v1/mentorship/count', { headers }),
+          fetch('http://localhost:3000/api/v1/forums/count', { headers })
+        ]);
 
-        // Fetch event count
-        const eventResponse = await fetch('http://localhost:3000/api/v1/events/count', {
-          headers
-        });
-
-        // Fetch mentorship count
-        const mentorshipResponse = await fetch('http://localhost:3000/api/v1/mentorship/count', {
-          headers
-        });
-
-        // Fetch forum count
-        const forumResponse = await fetch('http://localhost:3000/api/v1/forums/count', {
-          headers
-        });
-
-        if (!userResponse.ok) {
-          throw new Error('Failed to fetch user count');
-        }
-
-        if (!eventResponse.ok) {
-          throw new Error('Failed to fetch event count');
-        }
-
-        if (!mentorshipResponse.ok) {
-          throw new Error('Failed to fetch mentorship count');
-        }
-
-        if (!forumResponse.ok) {
-          throw new Error('Failed to fetch forum count');
-        }
-
-        const userData = await userResponse.json();
-        const eventData = await eventResponse.json();
-        const mentorshipData = await mentorshipResponse.json();
-        const forumData = await forumResponse.json();
+        const userData = userResponse.ok ? await userResponse.json() : { totalUsers: 0 };
+        const eventData = eventResponse.ok ? await eventResponse.json() : { totalEvents: 0 };
+        const mentorshipData = mentorshipResponse.ok ? await mentorshipResponse.json() : { totalMentorshipRelationships: 0 };
+        const forumData = forumResponse.ok ? await forumResponse.json() : { totalForumPosts: 0 };
         
         setUserCount(userData.totalUsers || 0);
         setEventCount(eventData.totalEvents || 0);
@@ -409,7 +431,7 @@ const AdminDashboard = () => {
       } catch (err) {
         setError(err.message);
         console.error('Error fetching counts:', err);
-        // Fallback to hardcoded values on error
+        // Fallback values
         setUserCount(2847);
         setEventCount(156);
         setMentorshipCount(428);
@@ -420,7 +442,32 @@ const AdminDashboard = () => {
     };
 
     fetchCounts();
+    fetchHealthData();
+    
+    // Set up interval to refresh health data every 30 seconds
+    const healthInterval = setInterval(fetchHealthData, 30000);
+    
+    return () => clearInterval(healthInterval);
   }, []);
+
+  // Helper function to get status badge color
+  const getStatusColor = (status) => {
+    if (status === 'Online' || status === 'Connected' || status === 'Healthy' || status === 'Operational') {
+      return 'bg-green-100 text-green-800';
+    } else if (status === 'Moderate' || status === 'Normal') {
+      return 'bg-yellow-100 text-yellow-800';
+    } else if (status === 'High' || status === 'Critical') {
+      return 'bg-red-100 text-red-800';
+    }
+    return 'bg-gray-100 text-gray-800';
+  };
+
+  // Helper function to format uptime
+  const formatUptime = (seconds) => {
+    const hours = Math.floor(seconds / 3600);
+    const minutes = Math.floor((seconds % 3600) / 60);
+    return `${hours}h ${minutes}m`;
+  };
 
   const sidebarItems = [
     { name: 'Dashboard', icon: BarChart3, active: true },
@@ -522,7 +569,6 @@ const AdminDashboard = () => {
           ))}
         </nav>
         
-        {/* Logout Button - Fixed at bottom */}
         <div className="p-4 border-t border-gray-200 mt-auto">
           <button className="flex items-center w-full px-4 py-3 text-red-600 hover:bg-red-50 rounded-lg transition-colors">
             <LogOut size={20} />
@@ -578,6 +624,16 @@ const AdminDashboard = () => {
             </div>
           )}
 
+          {/* System Status Alert */}
+          {healthData && healthData.status !== 'Healthy' && (
+            <div className="mb-4 p-4 bg-yellow-50 border border-yellow-200 rounded-lg flex items-center">
+              <AlertTriangle size={20} className="text-yellow-600 mr-2" />
+              <p className="text-yellow-700 text-sm">
+                System Status: {healthData.status} - Some services may be experiencing issues
+              </p>
+            </div>
+          )}
+
           {/* Stats Cards */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
             {stats.map((stat, index) => (
@@ -615,7 +671,7 @@ const AdminDashboard = () => {
             </div>
           </div>
 
-          {/* Recent Activity and Analytics */}
+          {/* Recent Activity and System Health */}
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
             {/* Recent Activity */}
             <div className="lg:col-span-2 bg-white p-6 rounded-xl shadow-sm border border-gray-200">
@@ -642,27 +698,154 @@ const AdminDashboard = () => {
 
             {/* Platform Health */}
             <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
-              <h3 className="text-lg font-semibold text-gray-800 mb-4">Platform Health</h3>
-              <div className="space-y-4">
-                <div className="flex items-center justify-between">
-                  <span className="text-sm text-gray-600">System Status</span>
-                  <span className="px-2 py-1 bg-green-100 text-green-800 text-xs rounded-full">Operational</span>
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="text-lg font-semibold text-gray-800">Platform Health</h3>
+                <button 
+                  onClick={fetchHealthData}
+                  className="text-blue-600 hover:text-blue-800 text-sm font-medium"
+                  disabled={healthLoading}
+                >
+                  {healthLoading ? 'Refreshing...' : 'Refresh'}
+                </button>
+              </div>
+              
+              {healthLoading ? (
+                <div className="flex items-center justify-center py-8">
+                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
                 </div>
-                <div className="flex items-center justify-between">
-                  <span className="text-sm text-gray-600">Database</span>
-                  <span className="px-2 py-1 bg-green-100 text-green-800 text-xs rounded-full">Healthy</span>
+              ) : healthData ? (
+                <div className="space-y-4">
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm text-gray-600">System Status</span>
+                    <span className={`px-2 py-1 text-xs rounded-full ${getStatusColor(healthData.checks['✅ System Status'])}`}>
+                      {healthData.checks['✅ System Status']}
+                    </span>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm text-gray-600">Database</span>
+                    <span className={`px-2 py-1 text-xs rounded-full ${getStatusColor(healthData.checks['✅ Database Health'])}`}>
+                      {healthData.checks['✅ Database Health']}
+                    </span>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm text-gray-600">Server Load</span>
+                    <span className={`px-2 py-1 text-xs rounded-full ${getStatusColor(healthData.checks['✅ Server Load'])}`}>
+                      {healthData.checks['✅ Server Load']}
+                    </span>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm text-gray-600">Active Sessions</span>
+                    <span className="text-sm font-medium text-gray-800">
+                      {healthData.checks['✅ Active Sessions']}
+                    </span>
+                  </div>
                 </div>
-                <div className="flex items-center justify-between">
-                  <span className="text-sm text-gray-600">Server Load</span>
-                  <span className="px-2 py-1 bg-yellow-100 text-yellow-800 text-xs rounded-full">Moderate</span>
+              ) : (
+                <div className="text-center py-4 text-gray-500">
+                  <XCircle size={32} className="mx-auto mb-2" />
+                  <p>Unable to load health data</p>
                 </div>
-                <div className="flex items-center justify-between">
-                  <span className="text-sm text-gray-600">Active Sessions</span>
-                  <span className="text-sm font-medium text-gray-800">1,847</span>
+              )}
+            </div>
+          </div>
+
+          {/* Detailed System Metrics */}
+          {healthData && healthData.details && (
+            <div className="mt-8 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {/* Server Metrics */}
+              <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
+                <div className="flex items-center mb-4">
+                  <Server size={20} className="text-blue-600 mr-2" />
+                  <h3 className="text-lg font-semibold text-gray-800">Server Metrics</h3>
+                </div>
+                <div className="space-y-3">
+                  <div className="flex justify-between">
+                    <span className="text-sm text-gray-600">Uptime</span>
+                    <span className="text-sm font-medium">{formatUptime(healthData.details.server.uptime)}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-sm text-gray-600">Memory Used</span>
+                    <span className="text-sm font-medium">{healthData.details.server.memory.used}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-sm text-gray-600">Memory Total</span>
+                    <span className="text-sm font-medium">{healthData.details.server.memory.total}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-sm text-gray-600">Node Version</span>
+                    <span className="text-sm font-medium">{healthData.details.server.version}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-sm text-gray-600">Platform</span>
+                    <span className="text-sm font-medium">{healthData.details.server.platform}</span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Database Metrics */}
+              <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
+                <div className="flex items-center mb-4">
+                  <Database size={20} className="text-green-600 mr-2" />
+                  <h3 className="text-lg font-semibold text-gray-800">Database Metrics</h3>
+                </div>
+                <div className="space-y-3">
+                  <div className="flex justify-between">
+                    <span className="text-sm text-gray-600">Status</span>
+                    <span className={`px-2 py-1 text-xs rounded-full ${getStatusColor(healthData.details.database.status)}`}>
+                      {healthData.details.database.status}
+                    </span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-sm text-gray-600">Connection Time</span>
+                    <span className="text-sm font-medium">
+                      {healthData.details.database.connectionTime ? `${healthData.details.database.connectionTime}ms` : 'N/A'}
+                    </span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-sm text-gray-600">Collections</span>
+                    <span className="text-sm font-medium">{healthData.details.database.collections}</span>
+                  </div>
+                  {healthData.details.database.error && (
+                    <div className="text-xs text-red-600 bg-red-50 p-2 rounded">
+                      Error: {healthData.details.database.error}
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              {/* System Metrics */}
+              <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
+                <div className="flex items-center mb-4">
+                  <Cpu size={20} className="text-purple-600 mr-2" />
+                  <h3 className="text-lg font-semibold text-gray-800">System Metrics</h3>
+                </div>
+                <div className="space-y-3">
+                  <div className="flex justify-between">
+                    <span className="text-sm text-gray-600">CPU Load</span>
+                    <span className="text-sm font-medium">{healthData.details.system.loadAverage}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-sm text-gray-600">CPU Cores</span>
+                    <span className="text-sm font-medium">{healthData.details.system.cpuCount}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-sm text-gray-600">Free Memory</span>
+                    <span className="text-sm font-medium">{healthData.details.system.freeMemory}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-sm text-gray-600">Total Memory</span>
+                    <span className="text-sm font-medium">{healthData.details.system.totalMemory}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-sm text-gray-600">Last Updated</span>
+                    <span className="text-sm font-medium">
+                      {new Date(healthData.details.timestamp).toLocaleTimeString()}
+                    </span>
+                  </div>
                 </div>
               </div>
             </div>
-          </div>
+          )}
 
           {/* User Growth Chart Placeholder */}
           <div className="mt-8 bg-white p-6 rounded-xl shadow-sm border border-gray-200">
