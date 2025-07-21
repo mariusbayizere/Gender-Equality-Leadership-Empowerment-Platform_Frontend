@@ -352,6 +352,7 @@ import {
   Search, Menu, Eye, UserPlus, CalendarPlus, FileText, Target, LogOut, ChevronLeft, User,
   Server, Database, Cpu, HardDrive, Clock, Zap, AlertTriangle, CheckCircle, XCircle
 } from 'lucide-react';
+import UserGrowthAnalytics from './UserGrowthAnalytics';
 
 const AdminDashboard = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
@@ -848,16 +849,9 @@ const AdminDashboard = () => {
           )}
 
           {/* User Growth Chart Placeholder */}
-          <div className="mt-8 bg-white p-6 rounded-xl shadow-sm border border-gray-200">
-            <h3 className="text-lg font-semibold text-gray-800 mb-4">User Growth Analytics</h3>
-            <div className="h-64 bg-gray-50 rounded-lg flex items-center justify-center">
-              <div className="text-center">
-                <BarChart3 size={48} className="mx-auto text-gray-400 mb-2" />
-                <p className="text-gray-600">Chart visualization would be integrated here</p>
-                <p className="text-sm text-gray-500">Showing user growth trends over time</p>
-              </div>
-            </div>
-          </div>
+          {/* <div className="mt-8 bg-white p-6 rounded-xl shadow-sm border border-gray-200"> */}
+            <UserGrowthAnalytics />
+          {/* </div> */}
         </main>
       </div>
     </div>
