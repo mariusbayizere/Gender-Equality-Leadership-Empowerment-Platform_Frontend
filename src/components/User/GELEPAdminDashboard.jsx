@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import {
-  Edit, List, Trash2, User, Users,Mail, Phone, Shield, Hash, MoreVertical, AlertCircle, X, UserPlus, Search, RefreshCw, Grid3X3, Menu, Smile, HelpCircle } from 'lucide-react';
+  Edit, List, Trash2, User, Users, Mail, Phone, Shield, Hash, MoreVertical, AlertCircle, X, UserPlus, Search, RefreshCw, Grid3X3, Menu, Smile, HelpCircle } from 'lucide-react';
 import UserForm from './UserForm'; 
 
 // Column definitions
@@ -28,6 +28,7 @@ const getGenderIcon = (gender) => {
       return <User className="text-gray-400 w-5 h-5" />;
   }
 };
+
 // Delete Confirmation Modal Component
 const DeleteConfirmation = ({
   isOpen,
@@ -95,7 +96,6 @@ const ModernUserManagement = () => {
   const [itemsPerPage] = useState(8);
   const [expandedCard, setExpandedCard] = useState(null);
   const [deleteModal, setDeleteModal] = useState({ isOpen: false, userToDelete: null });
-  // const [showCreateModal, setShowCreateModal] = useState(false);
   const [viewMode, setViewMode] = useState('table');
   const [showColumnToggle, setShowColumnToggle] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -103,28 +103,33 @@ const ModernUserManagement = () => {
   const [userToEdit, setUserToEdit] = useState(null);
   const [isEditMode, setIsEditMode] = useState(false);
 
+  // Show create modal - FIXED: Clear all edit states
   const handleShowCreate = () => {
+    console.log('Creating new user - clearing edit states');
     setUserToEdit(null);
     setIsEditMode(false);
     setShowCreateModal(true);
   };
 
-  // Show edit modal
+  // Show edit modal - FIXED: Set proper edit states
   const handleShowEdit = (user) => {
+    console.log('Editing user:', user);
     setUserToEdit(user);
     setIsEditMode(true);
     setShowCreateModal(true);
   };
 
+  // Close user form - FIXED: Clear all states properly
   const handleCloseUserForm = () => {
-  setShowCreateModal(false);
-  setUserToEdit(null);
-  setIsEditMode(false);
-};
+    console.log('Closing user form - clearing all states');
+    setShowCreateModal(false);
+    setUserToEdit(null);
+    setIsEditMode(false);
+  };
 
-
-  // After create/update, refresh users
+  // After create/update, refresh users - FIXED: Clear all states
   const handleUserSaved = () => {
+    console.log('User saved - refreshing and clearing states');
     fetchUsers();
     setShowCreateModal(false);
     setUserToEdit(null);
@@ -227,14 +232,6 @@ const ModernUserManagement = () => {
               <span className="text-gray-700 text-sm truncate">{user?.email || 'N/A'}</span>
             </div>
           )}
-          {/* {visibleColumns.gender && (
-            <div className="flex items-center space-x-3">
-              <div className="w-8 h-8 bg-yellow-100 rounded-full flex items-center justify-center">
-                {getGenderIcon(user?.gender)}
-              </div>
-              <span className="text-gray-700 text-sm capitalize">{user?.gender?.replace(/_/g, ' ') || 'N/A'}</span>
-            </div>
-          )} */}
           {visibleColumns.role && (
             <div className="flex items-center space-x-3">
               <div className="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center">
@@ -270,10 +267,8 @@ const ModernUserManagement = () => {
           )}
             {visibleColumns.actions && (
               <div className="flex items-center space-x-3 pt-3">
-
                 <button
                 onClick={() => handleShowEdit(user)}
-                // className="flex-1 bg-green-500 hover:bg-green-600 text-white px-4 py-2.5 rounded-xl flex items-center justify-center gap-2 text-sm font-medium transition-all duration-200 shadow-lg hover:shadow-xl"
                 className="flex-1 bg-green-600 bg-opacity-1 hover:bg-opacity-30 text-white px-4 py-2.5 rounded-lg flex items-center justify-center gap-2 text-sm font-medium transition-all duration-200 backdrop-blur-sm disabled:opacity-50 disabled:cursor-not-allowed"
                 title="Edit"
               >
@@ -282,7 +277,6 @@ const ModernUserManagement = () => {
               </button>
                 <button
                   onClick={() => handleDeleteClick(user)}
-                  // className="flex-1 bg-red-500 hover:bg-red-600 text-white px-4 py-2.5 rounded-xl flex items-center justify-center gap-2 text-sm font-medium transition-all duration-200 shadow-lg hover:shadow-xl"
                   className="flex-1 bg-red-600 bg-opacity-1 hover:bg-opacity-100 text-white px-4 py-2.5 rounded-lg flex items-center justify-center gap-2 text-sm font-medium transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
                   title="Delete"
                 >
@@ -350,13 +344,17 @@ const ModernUserManagement = () => {
     );
   }
 
-  if (!paginatedUsers || paginatedUsers.length === 0) {
+  // FIXED: Only show "No users found" when there are actually no users after filtering
+  if (!users || users.length === 0) {
     return (
       <div className="min-h-screen bg-gray-50 p-6">
         <div className="max-w-7xl mx-auto">
           <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-6 gap-4 bg-white rounded-xl p-4 shadow-sm">
             <div className="flex items-center gap-4">
-              <button className="bg-green-500 hover:bg-green-600 text-white px-4 py-2.5 rounded-xl flex items-center gap-2 transition-all duration-200 shadow-sm hover:shadow-md font-medium">
+              <button 
+                onClick={handleShowCreate}
+                className="bg-green-500 hover:bg-green-600 text-white px-4 py-2.5 rounded-xl flex items-center gap-2 transition-all duration-200 shadow-sm hover:shadow-md font-medium"
+              >
                 <UserPlus className="w-4 h-4" />
                 Create User
               </button>
@@ -372,7 +370,7 @@ const ModernUserManagement = () => {
                   className="pl-10 pr-4 py-2.5 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent w-64 bg-white shadow-sm"
                 />
               </div>
-              <button className="p-2.5 text-gray-600 hover:text-gray-800 bg-green-500 hover:bg-green-600 text-white rounded-xl transition-all duration-200 shadow-sm">
+              <button onClick={fetchUsers} className="p-2.5 text-gray-600 hover:text-gray-800 bg-green-500 hover:bg-green-600 text-white rounded-xl transition-all duration-200 shadow-sm">
                 <RefreshCw className="w-4 h-4" />
               </button>
               <button className="p-2.5 text-gray-600 hover:text-gray-800 bg-green-500 hover:bg-green-600 text-white rounded-xl transition-all duration-200 shadow-sm">
@@ -388,6 +386,15 @@ const ModernUserManagement = () => {
             </div>
             <PaginationControls />
           </div>
+          
+          {/* FIXED: Add UserForm here too */}
+          <UserForm
+            showModal={showCreateModal}
+            setShowModal={handleCloseUserForm}
+            onUserSaved={handleUserSaved}
+            userToEdit={userToEdit}
+            isEditMode={isEditMode}
+          />
         </div>
       </div>
     );
@@ -399,8 +406,7 @@ const ModernUserManagement = () => {
         <div className="flex flex-col space-y-4 mb-4 sm:mb-6">
           <div className="hidden lg:flex items-center justify-between bg-white rounded-lg shadow-sm p-4 border border-gray-200">
             <button 
-              // onClick={() => setShowCreateModal(true)}
-               onClick={handleShowCreate}
+              onClick={handleShowCreate}
               className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg text-sm flex items-center space-x-2 transition-colors shadow-sm"
             >
               <UserPlus className="w-4 h-4" />
@@ -445,11 +451,11 @@ const ModernUserManagement = () => {
               </div>
             </div>
           </div>
-          {/* Mobile Header */}
+          {/* Mobile Header - FIXED: Use handleShowCreate instead of setShowCreateModal */}
           <div className="lg:hidden bg-white rounded-lg shadow-sm p-4 border border-gray-200">
             <div className="flex items-center justify-between mb-3">
               <button 
-                onClick={() => setShowCreateModal(true)}
+                onClick={handleShowCreate}
                 className="bg-green-600 hover:bg-green-700 text-white px-3 py-2 rounded-lg text-sm flex items-center space-x-2 transition-colors"
               >
                 <UserPlus className="w-4 h-4" />
@@ -514,182 +520,198 @@ const ModernUserManagement = () => {
             <strong>Error:</strong> <span>{error}</span>
           </div>
         )}
-        <div className="mb-6">
-          <p className="text-gray-600 text-sm font-medium">
-            Showing {actualStartIndex + 1}-{Math.min(actualStartIndex + itemsPerPage, filteredUsers.length)} of {filteredUsers.length} users
-          </p>
-        </div>
-        {/* Mobile View - Cards */}
-        <div className="block lg:hidden">
-          <div className="space-y-4">
-            {paginatedUsers.map((user, index) => (
-              <MobileCard key={user?.id || index} user={user} index={index} />
-            ))}
+        
+        {/* FIXED: Show results info only when there are filtered results */}
+        {filteredUsers.length > 0 && (
+          <div className="mb-6">
+            <p className="text-gray-600 text-sm font-medium">
+              Showing {actualStartIndex + 1}-{Math.min(actualStartIndex + itemsPerPage, filteredUsers.length)} of {filteredUsers.length} users
+            </p>
           </div>
-          <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden mt-4">
+        )}
+
+        {/* FIXED: Show "no results" message when search returns no results */}
+        {filteredUsers.length === 0 && searchTerm && (
+          <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden mb-6">
+            <div className="p-12 text-center">
+              <Search className="w-16 h-16 text-gray-300 mx-auto mb-4" />
+              <p className="text-gray-800 text-xl font-semibold mb-2">No users match your search</p>
+              <p className="text-gray-500">Try searching with different keywords or clear the search to see all users.</p>
+<button 
+                onClick={() => setSearchTerm('')}
+                className="mt-4 bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-lg transition-colors"
+              >
+                Clear Search
+              </button>
+            </div>
             <PaginationControls />
           </div>
-        </div>
-        {/* Desktop View - Table */}
-        <div className="hidden lg:block bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
-          <div className="overflow-x-auto">
-            <table className="w-full min-w-full">
-              <thead>
-                <tr className="border-b border-gray-300">
-                  {visibleColumns.id && (
-                    <th className="text-left py-4 px-6 text-gray-600 font-medium text-sm">
-                      <div className="flex items-center space-x-2">
-                        <Hash className="w-4 h-4" />
-                        <span>ID</span>
-                      </div>
-                    </th>
-                  )}
-                  {visibleColumns.name && (
-                    // <th className="text-left py-4 px-6 text-gray-600 font-medium text-sm">
-                   <th className="text-left py-4 px-6 text-gray-700 font-medium cursor-pointer hover:bg-gray-100 transition-colors min-w-[250px]">
-                      <div className="flex items-center space-x-2">
-                        <User className="w-4 h-4" />
-                        <span>NAME</span>
-                      </div>
-                    </th>
-                  )}
-                  {visibleColumns.email && (
-                    <th className="text-left py-4 px-6 text-gray-600 font-medium text-sm">
-                      <div className="flex items-center space-x-2">
-                        <Mail className="w-4 h-4" />
-                        <span>EMAIL</span>
-                      </div>
-                    </th>
-                  )}
-                  {visibleColumns.gender && (
-                    <th className="text-left py-4 px-6 text-gray-600 font-medium text-sm">
-                      {/* <th className="text-left py-4 px-6 text-gray-700 font-medium cursor-pointer hover:bg-gray-100 transition-colors min-w-[200px]"> */}
-                      <div className="flex items-center space-x-2">
-                        <Smile className="w-4 h-4" />
-                        <span>GENDER</span>
-                      </div>
-                    </th>
-                  )}
-                  {visibleColumns.role && (
-                    <th className="text-left py-4 px-6 text-gray-600 font-medium text-sm">
-                      <div className="flex items-center space-x-2">
-                        <Shield className="w-4 h-4" />
-                        <span>ROLE</span>
-                      </div>
-                    </th>
-                  )}
-                  {visibleColumns.telephone && (
-                    <th className="text-left py-4 px-6 text-gray-600 font-medium text-sm">
-                      <div className="flex items-center space-x-2">
-                        <Phone className="w-4 h-4" />
-                        <span>TELEPHONE</span>
-                      </div>
-                    </th>
-                  )}
-                  {visibleColumns.actions && (
-                    <th className="text-left py-4 px-6 text-gray-600 font-medium text-sm">ACTIONS</th>
-                  )}
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-gray-200">
-                {paginatedUsers.map((user, index) => (
-                  <tr key={user?.id || index} className="hover:bg-gray-50 transition-colors">
-                    {visibleColumns.id && (
-                      <td className="py-4 px-6 text-gray-900 font-medium">
-                        {actualStartIndex + index + 1}
-                      </td>
-                    )}
-                    {visibleColumns.name && (
-                      <td className="py-4 px-6 text-gray-800">
-                        <div className="flex items-center space-x-2">
-                          <div className="bg-green-600 rounded-full p-1">
-                            <User className="w-3 h-3 text-white" />
+        )}
+
+        {/* Main Content - Table or Cards */}
+        {filteredUsers.length > 0 && (
+          <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+            {viewMode === 'table' ? (
+              <div className="overflow-x-auto">
+                <table className="w-full">
+                  <thead className="bg-gray-50 border-b border-gray-200">
+                    <tr>
+                      {visibleColumns.id && (
+                        <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                          <div className="flex items-center space-x-2">
+                            <Hash className="w-4 h-4" />
+                            <span>ID</span>
                           </div>
-                          <span className="text-gray-900 font-medium">
-                            {(user?.firstName || '') + ' ' + (user?.lastName || '') || 'N/A'}
-                          </span>
-                        </div>
-                      </td>
-                    )}
-                    {visibleColumns.email && (
-                      <td className="py-4 px-6">
-                        <div className="flex items-center gap-3">
-                          <Mail className="w-4 h-4 text-blue-600" />
-                          <span className="text-gray-900 truncate max-w-xs" title={user?.email}>
-                            {user?.email || 'N/A'}
-                          </span>
-                        </div>
-                      </td>
-                    )}
-                    {visibleColumns.gender && (
-                      <td className="py-4 px-6">
-                        <div className="flex items-center gap-3">
-                          <div className="flex-shrink-0">
-                            {getGenderIcon(user?.gender)}
+                        </th>
+                      )}
+                      {visibleColumns.name && (
+                        <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                          <div className="flex items-center space-x-2">
+                            <User className="w-4 h-4" />
+                            <span>Name</span>
                           </div>
-                          <span className="capitalize text-gray-700 font-medium">
-                            {user?.gender?.replace(/_/g, ' ') || 'N/A'}
-                          </span>
-                        </div>
-                      </td>
-                    )}
-                    {visibleColumns.role && (
-                      <td className="py-4 px-6">
-                        <span className={`inline-flex px-3 py-1.5 text-xs font-semibold rounded-full ${
-                          user?.userRole === 'Admin' 
-                            ? 'bg-green-100 text-green-700' 
-                            : 'bg-green-100 text-green-700'
-                        }`}>
-                          {user?.userRole || 'N/A'}
-                        </span>
-                      </td>
-                    )}
-                    {visibleColumns.telephone && (
-                      <td className="py-4 px-6">
-                        <div className="flex items-center gap-3">
-                          <Phone className="w-4 h-4 text-purple-600" />
-                          <span className="text-gray-900">
-                            {user?.telephone || 'N/A'}
-                          </span>
-                        </div>
-                      </td>
-                    )}
-                    {visibleColumns.actions && (
-                      <td className="py-4 px-6">
-                        <div className="flex items-center gap-2">
-                        <button
-                          onClick={() => handleShowEdit(user)}
-                          className="text-white hover:text-green-200 bg-green-600 hover:bg-green-700 transition-colors p-2.5 rounded-lg"
-                          title="Edit user"
-                        >
-                          <Edit className="w-4 h-4" />
-                        </button>
-                          <button
-                            onClick={() => handleDeleteClick(user)}
-                            className="text-white hover:text-red-200 bg-red-600 hover:bg-red-700 transition-colors p-2.5 rounded-lg"
-                            title="Delete user"
-                          >
-                            <Trash2 className="w-4 h-4" />
-                          </button>
-                        </div>
-                      </td>
-                    )}
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+                        </th>
+                      )}
+                      {visibleColumns.email && (
+                        <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                          <div className="flex items-center space-x-2">
+                            <Mail className="w-4 h-4" />
+                            <span>Email</span>
+                          </div>
+                        </th>
+                      )}
+                      {visibleColumns.gender && (
+                        <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                          <div className="flex items-center space-x-2">
+                            <Users className="w-4 h-4" />
+                            <span>Gender</span>
+                          </div>
+                        </th>
+                      )}
+                      {visibleColumns.role && (
+                        <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                          <div className="flex items-center space-x-2">
+                            <Shield className="w-4 h-4" />
+                            <span>Role</span>
+                          </div>
+                        </th>
+                      )}
+                      {visibleColumns.telephone && (
+                        <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                          <div className="flex items-center space-x-2">
+                            <Phone className="w-4 h-4" />
+                            <span>Telephone</span>
+                          </div>
+                        </th>
+                      )}
+                      {visibleColumns.actions && (
+                        <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                          Actions
+                        </th>
+                      )}
+                    </tr>
+                  </thead>
+                  <tbody className="bg-white divide-y divide-gray-200">
+                    {paginatedUsers.map((user, index) => (
+                      <tr key={user?.id} className="hover:bg-gray-50 transition-colors">
+                        {visibleColumns.id && (
+                          <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                            {actualStartIndex + index + 1}
+                          </td>
+                        )}
+                        {visibleColumns.name && (
+                          <td className="px-6 py-4 whitespace-nowrap">
+                            <div className="flex items-center space-x-3">
+                              <div className="w-8 h-8 bg-gradient-to-r from-green-500 to-green-600 rounded-full flex items-center justify-center shadow-sm">
+                                <User className="w-4 h-4 text-white" />
+                              </div>
+                              <div>
+                                <div className="text-sm font-medium text-gray-900">
+                                  {(user?.firstName || '') + ' ' + (user?.lastName || '') || 'N/A'}
+                                </div>
+                              </div>
+                            </div>
+                          </td>
+                        )}
+                        {visibleColumns.email && (
+                          <td className="px-6 py-4 whitespace-nowrap">
+                            <div className="text-sm text-gray-700">{user?.email || 'N/A'}</div>
+                          </td>
+                        )}
+                        {visibleColumns.gender && (
+                          <td className="px-6 py-4 whitespace-nowrap">
+                            <div className="flex items-center space-x-2">
+                              {getGenderIcon(user?.gender)}
+                              <span className="text-sm text-gray-700 capitalize">
+                                {user?.gender?.replace(/_/g, ' ') || 'N/A'}
+                              </span>
+                            </div>
+                          </td>
+                        )}
+                        {visibleColumns.role && (
+                          <td className="px-6 py-4 whitespace-nowrap">
+                            <span className={`inline-flex px-3 py-1 text-xs font-semibold rounded-full ${
+                              user?.userRole === 'Admin' 
+                                ? 'bg-green-100 text-green-700' 
+                                : 'bg-blue-100 text-blue-700'
+                            }`}>
+                              {user?.userRole || 'N/A'}
+                            </span>
+                          </td>
+                        )}
+                        {visibleColumns.telephone && (
+                          <td className="px-6 py-4 whitespace-nowrap">
+                            <div className="text-sm text-gray-700">{user?.telephone || 'N/A'}</div>
+                          </td>
+                        )}
+                        {visibleColumns.actions && (
+                          <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                            <div className="flex items-center space-x-2">
+                              <button
+                                onClick={() => handleShowEdit(user)}
+                                className="bg-green-500 hover:bg-green-600 text-white p-2 rounded-lg transition-colors shadow-sm"
+                                title="Edit User"
+                              >
+                                <Edit className="w-4 h-4" />
+                              </button>
+                              <button
+                                onClick={() => handleDeleteClick(user)}
+                                className="bg-red-500 hover:bg-red-600 text-white p-2 rounded-lg transition-colors shadow-sm"
+                                title="Delete User"
+                              >
+                                <Trash2 className="w-4 h-4" />
+                              </button>
+                            </div>
+                          </td>
+                        )}
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            ) : (
+              <div className="p-6">
+                <div className="grid gap-4">
+                  {paginatedUsers.map((user, index) => (
+                    <MobileCard key={user?.id} user={user} index={index} />
+                  ))}
+                </div>
+              </div>
+            )}
+            <PaginationControls />
           </div>
-          <PaginationControls />
-        </div>
+        )}
+
+        {/* User Form Modal */}
         <UserForm
-            showModal={showCreateModal}
-            setShowModal={setShowCreateModal}
-            onUserSaved={handleUserSaved}
-            userToEdit={userToEdit}
-            isEditMode={isEditMode}
-          />          
+          showModal={showCreateModal}
+          setShowModal={handleCloseUserForm}
+          onUserSaved={handleUserSaved}
+          userToEdit={userToEdit}
+          isEditMode={isEditMode}
+        />
 
-
+        {/* Delete Confirmation Modal */}
         <DeleteConfirmation
           isOpen={deleteModal.isOpen}
           userToDelete={deleteModal.userToDelete}
@@ -702,11 +724,3 @@ const ModernUserManagement = () => {
 };
 
 export default ModernUserManagement;
-
-//           {/* <UserForm
-//   showModal={showCreateModal}
-//   setShowModal={handleCloseUserForm} 
-//   onUserSaved={handleUserSaved}
-//   userToEdit={userToEdit}
-//   isEditMode={isEditMode}
-// /> */}
