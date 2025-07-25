@@ -1,31 +1,6 @@
-// import React from 'react';
-// import ExampleComponent from './components/ExampleComponent';
-
-// const App: React.FC = () => {
-//   return (
-//     <div className="App">
-//       <header className="App-header">
-//         <h1 className="text-3xl font-bold">Gender Equality Leadership Empowerment Platform</h1>
-//       </header>
-//       <main>
-//         <ExampleComponent />
-//       </main>
-//     </div>
-//   );
-// };
-
-// export default App;
-
-
 import React, { Component, useEffect } from 'react';
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 
-
-// import Layout from "@/routes/layout";
-// import Homepage from "@/components/Homepage/Homepage";
-// import AboutPage from "@/components/Homepage/AboutPage";
-// import ContactPage from "@/components/Homepage/ContactPage";
-// import ServicePage from "@/components/Homepage/ServicePage";
 
 import GELEPAdminDashboard from "@/components/User/GELEPAdminDashboard";
 import Login from "@/components/Authantication/Login";
@@ -60,12 +35,10 @@ const NotFoundPage = () => (
     </div>
 );
 
-// Simple Theme Provider (replace with your actual theme provider)
 const ThemeProvider = ({ children, storageKey }) => {
     return <div data-theme={storageKey}>{children}</div>;
 };
 
-// Error Boundary Component
 class ErrorBoundary extends Component {
     constructor(props) {
         super(props);
@@ -107,7 +80,7 @@ class ErrorBoundary extends Component {
 
 // Global error handling setup
 const setupGlobalErrorHandling = () => {
-    // Handle unhandled promise rejections
+
     window.addEventListener('unhandledrejection', (event) => {
         console.error('Unhandled promise rejection:', event.reason);
         
