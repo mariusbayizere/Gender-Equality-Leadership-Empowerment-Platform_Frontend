@@ -238,6 +238,8 @@ import UpdatePassword from './components/Authantication/UpdatePassword.jsx';
 import AdminDashboard from './components/Dashboard/AdminDashboard.jsx';
 import DashboardLayout from './components/Dashboard/DashboardLayout.jsx';
 import DashboardMain from './components/Dashboard/DashboardMain.jsx';
+import ModernCourseModulesManagement from './components/ModernCourseModules/ModernCourseModulesManagement'
+import ModernEnrollmentManagement from './components/Enrollment/ModernEnrollmentManagement'
 
 // Dashboard Page Components
 const DashboardUsersPage = () => (
@@ -487,6 +489,10 @@ function App() {
             element: <JobOpportunitiesManagement />,
         },
         {
+            path : "/enrollment",
+            element: <ModernEnrollmentManagement/>
+        },
+        {
             path: "/forums",
             element: <ModernForumManagement />,
         },
@@ -507,6 +513,10 @@ function App() {
         {
             path: "/login",
             element: <Login />,
+        },
+        {
+            path : "/modules",
+            element : <ModernCourseModulesManagement/>
         },
         {
             path: "/signup",
