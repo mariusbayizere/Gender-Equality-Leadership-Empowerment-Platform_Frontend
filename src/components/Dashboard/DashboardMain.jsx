@@ -331,19 +331,23 @@ const DashboardMain = () => {
   ];
 
   return (
-    <main className="p-6">
+    
+    
+// This the main with the responsiveness 
+
+<main className="p-4 sm:p-6 max-w-7xl mx-auto">
       {/* Error Message */}
       {error && (
-        <div className="mb-4 p-4 bg-red-50 border border-red-200 rounded-lg">
-          <p className="text-red-700 text-sm">Error loading data: {error}</p>
+        <div className="mb-4 p-3 sm:p-4 bg-red-50 border border-red-200 rounded-lg">
+          <p className="text-red-700 text-xs sm:text-sm">Error loading data: {error}</p>
         </div>
       )}
 
       {/* Activities Error Message */}
       {activitiesError && (
-        <div className="mb-4 p-4 bg-yellow-50 border border-yellow-200 rounded-lg flex items-center">
-          <AlertTriangle size={20} className="text-yellow-600 mr-2" />
-          <p className="text-yellow-700 text-sm">
+        <div className="mb-4 p-3 sm:p-4 bg-yellow-50 border border-yellow-200 rounded-lg flex items-center">
+          <AlertTriangle size={16} className="text-yellow-600 mr-2 flex-shrink-0" />
+          <p className="text-yellow-700 text-xs sm:text-sm">
             Activities Error: {activitiesError}
           </p>
         </div>
@@ -351,29 +355,29 @@ const DashboardMain = () => {
 
       {/* System Status Alert */}
       {healthData && healthData.status !== 'Healthy' && (
-        <div className="mb-4 p-4 bg-yellow-50 border border-yellow-200 rounded-lg flex items-center">
-          <AlertTriangle size={20} className="text-yellow-600 mr-2" />
-          <p className="text-yellow-700 text-sm">
+        <div className="mb-4 p-3 sm:p-4 bg-yellow-50 border border-yellow-200 rounded-lg flex items-center">
+          <AlertTriangle size={16} className="text-yellow-600 mr-2 flex-shrink-0" />
+          <p className="text-yellow-700 text-xs sm:text-sm">
             System Status: {healthData.status} - Some services may be experiencing issues
           </p>
         </div>
       )}
 
       {/* Stats Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mb-6 sm:mb-8">
         {stats.map((stat, index) => (
-          <div key={index} className={`${stat.color} p-6 rounded-xl shadow-sm border border-gray-200 hover:shadow-md transition-all duration-200 hover:scale-105`}>
+          <div key={index} className={`${stat.color} p-4 sm:p-6 rounded-xl shadow-sm border border-gray-200 hover:shadow-md transition-all duration-200 hover:scale-105`}>
             <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm text-gray-600 mb-1">{stat.title}</p>
-                <p className="text-2xl font-bold text-gray-800">{stat.value}</p>
-                <p className="text-sm text-green-600 flex items-center mt-1">
-                  <TrendingUp size={16} className="mr-1" />
-                  {stat.change} from last month
+              <div className="min-w-0 flex-1">
+                <p className="text-xs sm:text-sm text-gray-600 mb-1 truncate">{stat.title}</p>
+                <p className="text-xl sm:text-2xl font-bold text-gray-800 truncate">{stat.value}</p>
+                <p className="text-xs sm:text-sm text-green-600 flex items-center mt-1">
+                  <TrendingUp size={14} className="mr-1 flex-shrink-0" />
+                  <span className="truncate">{stat.change} from last month</span>
                 </p>
               </div>
-              <div className={`p-3 rounded-full ${stat.iconColor} shadow-lg`}>
-                <stat.icon size={24} className="text-white" />
+              <div className={`p-2 sm:p-3 rounded-full ${stat.iconColor} shadow-lg flex-shrink-0 ml-2`}>
+                <stat.icon size={20} className="text-white sm:w-6 sm:h-6" />
               </div>
             </div>
           </div>
@@ -381,41 +385,41 @@ const DashboardMain = () => {
       </div>
 
       {/* Quick Actions */}
-      <div className="mb-8">
-        <h3 className="text-lg font-semibold text-gray-800 mb-4">Quick Actions</h3>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="mb-6 sm:mb-8">
+        <h3 className="text-base sm:text-lg font-semibold text-gray-800 mb-3 sm:mb-4">Quick Actions</h3>
+        <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4">
           {quickActions.map((action, index) => (
             <button
               key={index}
-              className={`p-4 rounded-lg border border-gray-200 transition-all hover:shadow-md hover:scale-105 ${action.color}`}
+              className={`p-3 sm:p-4 rounded-lg border border-gray-200 transition-all hover:shadow-md hover:scale-105 ${action.color} text-center`}
             >
-              <action.icon size={24} className="mx-auto mb-2" />
-              <p className="text-sm font-medium">{action.title}</p>
+              <action.icon size={20} className="mx-auto mb-2 sm:w-6 sm:h-6" />
+              <p className="text-xs sm:text-sm font-medium leading-tight">{action.title}</p>
             </button>
           ))}
         </div>
       </div>
 
       {/* Recent Activity and System Health */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 xl:grid-cols-3 gap-4 sm:gap-6">
         {/* Recent Activity - Updated to use real API data */}
-        <div className="lg:col-span-2 bg-white p-6 rounded-xl shadow-sm border border-gray-200">
-          <div className="flex items-center justify-between mb-4">
-            <h3 className="text-lg font-semibold text-gray-800">
+        <div className="xl:col-span-2 bg-white p-4 sm:p-6 rounded-xl shadow-sm border border-gray-200">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-4 gap-2">
+            <h3 className="text-base sm:text-lg font-semibold text-gray-800">
               Recent Activity
-              {activitiesLoading && <span className="text-sm text-gray-500 ml-2">(Loading...)</span>}
+              {activitiesLoading && <span className="text-xs sm:text-sm text-gray-500 ml-2">(Loading...)</span>}
             </h3>
-            <div className="flex items-center space-x-2">
+            <div className="flex items-center space-x-2 flex-shrink-0">
               <button 
                 onClick={fetchRecentActivities}
                 disabled={activitiesLoading}
-                className="text-blue-600 hover:text-blue-800 text-sm font-medium flex items-center disabled:opacity-50"
+                className="text-blue-600 hover:text-blue-800 text-xs sm:text-sm font-medium flex items-center disabled:opacity-50"
               >
-                <Activity size={16} className="mr-1" />
+                <Activity size={14} className="mr-1" />
                 Refresh
               </button>
-              <button className="text-blue-600 hover:text-blue-800 text-sm font-medium flex items-center">
-                <Eye size={16} className="mr-1" />
+              <button className="text-blue-600 hover:text-blue-800 text-xs sm:text-sm font-medium flex items-center">
+                <Eye size={14} className="mr-1" />
                 View All
               </button>
             </div>
@@ -424,7 +428,7 @@ const DashboardMain = () => {
           <div className="space-y-3">
             {activitiesLoading ? (
               <div className="flex items-center justify-center py-8">
-                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+                <div className="animate-spin rounded-full h-6 w-6 sm:h-8 sm:w-8 border-b-2 border-blue-600"></div>
               </div>
             ) : recentActivities.length > 0 ? (
               <>
@@ -433,32 +437,32 @@ const DashboardMain = () => {
                   return (
                     <div 
                       key={activity.activity_id || index} 
-                      className={`flex items-start p-4 rounded-lg border transition-all duration-200 hover:shadow-md cursor-pointer ${
+                      className={`flex items-start p-3 sm:p-4 rounded-lg border transition-all duration-200 hover:shadow-md cursor-pointer ${
                         activity.is_read ? 'bg-gray-50 border-gray-200' : getActivityColor(activity.activity_type)
                       }`}
                       onClick={() => !activity.is_read && markActivityAsRead(activity.activity_id)}
                     >
-                      <div className="flex-shrink-0 mr-3">
-                        <div className="w-8 h-8 bg-white rounded-full flex items-center justify-center shadow-sm">
-                          <ActivityIcon size={16} className="text-gray-600" />
+                      <div className="flex-shrink-0 mr-2 sm:mr-3">
+                        <div className="w-6 h-6 sm:w-8 sm:h-8 bg-white rounded-full flex items-center justify-center shadow-sm">
+                          <ActivityIcon size={14} className="text-gray-600 sm:w-4 sm:h-4" />
                         </div>
                       </div>
                       <div className="flex-1 min-w-0">
-                        <div className="flex items-start justify-between">
-                          <div className="flex-1">
-                            <p className={`text-sm font-medium ${activity.is_read ? 'text-gray-700' : 'text-gray-900'}`}>
+                        <div className="flex items-start justify-between gap-2">
+                          <div className="flex-1 min-w-0">
+                            <p className={`text-xs sm:text-sm font-medium ${activity.is_read ? 'text-gray-700' : 'text-gray-900'} truncate`}>
                               {activity.title}
                             </p>
-                            <p className={`text-xs mt-1 ${activity.is_read ? 'text-gray-500' : 'text-gray-600'}`}>
+                            <p className={`text-xs mt-1 ${activity.is_read ? 'text-gray-500' : 'text-gray-600'} line-clamp-2 sm:line-clamp-none`}>
                               {activity.description}
                             </p>
                             {activity.metadata?.entity_name && (
-                              <p className="text-xs text-blue-600 mt-1 font-medium">
+                              <p className="text-xs text-blue-600 mt-1 font-medium truncate">
                                 {activity.metadata.entity_name}
                               </p>
                             )}
                           </div>
-                          <div className="flex items-center ml-2">
+                          <div className="flex items-center ml-2 flex-shrink-0">
                             {!activity.is_read && (
                               <div className="w-2 h-2 bg-blue-500 rounded-full mr-2"></div>
                             )}
@@ -477,16 +481,16 @@ const DashboardMain = () => {
                   <div className="flex justify-center pt-4">
                     <button
                       onClick={() => setShowAllActivities(!showAllActivities)}
-                      className="text-blue-600 hover:text-blue-800 text-sm font-medium flex items-center transition-colors duration-200"
+                      className="text-blue-600 hover:text-blue-800 text-xs sm:text-sm font-medium flex items-center transition-colors duration-200"
                     >
                       {showAllActivities ? (
                         <>
-                          <ChevronUp size={16} className="mr-1" />
+                          <ChevronUp size={14} className="mr-1" />
                           Show Less
                         </>
                       ) : (
                         <>
-                          <ChevronDown size={16} className="mr-1" />
+                          <ChevronDown size={14} className="mr-1" />
                           Show More ({recentActivities.length - 4} more)
                         </>
                       )}
@@ -496,11 +500,11 @@ const DashboardMain = () => {
               </>
             ) : (
               <div className="text-center py-8 text-gray-500">
-                <Activity size={32} className="mx-auto mb-2 opacity-50" />
-                <p>No recent activities found</p>
+                <Activity size={24} className="mx-auto mb-2 opacity-50 sm:w-8 sm:h-8" />
+                <p className="text-xs sm:text-sm">No recent activities found</p>
                 <button 
                   onClick={fetchRecentActivities}
-                  className="text-blue-600 hover:text-blue-800 text-sm mt-2"
+                  className="text-blue-600 hover:text-blue-800 text-xs sm:text-sm mt-2"
                 >
                   Try refreshing
                 </button>
@@ -510,12 +514,12 @@ const DashboardMain = () => {
         </div>
 
         {/* Platform Health */}
-        <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
-          <div className="flex items-center justify-between mb-4">
-            <h3 className="text-lg font-semibold text-gray-800">Platform Health</h3>
+        <div className="bg-white p-4 sm:p-6 rounded-xl shadow-sm border border-gray-200">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-4 gap-2">
+            <h3 className="text-base sm:text-lg font-semibold text-gray-800">Platform Health</h3>
             <button 
               onClick={fetchHealthData}
-              className="text-blue-600 hover:text-blue-800 text-sm font-medium"
+              className="text-blue-600 hover:text-blue-800 text-xs sm:text-sm font-medium self-start sm:self-auto"
               disabled={healthLoading}
             >
               {healthLoading ? 'Refreshing...' : 'Refresh'}
@@ -524,143 +528,491 @@ const DashboardMain = () => {
           
           {healthLoading ? (
             <div className="flex items-center justify-center py-8">
-              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+              <div className="animate-spin rounded-full h-6 w-6 sm:h-8 sm:w-8 border-b-2 border-blue-600"></div>
             </div>
           ) : healthData ? (
-            <div className="space-y-4">
+            <div className="space-y-3 sm:space-y-4">
               <div className="flex items-center justify-between">
-                <span className="text-sm text-gray-600">System Status</span>
-                <span className={`px-2 py-1 text-xs rounded-full ${getStatusColor(healthData.checks['✅ System Status'])}`}>
+                <span className="text-xs sm:text-sm text-gray-600 truncate mr-2">System Status</span>
+                <span className={`px-2 py-1 text-xs rounded-full flex-shrink-0 ${getStatusColor(healthData.checks['✅ System Status'])}`}>
                   {healthData.checks['✅ System Status']}
                 </span>
               </div>
               <div className="flex items-center justify-between">
-                <span className="text-sm text-gray-600">Database</span>
-                <span className={`px-2 py-1 text-xs rounded-full ${getStatusColor(healthData.checks['✅ Database Health'])}`}>
+                <span className="text-xs sm:text-sm text-gray-600 truncate mr-2">Database</span>
+                <span className={`px-2 py-1 text-xs rounded-full flex-shrink-0 ${getStatusColor(healthData.checks['✅ Database Health'])}`}>
                   {healthData.checks['✅ Database Health']}
                 </span>
               </div>
               <div className="flex items-center justify-between">
-                <span className="text-sm text-gray-600">Server Load</span>
-                <span className={`px-2 py-1 text-xs rounded-full ${getStatusColor(healthData.checks['✅ Server Load'])}`}>
+                <span className="text-xs sm:text-sm text-gray-600 truncate mr-2">Server Load</span>
+                <span className={`px-2 py-1 text-xs rounded-full flex-shrink-0 ${getStatusColor(healthData.checks['✅ Server Load'])}`}>
                   {healthData.checks['✅ Server Load']}
                 </span>
               </div>
               <div className="flex items-center justify-between">
-                <span className="text-sm text-gray-600">Active Sessions</span>
-                <span className="text-sm font-medium text-gray-800">
+                <span className="text-xs sm:text-sm text-gray-600 truncate mr-2">Active Sessions</span>
+                <span className="text-xs sm:text-sm font-medium text-gray-800 flex-shrink-0">
                   {healthData.checks['✅ Active Sessions']}
                 </span>
               </div>
             </div>
           ) : (
             <div className="text-center py-4 text-gray-500">
-              <XCircle size={32} className="mx-auto mb-2" />
-              <p>Unable to load health data</p>
+              <XCircle size={24} className="mx-auto mb-2 sm:w-8 sm:h-8" />
+              <p className="text-xs sm:text-sm">Unable to load health data</p>
             </div>
           )}
         </div>
       </div>
 
       {/* Detailed System Metrics */}
-      {healthData && healthData.details && (
-        <div className="mt-8 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {/* Server Metrics */}
-          <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
-            <div className="flex items-center mb-4">
-              <Server size={20} className="text-blue-600 mr-2" />
-              <h3 className="text-lg font-semibold text-gray-800">Server Metrics</h3>
-            </div>
-            <div className="space-y-3">
-              <div className="flex justify-between">
-                <span className="text-sm text-gray-600">Uptime</span>
-                <span className="text-sm font-medium">{formatUptime(healthData.details.server.uptime)}</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-sm text-gray-600">Memory Used</span>
-                <span className="text-sm font-medium">{healthData.details.server.memory.used}</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-sm text-gray-600">Memory Total</span>
-                <span className="text-sm font-medium">{healthData.details.server.memory.total}</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-sm text-gray-600">Status</span>
-                <span className={`px-2 py-1 text-xs rounded-full ${getStatusColor(healthData.details.server.status)}`}>
-                  {healthData.details.server.status}
-                </span>
-              </div>
-            </div>
-          </div>
+{healthData && healthData.details && (
+  <div className="mt-6 sm:mt-8 grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 sm:gap-6">
+    {/* Server Metrics */}
+    <div className="bg-white p-4 sm:p-6 rounded-xl shadow-sm border border-gray-200">
+      <div className="flex items-center mb-3 sm:mb-4">
+        <Server size={16} className="text-blue-600 mr-2 flex-shrink-0 sm:w-5 sm:h-5" />
+        <h3 className="text-sm sm:text-base font-semibold text-gray-800 truncate">Server Metrics</h3>
+      </div>
+      <div className="space-y-2 sm:space-y-3">
+        <div className="flex justify-between items-center min-w-0">
+          <span className="text-xs sm:text-sm text-gray-600 truncate pr-2">Uptime</span>
+          <span className="text-xs sm:text-sm font-medium text-right flex-shrink-0">
+            {formatUptime(healthData.details.server.uptime)}
+          </span>
+        </div>
+        <div className="flex justify-between items-center min-w-0">
+          <span className="text-xs sm:text-sm text-gray-600 truncate pr-2">Memory Used</span>
+          <span className="text-xs sm:text-sm font-medium text-right flex-shrink-0">
+            {healthData.details.server.memory.used}
+          </span>
+        </div>
+        <div className="flex justify-between items-center min-w-0">
+          <span className="text-xs sm:text-sm text-gray-600 truncate pr-2">Memory Total</span>
+          <span className="text-xs sm:text-sm font-medium text-right flex-shrink-0">
+            {healthData.details.server.memory.total}
+          </span>
+        </div>
+        <div className="flex justify-between items-center min-w-0">
+          <span className="text-xs sm:text-sm text-gray-600 truncate pr-2">Status</span>
+          <span className={`px-2 py-1 text-xs rounded-full flex-shrink-0 ${getStatusColor(healthData.details.server.status)}`}>
+            {healthData.details.server.status}
+          </span>
+        </div>
+      </div>
+    </div>
 
           {/* Database Metrics */}
-          <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
-            <div className="flex items-center mb-4">
-              <Database size={20} className="text-green-600 mr-2" />
-              <h3 className="text-lg font-semibold text-gray-800">Database Metrics</h3>
-            </div>
-            <div className="space-y-3">
-              <div className="flex justify-between">
-                <span className="text-sm text-gray-600">Connection Time</span>
-                <span className="text-sm font-medium">
-                  {healthData.details.database.connectionTime ? 
-                    `${healthData.details.database.connectionTime}ms` : 
-                    'N/A'
-                  }
-                </span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-sm text-gray-600">Collections</span>
-                <span className="text-sm font-medium">{healthData.details.database.collections}</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-sm text-gray-600">Status</span>
-                <span className={`px-2 py-1 text-xs rounded-full ${getStatusColor(healthData.details.database.status)}`}>
-                  {healthData.details.database.status}
-                </span>
-              </div>
-            </div>
-          </div>
+    <div className="bg-white p-4 sm:p-6 rounded-xl shadow-sm border border-gray-200">
+      <div className="flex items-center mb-3 sm:mb-4">
+        <Database size={16} className="text-green-600 mr-2 flex-shrink-0 sm:w-5 sm:h-5" />
+        <h3 className="text-sm sm:text-base font-semibold text-gray-800 truncate">Database Metrics</h3>
+      </div>
+      <div className="space-y-2 sm:space-y-3">
+        <div className="flex justify-between items-center min-w-0">
+          <span className="text-xs sm:text-sm text-gray-600 truncate pr-2">Connection Time</span>
+          <span className="text-xs sm:text-sm font-medium text-right flex-shrink-0">
+            {healthData.details.database.connectionTime ? 
+              `${healthData.details.database.connectionTime}ms` : 
+              'N/A'
+            }
+          </span>
+        </div>
+        <div className="flex justify-between items-center min-w-0">
+          <span className="text-xs sm:text-sm text-gray-600 truncate pr-2">Collections</span>
+          <span className="text-xs sm:text-sm font-medium text-right flex-shrink-0">
+            {healthData.details.database.collections}
+          </span>
+        </div>
+        <div className="flex justify-between items-center min-w-0">
+          <span className="text-xs sm:text-sm text-gray-600 truncate pr-2">Status</span>
+          <span className={`px-2 py-1 text-xs rounded-full flex-shrink-0 ${getStatusColor(healthData.details.database.status)}`}>
+            {healthData.details.database.status}
+          </span>
+        </div>
+      </div>
+    </div>
 
           {/* System Metrics */}
-          <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
-            <div className="flex items-center mb-4">
-              <Cpu size={20} className="text-purple-600 mr-2" />
-              <h3 className="text-lg font-semibold text-gray-800">System Metrics</h3>
-            </div>
-            <div className="space-y-3">
-              <div className="flex justify-between">
-                <span className="text-sm text-gray-600">Load Average</span>
-                <span className="text-sm font-medium">{healthData.details.system.loadAverage}</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-sm text-gray-600">Free Memory</span>
-                <span className="text-sm font-medium">{healthData.details.system.freeMemory}</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-sm text-gray-600">Total Memory</span>
-                <span className="text-sm font-medium">{healthData.details.system.totalMemory}</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-sm text-gray-600">CPU Count</span>
-                <span className="text-sm font-medium">{healthData.details.system.cpuCount}</span>
-              </div>
-            </div>
-          </div>
+    <div className="bg-white p-4 sm:p-6 rounded-xl shadow-sm border border-gray-200 md:col-span-2 xl:col-span-1">
+      <div className="flex items-center mb-3 sm:mb-4">
+        <Cpu size={16} className="text-purple-600 mr-2 flex-shrink-0 sm:w-5 sm:h-5" />
+        <h3 className="text-sm sm:text-base font-semibold text-gray-800 truncate">System Metrics</h3>
+      </div>
+      <div className="space-y-2 sm:space-y-3">
+        <div className="flex justify-between items-center min-w-0">
+          <span className="text-xs sm:text-sm text-gray-600 truncate pr-2">Load Average</span>
+          <span className="text-xs sm:text-sm font-medium text-right flex-shrink-0">
+            {healthData.details.system.loadAverage}
+          </span>
         </div>
+        <div className="flex justify-between items-center min-w-0">
+          <span className="text-xs sm:text-sm text-gray-600 truncate pr-2">Free Memory</span>
+          <span className="text-xs sm:text-sm font-medium text-right flex-shrink-0">
+            {healthData.details.system.freeMemory}
+          </span>
+        </div>
+        <div className="flex justify-between items-center min-w-0">
+          <span className="text-xs sm:text-sm text-gray-600 truncate pr-2">Total Memory</span>
+          <span className="text-xs sm:text-sm font-medium text-right flex-shrink-0">
+            {healthData.details.system.totalMemory}
+          </span>
+        </div>
+        <div className="flex justify-between items-center min-w-0">
+          <span className="text-xs sm:text-sm text-gray-600 truncate pr-2">CPU Count</span>
+          <span className="text-xs sm:text-sm font-medium text-right flex-shrink-0">
+            {healthData.details.system.cpuCount}
+          </span>
+        </div>
+      </div>
+    </div>
+  </div>
       )}
 
       {/* Last Updated Info */}
       {healthData && healthData.details && (
-        <div className="mt-6 text-center">
+        <div className="mt-4 sm:mt-6 text-center">
           <p className="text-xs text-gray-500 flex items-center justify-center">
-            <Clock size={14} className="mr-1" />
+            <Clock size={12} className="mr-1 sm:w-3.5 sm:h-3.5" />
             Last updated: {new Date(healthData.details.timestamp).toLocaleString()}
           </p>
         </div>
       )}
     </main>
+
+
+
   );
 };
 
+    // <main className="p-6">
+    //   {/* Error Message */}
+    //   {error && (
+    //     <div className="mb-4 p-4 bg-red-50 border border-red-200 rounded-lg">
+    //       <p className="text-red-700 text-sm">Error loading data: {error}</p>
+    //     </div>
+    //   )}
+
+    //   {/* Activities Error Message */}
+    //   {activitiesError && (
+    //     <div className="mb-4 p-4 bg-yellow-50 border border-yellow-200 rounded-lg flex items-center">
+    //       <AlertTriangle size={20} className="text-yellow-600 mr-2" />
+    //       <p className="text-yellow-700 text-sm">
+    //         Activities Error: {activitiesError}
+    //       </p>
+    //     </div>
+    //   )}
+
+    //   {/* System Status Alert */}
+    //   {healthData && healthData.status !== 'Healthy' && (
+    //     <div className="mb-4 p-4 bg-yellow-50 border border-yellow-200 rounded-lg flex items-center">
+    //       <AlertTriangle size={20} className="text-yellow-600 mr-2" />
+    //       <p className="text-yellow-700 text-sm">
+    //         System Status: {healthData.status} - Some services may be experiencing issues
+    //       </p>
+    //     </div>
+    //   )}
+
+    //   {/* Stats Cards */}
+    //   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+    //     {stats.map((stat, index) => (
+    //       <div key={index} className={`${stat.color} p-6 rounded-xl shadow-sm border border-gray-200 hover:shadow-md transition-all duration-200 hover:scale-105`}>
+    //         <div className="flex items-center justify-between">
+    //           <div>
+    //             <p className="text-sm text-gray-600 mb-1">{stat.title}</p>
+    //             <p className="text-2xl font-bold text-gray-800">{stat.value}</p>
+    //             <p className="text-sm text-green-600 flex items-center mt-1">
+    //               <TrendingUp size={16} className="mr-1" />
+    //               {stat.change} from last month
+    //             </p>
+    //           </div>
+    //           <div className={`p-3 rounded-full ${stat.iconColor} shadow-lg`}>
+    //             <stat.icon size={24} className="text-white" />
+    //           </div>
+    //         </div>
+    //       </div>
+    //     ))}
+    //   </div>
+
+    //   {/* Quick Actions */}
+    //   <div className="mb-8">
+    //     <h3 className="text-lg font-semibold text-gray-800 mb-4">Quick Actions</h3>
+    //     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+    //       {quickActions.map((action, index) => (
+    //         <button
+    //           key={index}
+    //           className={`p-4 rounded-lg border border-gray-200 transition-all hover:shadow-md hover:scale-105 ${action.color}`}
+    //         >
+    //           <action.icon size={24} className="mx-auto mb-2" />
+    //           <p className="text-sm font-medium">{action.title}</p>
+    //         </button>
+    //       ))}
+    //     </div>
+    //   </div>
+
+    //   {/* Recent Activity and System Health */}
+    //   <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+    //     {/* Recent Activity - Updated to use real API data */}
+    //     <div className="lg:col-span-2 bg-white p-6 rounded-xl shadow-sm border border-gray-200">
+    //       <div className="flex items-center justify-between mb-4">
+    //         <h3 className="text-lg font-semibold text-gray-800">
+    //           Recent Activity
+    //           {activitiesLoading && <span className="text-sm text-gray-500 ml-2">(Loading...)</span>}
+    //         </h3>
+    //         <div className="flex items-center space-x-2">
+    //           <button 
+    //             onClick={fetchRecentActivities}
+    //             disabled={activitiesLoading}
+    //             className="text-blue-600 hover:text-blue-800 text-sm font-medium flex items-center disabled:opacity-50"
+    //           >
+    //             <Activity size={16} className="mr-1" />
+    //             Refresh
+    //           </button>
+    //           <button className="text-blue-600 hover:text-blue-800 text-sm font-medium flex items-center">
+    //             <Eye size={16} className="mr-1" />
+    //             View All
+    //           </button>
+    //         </div>
+    //       </div>
+          
+    //       <div className="space-y-3">
+    //         {activitiesLoading ? (
+    //           <div className="flex items-center justify-center py-8">
+    //             <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+    //           </div>
+    //         ) : recentActivities.length > 0 ? (
+    //           <>
+    //             {(showAllActivities ? recentActivities : recentActivities.slice(0, 3)).map((activity, index) => {
+    //               const ActivityIcon = getActivityIcon(activity.activity_type, activity.entity_type);
+    //               return (
+    //                 <div 
+    //                   key={activity.activity_id || index} 
+    //                   className={`flex items-start p-4 rounded-lg border transition-all duration-200 hover:shadow-md cursor-pointer ${
+    //                     activity.is_read ? 'bg-gray-50 border-gray-200' : getActivityColor(activity.activity_type)
+    //                   }`}
+    //                   onClick={() => !activity.is_read && markActivityAsRead(activity.activity_id)}
+    //                 >
+    //                   <div className="flex-shrink-0 mr-3">
+    //                     <div className="w-8 h-8 bg-white rounded-full flex items-center justify-center shadow-sm">
+    //                       <ActivityIcon size={16} className="text-gray-600" />
+    //                     </div>
+    //                   </div>
+    //                   <div className="flex-1 min-w-0">
+    //                     <div className="flex items-start justify-between">
+    //                       <div className="flex-1">
+    //                         <p className={`text-sm font-medium ${activity.is_read ? 'text-gray-700' : 'text-gray-900'}`}>
+    //                           {activity.title}
+    //                         </p>
+    //                         <p className={`text-xs mt-1 ${activity.is_read ? 'text-gray-500' : 'text-gray-600'}`}>
+    //                           {activity.description}
+    //                         </p>
+    //                         {activity.metadata?.entity_name && (
+    //                           <p className="text-xs text-blue-600 mt-1 font-medium">
+    //                             {activity.metadata.entity_name}
+    //                           </p>
+    //                         )}
+    //                       </div>
+    //                       <div className="flex items-center ml-2">
+    //                         {!activity.is_read && (
+    //                           <div className="w-2 h-2 bg-blue-500 rounded-full mr-2"></div>
+    //                         )}
+    //                         <span className="text-xs text-gray-500 whitespace-nowrap">
+    //                           {formatTimeAgo(activity.timestamp)}
+    //                         </span>
+    //                       </div>
+    //                     </div>
+    //                   </div>
+    //                 </div>
+    //               );
+    //             })}
+                
+    //             {/* Show More/Show Less button */}
+    //             {recentActivities.length > 4 && (
+    //               <div className="flex justify-center pt-4">
+    //                 <button
+    //                   onClick={() => setShowAllActivities(!showAllActivities)}
+    //                   className="text-blue-600 hover:text-blue-800 text-sm font-medium flex items-center transition-colors duration-200"
+    //                 >
+    //                   {showAllActivities ? (
+    //                     <>
+    //                       <ChevronUp size={16} className="mr-1" />
+    //                       Show Less
+    //                     </>
+    //                   ) : (
+    //                     <>
+    //                       <ChevronDown size={16} className="mr-1" />
+    //                       Show More ({recentActivities.length - 4} more)
+    //                     </>
+    //                   )}
+    //                 </button>
+    //               </div>
+    //             )}
+    //           </>
+    //         ) : (
+    //           <div className="text-center py-8 text-gray-500">
+    //             <Activity size={32} className="mx-auto mb-2 opacity-50" />
+    //             <p>No recent activities found</p>
+    //             <button 
+    //               onClick={fetchRecentActivities}
+    //               className="text-blue-600 hover:text-blue-800 text-sm mt-2"
+    //             >
+    //               Try refreshing
+    //             </button>
+    //           </div>
+    //         )}
+    //       </div>
+    //     </div>
+
+    //     {/* Platform Health */}
+    //     <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
+    //       <div className="flex items-center justify-between mb-4">
+    //         <h3 className="text-lg font-semibold text-gray-800">Platform Health</h3>
+    //         <button 
+    //           onClick={fetchHealthData}
+    //           className="text-blue-600 hover:text-blue-800 text-sm font-medium"
+    //           disabled={healthLoading}
+    //         >
+    //           {healthLoading ? 'Refreshing...' : 'Refresh'}
+    //         </button>
+    //       </div>
+          
+    //       {healthLoading ? (
+    //         <div className="flex items-center justify-center py-8">
+    //           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+    //         </div>
+    //       ) : healthData ? (
+    //         <div className="space-y-4">
+    //           <div className="flex items-center justify-between">
+    //             <span className="text-sm text-gray-600">System Status</span>
+    //             <span className={`px-2 py-1 text-xs rounded-full ${getStatusColor(healthData.checks['✅ System Status'])}`}>
+    //               {healthData.checks['✅ System Status']}
+    //             </span>
+    //           </div>
+    //           <div className="flex items-center justify-between">
+    //             <span className="text-sm text-gray-600">Database</span>
+    //             <span className={`px-2 py-1 text-xs rounded-full ${getStatusColor(healthData.checks['✅ Database Health'])}`}>
+    //               {healthData.checks['✅ Database Health']}
+    //             </span>
+    //           </div>
+    //           <div className="flex items-center justify-between">
+    //             <span className="text-sm text-gray-600">Server Load</span>
+    //             <span className={`px-2 py-1 text-xs rounded-full ${getStatusColor(healthData.checks['✅ Server Load'])}`}>
+    //               {healthData.checks['✅ Server Load']}
+    //             </span>
+    //           </div>
+    //           <div className="flex items-center justify-between">
+    //             <span className="text-sm text-gray-600">Active Sessions</span>
+    //             <span className="text-sm font-medium text-gray-800">
+    //               {healthData.checks['✅ Active Sessions']}
+    //             </span>
+    //           </div>
+    //         </div>
+    //       ) : (
+    //         <div className="text-center py-4 text-gray-500">
+    //           <XCircle size={32} className="mx-auto mb-2" />
+    //           <p>Unable to load health data</p>
+    //         </div>
+    //       )}
+    //     </div>
+    //   </div>
+
+    //   {/* Detailed System Metrics */}
+    //   {healthData && healthData.details && (
+    //     <div className="mt-8 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+    //       {/* Server Metrics */}
+    //       <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
+    //         <div className="flex items-center mb-4">
+    //           <Server size={20} className="text-blue-600 mr-2" />
+    //           <h3 className="text-lg font-semibold text-gray-800">Server Metrics</h3>
+    //         </div>
+    //         <div className="space-y-3">
+    //           <div className="flex justify-between">
+    //             <span className="text-sm text-gray-600">Uptime</span>
+    //             <span className="text-sm font-medium">{formatUptime(healthData.details.server.uptime)}</span>
+    //           </div>
+    //           <div className="flex justify-between">
+    //             <span className="text-sm text-gray-600">Memory Used</span>
+    //             <span className="text-sm font-medium">{healthData.details.server.memory.used}</span>
+    //           </div>
+    //           <div className="flex justify-between">
+    //             <span className="text-sm text-gray-600">Memory Total</span>
+    //             <span className="text-sm font-medium">{healthData.details.server.memory.total}</span>
+    //           </div>
+    //           <div className="flex justify-between">
+    //             <span className="text-sm text-gray-600">Status</span>
+    //             <span className={`px-2 py-1 text-xs rounded-full ${getStatusColor(healthData.details.server.status)}`}>
+    //               {healthData.details.server.status}
+    //             </span>
+    //           </div>
+    //         </div>
+    //       </div>
+
+    //       {/* Database Metrics */}
+    //       <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
+    //         <div className="flex items-center mb-4">
+    //           <Database size={20} className="text-green-600 mr-2" />
+    //           <h3 className="text-lg font-semibold text-gray-800">Database Metrics</h3>
+    //         </div>
+    //         <div className="space-y-3">
+    //           <div className="flex justify-between">
+    //             <span className="text-sm text-gray-600">Connection Time</span>
+    //             <span className="text-sm font-medium">
+    //               {healthData.details.database.connectionTime ? 
+    //                 `${healthData.details.database.connectionTime}ms` : 
+    //                 'N/A'
+    //               }
+    //             </span>
+    //           </div>
+    //           <div className="flex justify-between">
+    //             <span className="text-sm text-gray-600">Collections</span>
+    //             <span className="text-sm font-medium">{healthData.details.database.collections}</span>
+    //           </div>
+    //           <div className="flex justify-between">
+    //             <span className="text-sm text-gray-600">Status</span>
+    //             <span className={`px-2 py-1 text-xs rounded-full ${getStatusColor(healthData.details.database.status)}`}>
+    //               {healthData.details.database.status}
+    //             </span>
+    //           </div>
+    //         </div>
+    //       </div>
+
+    //       {/* System Metrics */}
+    //       <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
+    //         <div className="flex items-center mb-4">
+    //           <Cpu size={20} className="text-purple-600 mr-2" />
+    //           <h3 className="text-lg font-semibold text-gray-800">System Metrics</h3>
+    //         </div>
+    //         <div className="space-y-3">
+    //           <div className="flex justify-between">
+    //             <span className="text-sm text-gray-600">Load Average</span>
+    //             <span className="text-sm font-medium">{healthData.details.system.loadAverage}</span>
+    //           </div>
+    //           <div className="flex justify-between">
+    //             <span className="text-sm text-gray-600">Free Memory</span>
+    //             <span className="text-sm font-medium">{healthData.details.system.freeMemory}</span>
+    //           </div>
+    //           <div className="flex justify-between">
+    //             <span className="text-sm text-gray-600">Total Memory</span>
+    //             <span className="text-sm font-medium">{healthData.details.system.totalMemory}</span>
+    //           </div>
+    //           <div className="flex justify-between">
+    //             <span className="text-sm text-gray-600">CPU Count</span>
+    //             <span className="text-sm font-medium">{healthData.details.system.cpuCount}</span>
+    //           </div>
+    //         </div>
+    //       </div>
+    //     </div>
+    //   )}
+
+    //   {/* Last Updated Info */}
+    //   {healthData && healthData.details && (
+    //     <div className="mt-6 text-center">
+    //       <p className="text-xs text-gray-500 flex items-center justify-center">
+    //         <Clock size={14} className="mr-1" />
+    //         Last updated: {new Date(healthData.details.timestamp).toLocaleString()}
+    //       </p>
+    //     </div>
+    //   )}
+    // </main>
 export default DashboardMain;

@@ -2,12 +2,13 @@ import React, { useState } from 'react';
 import { Outlet, useNavigate, useLocation } from 'react-router-dom';
 import {
   BarChart3, Users, Calendar, UserCheck, FileText, MessageSquare, Target,
-  Settings, LogOut, ChevronLeft, Menu, Bell, Search, User
+  Settings, LogOut, ChevronLeft, Menu, Bell, Search, User, X
 } from 'lucide-react';
 import { Header } from './header';
 
 const DashboardLayout = () => {
-  const [isSidebarOpen, setIsSidebarOpen] = useState(true);
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false); // Start closed on mobile
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -17,49 +18,41 @@ const DashboardLayout = () => {
       name: 'Dashboard', 
       icon: BarChart3, 
       path: '/dashboard',
-      description: 'Overview and analytics'
     },
     { 
       name: 'Users', 
       icon: Users, 
       path: '/dashboard/users',
-      description: 'User management'
     },
     { 
       name: 'Events', 
       icon: Calendar, 
       path: '/dashboard/events',
-      description: 'Event management'
     },
     { 
       name: 'Mentorship', 
       icon: UserCheck, 
       path: '/dashboard/mentorship',
-      description: 'Mentorship programs'
     },
     { 
       name: 'Reports', 
       icon: FileText, 
       path: '/dashboard/reports',
-      description: 'Analytics and reports'
     },
     { 
       name: 'Forum', 
       icon: MessageSquare, 
       path: '/dashboard/forum',
-      description: 'Forum management'
     },
     { 
       name: 'Progress', 
       icon: Target, 
       path: '/dashboard/progress',
-      description: 'Progress tracking'
     },
     { 
       name: 'Settings', 
       icon: Settings, 
       path: '/dashboard/settings',
-      description: 'System settings'
     },
   ];
 
@@ -74,6 +67,8 @@ const DashboardLayout = () => {
   // Handle navigation
   const handleNavigation = (path) => {
     navigate(path);
+    // Close mobile menu after navigation
+    setIsMobileMenuOpen(false);
   };
 
   // Handle logout
@@ -82,10 +77,23 @@ const DashboardLayout = () => {
     navigate('/login');
   };
 
+  // Toggle mobile menu
+  const toggleMobileMenu = () => {
+    setIsMobileMenuOpen(!isMobileMenuOpen);
+  };
+
   return (
-    <div className="flex h-screen bg-gray-50 font-outfit">
-      {/* Sidebar */}
-      <div className={`${isSidebarOpen ? 'w-64' : 'w-20'} bg-white shadow-lg transition-all duration-300 ease-in-out flex flex-col`}>
+    <div className="flex h-screen bg-gray-50 font-outfit overflow-hidden">
+      {/* Mobile Menu Overlay */}
+      {isMobileMenuOpen && (
+        <div 
+          className="fixed inset-0 bg-black bg-opacity-50 z-40 lg:hidden"
+          onClick={() => setIsMobileMenuOpen(false)}
+        />
+      )}
+
+      {/* Sidebar - Desktop */}
+      <div className={`hidden lg:flex ${isSidebarOpen ? 'w-64' : 'w-20'} bg-white shadow-lg transition-all duration-300 ease-in-out flex-col`}>
         {/* Sidebar Header */}
         <div className="p-4 border-b border-gray-200">
           <div className="flex items-center justify-between">
@@ -128,17 +136,7 @@ const DashboardLayout = () => {
                   {isSidebarOpen && (
                     <div className="ml-3 text-left">
                       <span className="block font-medium text-sm">{item.name}</span>
-                      <span className={`block text-xs ${
-                        isActive ? 'text-blue-100' : 'text-gray-400'
-                      } transition-colors duration-200`}>
-                        {item.description}
-                      </span>
                     </div>
-                  )}
-                  
-                  {/* Active indicator */}
-                  {isActive && (
-                    <div className="absolute right-2 w-2 h-2 bg-white rounded-full"></div>
                   )}
                   
                   {/* Tooltip for collapsed sidebar */}
@@ -175,29 +173,95 @@ const DashboardLayout = () => {
         </div>
       </div>
 
+      {/* Mobile Sidebar */}
+      <div className={`fixed inset-y-0 left-0 z-50 w-64 bg-white shadow-lg transform transition-transform duration-300 ease-in-out lg:hidden ${
+        isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full'
+      }`}>
+        {/* Mobile Sidebar Header */}
+        <div className="p-4 border-b border-gray-200">
+          <div className="flex items-center justify-between">
+            <h1 className="font-bold text-xl text-gray-800">GELEP Admin</h1>
+            <button
+              onClick={() => setIsMobileMenuOpen(false)}
+              className="p-2 rounded-lg hover:bg-gray-100 transition-colors duration-200"
+            >
+              <X size={20} />
+            </button>
+          </div>
+        </div>
+        
+        {/* Mobile Navigation Items */}
+        <nav className="mt-4 flex-1 overflow-y-auto">
+          <div className="space-y-1 px-2">
+            {sidebarItems.map((item, index) => {
+              const isActive = isActiveItem(item.path);
+              const Icon = item.icon;
+              
+              return (
+                <button
+                  key={index}
+                  onClick={() => handleNavigation(item.path)}
+                  className={`w-full flex items-center px-3 py-3 rounded-lg transition-all duration-200 ${
+                    isActive 
+                      ? 'bg-blue-500 text-white shadow-sm' 
+                      : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
+                  }`}
+                >
+                  <Icon 
+                    size={20} 
+                    className={`${isActive ? 'text-white' : 'text-gray-500'} transition-colors duration-200`}
+                  />
+                  <div className="ml-3 text-left">
+                    <span className="block font-medium text-sm">{item.name}</span>
+                  </div>
+                </button>
+              );
+            })}
+          </div>
+        </nav>
+        
+        {/* Mobile Sidebar Footer */}
+        <div className="p-4 border-t border-gray-200 mt-auto">
+          <button 
+            onClick={handleLogout}
+            className="flex items-center w-full px-3 py-3 text-red-600 hover:bg-red-50 rounded-lg transition-colors duration-200"
+          >
+            <LogOut size={20} className="text-red-500" />
+            <span className="ml-3 font-medium">Logout</span>
+          </button>
+        </div>
+      </div>
+
       {/* Main Content Area */}
-      <div className="flex-1 overflow-hidden flex flex-col">
-        {/* Header */}
-        <Header />
+      <div className="flex-1 overflow-hidden flex flex-col min-w-0">
+        {/* Mobile Header with Menu Button */}
+        <div className="lg:hidden bg-white border-b border-gray-200 px-4 py-3">
+          <div className="flex items-center justify-between">
+            <button
+              onClick={toggleMobileMenu}
+              className="p-2 rounded-lg hover:bg-gray-100 transition-colors duration-200"
+            >
+              <Menu size={20} />
+            </button>
+            <h1 className="font-bold text-lg text-gray-800">GELEP Admin</h1>
+            <div className="flex items-center space-x-2">
+              <button className="p-2 rounded-lg hover:bg-gray-100 transition-colors duration-200">
+                <Bell size={20} />
+              </button>
+              <button className="p-2 rounded-lg hover:bg-gray-100 transition-colors duration-200">
+                <User size={20} />
+              </button>
+            </div>
+          </div>
+        </div>
+
+        {/* Desktop Header */}
+        <div className="hidden lg:block">
+          <Header />
+        </div>
         
         {/* Page Content */}
         <main className="flex-1 overflow-auto bg-gray-50">
-          {/* Breadcrumb */}
-          <div className="bg-white border-b border-gray-200 px-6 py-3">
-            <div className="flex items-center space-x-2 text-sm text-gray-500">
-              <span>Dashboard</span>
-              {location.pathname !== '/dashboard' && location.pathname !== '/' && (
-                <>
-                  <span>/</span>
-                  <span className="text-gray-900 font-medium">
-                    {sidebarItems.find(item => location.pathname.startsWith(item.path) && item.path !== '/dashboard')?.name || 'Page'}
-                  </span>
-                </>
-              )}
-            </div>
-          </div>
-          
-          {/* Outlet for nested routes */}
           <div className="h-full">
             <Outlet />
           </div>

@@ -70,7 +70,6 @@
 // }
 
 
-
 import React, { useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import {
@@ -83,7 +82,7 @@ export const SliderBar = ({ isOpen = true, onToggle }) => {
   const navigate = useNavigate();
   const location = useLocation();
 
-  // Sidebar navigation items
+  // Sidebar navigation items - updated paths to match the new routing structure
   const sidebarItems = [
     { 
       name: 'Dashboard', 
@@ -138,9 +137,9 @@ export const SliderBar = ({ isOpen = true, onToggle }) => {
   // Check if current path matches the item path
   const isActiveItem = (itemPath) => {
     if (itemPath === '/dashboard') {
-      return location.pathname === '/dashboard' || location.pathname === '/';
+      return location.pathname === '/dashboard';
     }
-    return location.pathname.startsWith(itemPath);
+    return location.pathname === itemPath;
   };
 
   // Handle sidebar toggle
