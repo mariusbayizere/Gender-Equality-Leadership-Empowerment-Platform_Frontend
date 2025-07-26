@@ -241,7 +241,7 @@ import DashboardMain from './components/Dashboard/DashboardMain.jsx';
 import ModernCourseModulesManagement from './components/ModernCourseModules/ModernCourseModulesManagement'
 import ModernEnrollmentManagement from './components/Enrollment/ModernEnrollmentManagement'
 import ModernCertificationManagement from './components/Certification/ModernCertificationManagement'
-import LeadershipTrainingDevelopment from './components/TrainingCourse/LeadershipTrainingDevelopment'
+import LeadershipTrainingDevelopment from './components/online_course/LeadershipTrainingDevelopment'
 
 // Dashboard Page Components
 const DashboardUsersPage = () => (
