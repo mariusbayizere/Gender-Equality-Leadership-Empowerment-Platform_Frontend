@@ -322,8 +322,10 @@ const DeleteConfirmation = ({
 
 const ModernEnrollmentManagement = () => {
   const [enrollments, setEnrollments] = useState([]);
+  const [users, setUsers] = useState([]);
+  const [courses, setCourses] = useState([]);
   const [visibleColumns, setVisibleColumns] = useState({
-    id: true, user_id: true, training_course_id: true, status: true, enrolled_at: true, actions: true
+    id: true, user_name: true, course_title: true, status: true, enrolled_at: true, actions: true
   });
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -372,6 +374,42 @@ const ModernEnrollmentManagement = () => {
     setIsEditMode(false);
   };
 
+  // Fetch users from API
+  const fetchUsers = async () => {
+    try {
+      const token = localStorage.getItem('token') || localStorage.getItem('authToken') || localStorage.getItem('accessToken');
+      const res = await fetch('http://localhost:3000/api/v1/users', {
+        headers: { 
+          'Content-Type': 'application/json', 
+          ...(token && { Authorization: `Bearer ${token}` }) 
+        }
+      });
+      if (!res.ok) throw new Error('Failed to fetch users');
+      const data = await res.json();
+      setUsers(Array.isArray(data) ? data : []);
+    } catch (err) {
+      console.error('Failed to load users:', err.message);
+    }
+  };
+
+  // Fetch courses from API
+  const fetchCourses = async () => {
+    try {
+      const token = localStorage.getItem('token') || localStorage.getItem('authToken') || localStorage.getItem('accessToken');
+      const res = await fetch('http://localhost:3000/api/v1/training_courses', {
+        headers: { 
+          'Content-Type': 'application/json', 
+          ...(token && { Authorization: `Bearer ${token}` }) 
+        }
+      });
+      if (!res.ok) throw new Error('Failed to fetch courses');
+      const data = await res.json();
+      setCourses(Array.isArray(data) ? data : []);
+    } catch (err) {
+      console.error('Failed to load courses:', err.message);
+    }
+  };
+
   // Fetch enrollments from API
   const fetchEnrollments = async () => {
     setLoading(true);
@@ -394,7 +432,22 @@ const ModernEnrollmentManagement = () => {
     }
   };
 
-  useEffect(() => { fetchEnrollments(); }, []);
+  // Get user name by ID
+  const getUserName = (userId) => {
+    const user = users.find(u => u.id === userId);
+    return user ? `${user.firstName} ${user.lastName}` : userId || 'Unknown User';
+  };
+
+  // Get course title by ID
+  const getCourseTitle = (courseId) => {
+    const course = courses.find(c => c.id === courseId);
+    return course ? course.title : courseId || 'Unknown Course';
+  };
+
+  useEffect(() => {
+    // Fetch all data in parallel
+    Promise.all([fetchUsers(), fetchCourses(), fetchEnrollments()]);
+  }, []);
 
   // Delete enrollment
   const handleDelete = async (enrollmentId) => {
@@ -475,9 +528,12 @@ const ModernEnrollmentManagement = () => {
   // Filtered and paginated enrollments
   const filteredEnrollments = enrollments.filter(enrollment => {
     const search = searchTerm.toLowerCase();
+    const userName = getUserName(enrollment.user_id).toLowerCase();
+    const courseTitle = getCourseTitle(enrollment.training_course_id).toLowerCase();
+    
     return (
-      (enrollment.user_id && enrollment.user_id.toLowerCase().includes(search)) ||
-      (enrollment.training_course_id && enrollment.training_course_id.toLowerCase().includes(search)) ||
+      userName.includes(search) ||
+      courseTitle.includes(search) ||
       (enrollment.status && enrollment.status.toLowerCase().includes(search))
     );
   });
@@ -497,7 +553,7 @@ const ModernEnrollmentManagement = () => {
             </div>
             <div>
               <h3 className="text-gray-900 font-semibold text-base">
-                {truncateText(enrollment?.user_id, 20)}
+                {truncateText(getUserName(enrollment?.user_id), 20)}
               </h3>
               <p className="text-gray-500 text-sm">
                 ID: {actualStartIndex + index + 1}
@@ -509,12 +565,12 @@ const ModernEnrollmentManagement = () => {
           </button>
         </div>
         <div className="space-y-3">
-          {visibleColumns.training_course_id && (
+          {visibleColumns.course_title && (
             <div className="flex items-center space-x-3">
               <div className="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center">
                 <Hash className="w-4 h-4 text-green-600" />
               </div>
-              <span className="text-gray-700 text-sm">{enrollment?.training_course_id || 'N/A'}</span>
+              <span className="text-gray-700 text-sm">{getCourseTitle(enrollment?.training_course_id)}</span>
             </div>
           )}
           {visibleColumns.status && (
@@ -644,7 +700,7 @@ const ModernEnrollmentManagement = () => {
               <button onClick={fetchEnrollments} className="p-2.5 text-gray-600 hover:text-gray-800 bg-blue-500 hover:bg-blue-600 text-white rounded-xl transition-all duration-200 shadow-sm">
                 <RefreshCw className="w-4 h-4" />
               </button>
-<button className="p-2.5 text-gray-600 hover:text-gray-800 bg-blue-500 hover:bg-blue-600 text-white rounded-xl transition-all duration-200 shadow-sm">
+              <button className="p-2.5 text-gray-600 hover:text-gray-800 bg-blue-500 hover:bg-blue-600 text-white rounded-xl transition-all duration-200 shadow-sm">
                 <Grid3X3 className="w-4 h-4" />
               </button>
             </div>
@@ -700,232 +756,76 @@ const ModernEnrollmentManagement = () => {
     );
   }
 
-//   return (
-//     <div className="min-h-screen bg-gray-50 p-6">
-//       <div className="max-w-7xl mx-auto">
-//         {/* Header Section */}
-//         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-6 gap-4 bg-white rounded-xl p-4 shadow-sm">
-//           <div className="flex items-center gap-4">
-//             <button 
-//               onClick={handleShowCreate}
-//               className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2.5 rounded-xl flex items-center gap-2 transition-all duration-200 shadow-sm hover:shadow-md font-medium"
-//             >
-//               <Plus className="w-4 h-4" />
-//               Create Enrollment
-//             </button>
-//             <div className="text-sm text-gray-600 bg-gray-100 px-3 py-2 rounded-lg">
-//               {enrollments.length} total enrollment{enrollments.length !== 1 ? 's' : ''}
-//             </div>
-//           </div>
+  return (
+    <div className="min-h-screen bg-gray-50">
+      <div className="max-w-7xl mx-auto p-6">
+        {/* Header Section */}
+        <div className="flex flex-col space-y-4 mb-4 sm:mb-6">
+          <div className="hidden lg:flex items-center justify-between bg-white rounded-lg shadow-sm p-4 border border-gray-200">
+            <button 
+              onClick={handleShowCreate}
+              className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm flex items-center space-x-2 transition-colors shadow-sm"
+            >
+              <Plus className="w-4 h-4" />
+              <span>Create Enrollment</span>
+            </button>
+            <div className="flex items-center space-x-3">
+              <div className="text-sm text-gray-600 bg-gray-50 px-3 py-2 rounded-lg border border-gray-200">
+                {enrollments.length} total enrollment{enrollments.length !== 1 ? 's' : ''}
+              </div>
+              <div className="relative">
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500 w-4 h-4" />
+                <input
+                  type="text"
+                  placeholder="Search enrollments..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="bg-gray-50 text-gray-700 placeholder-gray-500 pl-10 pr-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 w-64"
+                />
+              </div>
+              <button onClick={fetchEnrollments} className="bg-blue-600 hover:bg-blue-700 text-white p-2 rounded-lg shadow-sm transition-colors" title="Refresh">
+                <RefreshCw className="w-4 h-4" />
+              </button>
+              <button onClick={() => setViewMode(viewMode === 'table' ? 'cards' : 'table')} className="bg-blue-600 hover:bg-blue-700 text-white p-2 rounded-lg shadow-sm transition-colors" title={viewMode === 'table' ? 'Card View' : 'Table View'}>
+                <List className="w-4 h-4" />
+              </button>
+              <div className="relative column-toggle-container">
+                <button onClick={() => setShowColumnToggle(!showColumnToggle)} className="bg-blue-600 hover:bg-blue-700 text-white p-2 rounded-lg shadow-sm transition-colors" title="Column Visibility">
+                  <Grid3X3 className="w-4 h-4" />
+                </button>
+                {showColumnToggle && (
+                  <div className="absolute right-0 top-full mt-2 bg-white rounded-lg shadow-lg border border-gray-200 py-2 px-3 z-50 min-w-[150px]">
+                    {columnsList.map(column => (
+                      <label key={column.key} className="flex items-center space-x-2 py-1 cursor-pointer text-gray-700 hover:bg-gray-50 rounded px-2">
+                        <input
+                          type="checkbox"
+                          checked={visibleColumns[column.key]}
+                          onChange={() => toggleColumn(column.key)}
+                          className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500"
+                        />
+                        <span className="text-sm">{column.label}</span>
+                      </label>
+                    ))}
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
           
-//           <div className="flex items-center gap-3">
-//             <div className="relative">
-//               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
-//               <input
-//                 type="text"
-//                 placeholder="Search enrollments..."
-//                 value={searchTerm}
-//                 onChange={(e) => setSearchTerm(e.target.value)}
-//                 className="pl-10 pr-4 py-2.5 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent w-64 bg-white shadow-sm"
-//               />
-//             </div>
-            
-//             <button 
-//               onClick={fetchEnrollments}
-//               className="p-2.5 text-gray-600 hover:text-gray-800 bg-white border border-gray-200 rounded-xl transition-all duration-200 shadow-sm hover:shadow-md"
-//             >
-//               <RefreshCw className="w-4 h-4" />
-//             </button>
-            
-//             <div className="relative">
-//               <button
-//                 onClick={() => setShowColumnToggle(!showColumnToggle)}
-//                 className="p-2.5 text-gray-600 hover:text-gray-800 bg-white border border-gray-200 rounded-xl transition-all duration-200 shadow-sm hover:shadow-md"
-//               >
-//                 <Grid3X3 className="w-4 h-4" />
-//               </button>
-              
-//               {showColumnToggle && (
-//                 <div className="absolute right-0 top-12 bg-white border border-gray-200 rounded-xl shadow-lg p-3 z-20 min-w-48">
-//                   <div className="text-sm font-medium text-gray-700 mb-2">Toggle Columns</div>
-//                   {columnsList.map(col => (
-//                     <label key={col.key} className="flex items-center space-x-2 py-1 cursor-pointer hover:bg-gray-50 rounded px-2">
-//                       <input
-//                         type="checkbox"
-//                         checked={visibleColumns[col.key]}
-//                         onChange={() => toggleColumn(col.key)}
-//                         className="rounded border-gray-300"
-//                       />
-//                       <span className="text-sm text-gray-700">{col.label}</span>
-//                     </label>
-//                   ))}
-//                 </div>
-//               )}
-//             </div>
-            
-//             <button
-//               onClick={() => setViewMode(viewMode === 'table' ? 'cards' : 'table')}
-//               className="p-2.5 text-gray-600 hover:text-gray-800 bg-white border border-gray-200 rounded-xl transition-all duration-200 shadow-sm hover:shadow-md"
-//             >
-//               {viewMode === 'table' ? <Grid3X3 className="w-4 h-4" /> : <List className="w-4 h-4" />}
-//             </button>
-            
-//             <button
-//               onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-//               className="p-2.5 text-gray-600 hover:text-gray-800 bg-white border border-gray-200 rounded-xl transition-all duration-200 shadow-sm hover:shadow-md sm:hidden"
-//             >
-//               <Menu className="w-4 h-4" />
-//             </button>
-//           </div>
-//         </div>
-
-//         {/* Content Section */}
-//         {filteredEnrollments.length === 0 ? (
-//           <div className="flex items-center justify-center py-16 bg-white rounded-xl shadow-sm">
-//             <div className="text-center">
-//               <Search className="w-16 h-16 text-gray-300 mx-auto mb-4" />
-//               <h3 className="text-lg font-semibold text-gray-900 mb-2">No Results Found</h3>
-//               <p className="text-gray-500 mb-6">
-//                 {searchTerm ? `No enrollments match "${searchTerm}"` : 'No enrollments to display'}
-//               </p>
-//               {searchTerm && (
-//                 <button 
-//                   onClick={() => setSearchTerm('')}
-//                   className="bg-blue-500 hover:bg-blue-600 text-white px-6 py-3 rounded-xl transition-all duration-200 shadow-sm hover:shadow-md font-medium"
-//                 >
-//                   Clear Search
-//                 </button>
-//               )}
-//             </div>
-//           </div>
-//         ) : viewMode === 'cards' || window.innerWidth < 768 ? (
-//           // Card View
-//           <div className="space-y-4">
-//             {paginatedEnrollments.map((enrollment, index) => (
-//               <MobileCard key={enrollment?.id || index} enrollment={enrollment} index={index} />
-//             ))}
-//           </div>
-//         ) : (
-//           // Table View
-//           <div className="bg-white rounded-xl shadow-sm overflow-hidden">
-//             <div className="overflow-x-auto">
-//               <table className="w-full">
-//                 <thead className="bg-gray-50 border-b border-gray-200">
-//                   <tr>
-//                     {columnsList.map(col => 
-//                       visibleColumns[col.key] && (
-//                         <th key={col.key} className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-//                           {col.label}
-//                         </th>
-//                       )
-//                     )}
-//                   </tr>
-//                 </thead>
-//                 <tbody className="bg-white divide-y divide-gray-200">
-//                   {paginatedEnrollments.map((enrollment, index) => (
-//                     <tr key={enrollment?.id || index} className="hover:bg-gray-50 transition-colors">
-//                       {visibleColumns.id && (
-//                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-//                           {actualStartIndex + index + 1}
-//                         </td>
-//                       )}
-//                       {visibleColumns.user_id && (
-//                         <td className="px-6 py-4 whitespace-nowrap">
-//                           <div className="flex items-center">
-//                             <div className="w-8 h-8 bg-gradient-to-r from-blue-500 to-blue-600 rounded-full flex items-center justify-center mr-3">
-//                               <Users className="w-4 h-4 text-white" />
-//                             </div>
-//                             <span className="text-sm font-medium text-gray-900">
-//                               {enrollment?.user_id || 'N/A'}
-//                             </span>
-//                           </div>
-//                         </td>
-//                       )}
-//                       {visibleColumns.training_course_id && (
-//                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-//                           {enrollment?.training_course_id || 'N/A'}
-//                         </td>
-//                       )}
-//                       {visibleColumns.status && (
-//                         <td className="px-6 py-4 whitespace-nowrap">
-//                           {getStatusBadge(enrollment?.status)}
-//                         </td>
-//                       )}
-//                       {visibleColumns.enrolled_at && (
-//                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-//                           {formatDate(enrollment?.enrolled_at)}
-//                         </td>
-//                       )}
-//                       {visibleColumns.actions && (
-//                         <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-//                           <div className="flex items-center space-x-2">
-//                             <button
-//                               onClick={() => handleShowEdit(enrollment)}
-//                               className="text-blue-600 hover:text-blue-800 p-2 rounded-lg hover:bg-blue-50 transition-all duration-200"
-//                               title="Edit"
-//                             >
-//                               <Edit className="w-4 h-4" />
-//                             </button>
-//                             <button
-//                               onClick={() => handleDeleteClick(enrollment)}
-//                               className="text-red-600 hover:text-red-800 p-2 rounded-lg hover:bg-red-50 transition-all duration-200"
-//                               title="Delete"
-//                             >
-//                               <Trash2 className="w-4 h-4" />
-//                             </button>
-//                           </div>
-//                         </td>
-//                       )}
-//                     </tr>
-//                   ))}
-//                 </tbody>
-//               </table>
-//             </div>
-//           </div>
-//         )}
-
-//         {/* Pagination */}
-//         {filteredEnrollments.length > 0 && <PaginationControls />}
-//       </div>
-
-//       {/* Modals */}
-//       <EnrollmentForm
-//         showModal={showCreateModal}
-//         setShowModal={handleCloseEnrollmentForm}
-//         onEnrollmentSaved={handleEnrollmentSaved}
-//         enrollmentToEdit={enrollmentToEdit}
-//         isEditMode={isEditMode}
-//       />
-
-//       <DeleteConfirmation
-//         isOpen={deleteModal.isOpen}
-//         enrollmentToDelete={deleteModal.enrollmentToDelete}
-//         onConfirm={handleDeleteConfirm}
-//         onCancel={handleDeleteCancel}
-//       />
-//     </div>
-//   );
-// };
-
-// export default ModernEnrollmentManagement;
-
-
-return (
-  <div className="min-h-screen bg-gray-50">
-    <div className="max-w-7xl mx-auto p-6">
-      {/* Header Section */}
-      <div className="flex flex-col space-y-4 mb-4 sm:mb-6">
-        <div className="hidden lg:flex items-center justify-between bg-white rounded-lg shadow-sm p-4 border border-gray-200">
-          <button 
-            onClick={handleShowCreate}
-            className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm flex items-center space-x-2 transition-colors shadow-sm"
-          >
-            <Plus className="w-4 h-4" />
-            <span>Create Enrollment</span>
-          </button>
-          <div className="flex items-center space-x-3">
-            <div className="text-sm text-gray-600 bg-gray-50 px-3 py-2 rounded-lg border border-gray-200">
-              {enrollments.length} total enrollment{enrollments.length !== 1 ? 's' : ''}
+          {/* Mobile Header */}
+          <div className="lg:hidden bg-white rounded-lg shadow-sm p-4 border border-gray-200">
+            <div className="flex items-center justify-between mb-3">
+              <button 
+                onClick={handleShowCreate}
+                className="bg-blue-600 hover:bg-blue-700 text-white px-3 py-2 rounded-lg text-sm flex items-center space-x-2 transition-colors"
+              >
+                <Plus className="w-4 h-4" />
+                <span className="hidden sm:inline">Create Enrollment</span>
+                <span className="sm:hidden">Create</span>
+              </button>
+              <button onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)} className="bg-blue-600 hover:bg-blue-700 text-white p-2 rounded-lg">
+                {isMobileMenuOpen ? <X className="w-4 h-4" /> : <Menu className="w-4 h-4" />}
+              </button>
             </div>
             <div className="relative">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500 w-4 h-4" />
@@ -934,219 +834,188 @@ return (
                 placeholder="Search enrollments..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="bg-gray-50 text-gray-700 placeholder-gray-500 pl-10 pr-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 w-64"
+                className="w-full bg-gray-50 text-gray-700 placeholder-gray-500 pl-10 pr-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
               />
             </div>
-            <button onClick={fetchEnrollments} className="bg-blue-600 hover:bg-blue-700 text-white p-2 rounded-lg shadow-sm transition-colors" title="Refresh">
-              <RefreshCw className="w-4 h-4" />
-            </button>
-            <button onClick={() => setViewMode(viewMode === 'table' ? 'cards' : 'table')} className="bg-blue-600 hover:bg-blue-700 text-white p-2 rounded-lg shadow-sm transition-colors" title={viewMode === 'table' ? 'Card View' : 'Table View'}>
-              <List className="w-4 h-4" />
-            </button>
-            <div className="relative column-toggle-container">
-              <button onClick={() => setShowColumnToggle(!showColumnToggle)} className="bg-blue-600 hover:bg-blue-700 text-white p-2 rounded-lg shadow-sm transition-colors" title="Column Visibility">
-                <Grid3X3 className="w-4 h-4" />
-              </button>
-              {showColumnToggle && (
-                <div className="absolute right-0 top-full mt-2 bg-white rounded-lg shadow-lg border border-gray-200 py-2 px-3 z-50 min-w-[150px]">
-                  {columnsList.map(column => (
-                    <label key={column.key} className="flex items-center space-x-2 py-1 cursor-pointer text-gray-700 hover:bg-gray-50 rounded px-2">
-                      <input
-                        type="checkbox"
-                        checked={visibleColumns[column.key]}
-                        onChange={() => toggleColumn(column.key)}
-                        className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500"
-                      />
-                      <span className="text-sm">{column.label}</span>
-                    </label>
-                  ))}
+            {isMobileMenuOpen && (
+              <div className="mt-3 mobile-menu-container bg-gray-50 rounded-lg p-3 space-y-3 border border-gray-200">
+                <div className="flex flex-wrap gap-2">
+                  <button onClick={fetchEnrollments} className="flex items-center space-x-2 bg-blue-600 hover:bg-blue-700 text-white px-3 py-2 rounded text-sm transition-colors">
+                    <RefreshCw className="w-4 h-4" />
+                    <span>Refresh</span>
+                  </button>
+                  <button onClick={() => setViewMode(viewMode === 'table' ? 'cards' : 'table')} className="flex items-center space-x-2 bg-blue-600 hover:bg-blue-700 text-white px-3 py-2 rounded text-sm transition-colors">
+                    <List className="w-4 h-4" />
+                    <span>{viewMode === 'table' ? 'Cards' : 'Table'}</span>
+                  </button>
+                  <button onClick={() => setShowColumnToggle(!showColumnToggle)} className="flex items-center space-x-2 bg-blue-600 hover:bg-blue-700 text-white px-3 py-2 rounded text-sm transition-colors">
+                    <Grid3X3 className="w-4 h-4" />
+                    <span>Columns</span>
+                  </button>
                 </div>
-              )}
-            </div>
-          </div>
-        </div>
-        
-        {/* Mobile Header */}
-        <div className="lg:hidden bg-white rounded-lg shadow-sm p-4 border border-gray-200">
-          <div className="flex items-center justify-between mb-3">
-            <button 
-              onClick={handleShowCreate}
-              className="bg-blue-600 hover:bg-blue-700 text-white px-3 py-2 rounded-lg text-sm flex items-center space-x-2 transition-colors"
-            >
-              <Plus className="w-4 h-4" />
-              <span className="hidden sm:inline">Create Enrollment</span>
-              <span className="sm:hidden">Create</span>
-            </button>
-            <button onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)} className="bg-blue-600 hover:bg-blue-700 text-white p-2 rounded-lg">
-              {isMobileMenuOpen ? <X className="w-4 h-4" /> : <Menu className="w-4 h-4" />}
-            </button>
-          </div>
-          <div className="relative">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500 w-4 h-4" />
-            <input
-              type="text"
-              placeholder="Search enrollments..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full bg-gray-50 text-gray-700 placeholder-gray-500 pl-10 pr-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-            />
-          </div>
-          {isMobileMenuOpen && (
-            <div className="mt-3 mobile-menu-container bg-gray-50 rounded-lg p-3 space-y-3 border border-gray-200">
-              <div className="flex flex-wrap gap-2">
-                <button onClick={fetchEnrollments} className="flex items-center space-x-2 bg-blue-600 hover:bg-blue-700 text-white px-3 py-2 rounded text-sm transition-colors">
-                  <RefreshCw className="w-4 h-4" />
-                  <span>Refresh</span>
-                </button>
-                <button onClick={() => setViewMode(viewMode === 'table' ? 'cards' : 'table')} className="flex items-center space-x-2 bg-blue-600 hover:bg-blue-700 text-white px-3 py-2 rounded text-sm transition-colors">
-                  <List className="w-4 h-4" />
-                  <span>{viewMode === 'table' ? 'Cards' : 'Table'}</span>
-                </button>
-                <button onClick={() => setShowColumnToggle(!showColumnToggle)} className="flex items-center space-x-2 bg-blue-600 hover:bg-blue-700 text-white px-3 py-2 rounded text-sm transition-colors">
-                  <Grid3X3 className="w-4 h-4" />
-                  <span>Columns</span>
-                </button>
+                {showColumnToggle && (
+                  <div className="bg-white rounded-lg border border-gray-200 p-3 space-y-2">
+                    <h4 className="text-sm font-medium text-gray-700 mb-2">Toggle Columns</h4>
+                    {columnsList.map(column => (
+                      <label key={column.key} className="flex items-center space-x-2 cursor-pointer text-gray-700">
+                        <input
+                          type="checkbox"
+                          checked={visibleColumns[column.key]}
+                          onChange={() => toggleColumn(column.key)}
+                          className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500"
+                        />
+                        <span className="text-sm">{column.label}</span>
+                      </label>
+                    ))}
+                  </div>
+                )}
               </div>
-            </div>
-          )}
-        </div>
-      </div>
-
-      {/* Error Display */}
-      {error && (
-        <div className="bg-red-50 border border-red-200 rounded-lg p-4 mb-6">
-          <div className="flex items-center">
-            <AlertCircle className="w-5 h-5 text-red-600 mr-2" />
-            <p className="text-red-700">{error}</p>
-          </div>
-        </div>
-      )}
-
-      {/* Content Section */}
-      <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
-        {filteredEnrollments.length === 0 ? (
-          <div className="p-12 text-center">
-            <Search className="w-16 h-16 text-gray-300 mx-auto mb-4" />
-            <p className="text-gray-800 text-xl font-semibold mb-2">
-              {searchTerm ? 'No results found' : 'No enrollments to display'}
-            </p>
-            <p className="text-gray-500 mb-6">
-              {searchTerm ? 'Try adjusting your search criteria.' : 'Get started by creating your first enrollment.'}
-            </p>
-            {searchTerm && (
-              <button 
-                onClick={() => setSearchTerm('')}
-                className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg transition-colors shadow-sm font-medium"
-              >
-                Clear Search
-              </button>
             )}
           </div>
-        ) : viewMode === 'table' ? (
-          <div className="overflow-x-auto">
-            <table className="w-full">
-              <thead>
-                <tr className="bg-gray-50 border-b border-gray-100">
-                  {columnsList.map((col) => (
-                    visibleColumns[col.key] && (
-                      <th key={col.key} className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
-                        {col.label}
-                      </th>
-                    )
-                  ))}
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-gray-100">
+        </div>
+
+        {/* Main Content */}
+        <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+          {viewMode === 'table' ? (
+            <>
+              <div className="overflow-x-auto">
+                <table className="w-full">
+                  <thead className="bg-gray-50 border-b border-gray-200">
+                    <tr>
+                      {visibleColumns.id && (
+                        <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">#</th>
+                      )}
+                      {visibleColumns.user_name && (
+                        <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">User Name</th>
+                      )}
+                      {visibleColumns.course_title && (
+                        <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Course Title</th>
+                      )}
+                      {visibleColumns.status && (
+                        <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Status</th>
+                      )}
+                      {visibleColumns.enrolled_at && (
+                        <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Enrolled At</th>
+                      )}
+                      {visibleColumns.actions && (
+                        <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Actions</th>
+                      )}
+                    </tr>
+                  </thead>
+                  <tbody className="bg-white divide-y divide-gray-200">
+                    {paginatedEnrollments.map((enrollment, index) => (
+                      <tr key={enrollment?.id} className="hover:bg-gray-50 transition-colors">
+                        {visibleColumns.id && (
+                          <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                            {actualStartIndex + index + 1}
+                          </td>
+                        )}
+                        {visibleColumns.user_name && (
+                          <td className="px-6 py-4 whitespace-nowrap">
+                            <div className="flex items-center">
+                              <div className="w-10 h-10 bg-gradient-to-r from-blue-500 to-blue-600 rounded-full flex items-center justify-center shadow-sm">
+                                <Users className="w-5 h-5 text-white" />
+                              </div>
+                              <div className="ml-4">
+                                <div className="text-sm font-medium text-gray-900">
+                                  {getUserName(enrollment?.user_id)}
+                                </div>
+                              </div>
+                            </div>
+                          </td>
+                        )}
+                        {visibleColumns.course_title && (
+                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                            {truncateText(getCourseTitle(enrollment?.training_course_id), 40)}
+                          </td>
+                        )}
+                        {visibleColumns.status && (
+                          <td className="px-6 py-4 whitespace-nowrap">
+                            {getStatusBadge(enrollment?.status)}
+                          </td>
+                        )}
+                        {visibleColumns.enrolled_at && (
+                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                            {formatDate(enrollment?.enrolled_at)}
+                          </td>
+                        )}
+                        {visibleColumns.actions && (
+                          <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                            <div className="flex items-center space-x-2">
+                              <button
+                                onClick={() => handleShowEdit(enrollment)}
+                                className="text-blue-600 hover:text-blue-800 p-2 rounded-lg hover:bg-blue-50 transition-all duration-200"
+                                title="Edit"
+                              >
+                                <Edit className="w-4 h-4" />
+                              </button>
+                              <button
+                                onClick={() => handleDeleteClick(enrollment)}
+                                className="text-red-600 hover:text-red-800 p-2 rounded-lg hover:bg-red-50 transition-all duration-200"
+                                title="Delete"
+                              >
+                                <Trash2 className="w-4 h-4" />
+                              </button>
+                            </div>
+                          </td>
+                        )}
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+              <PaginationControls />
+            </>
+          ) : (
+            <>
+              <div className="p-6">
                 {paginatedEnrollments.map((enrollment, index) => (
-                  <tr key={enrollment?.id || index} className="hover:bg-gray-50 transition-colors">
-                    {visibleColumns.id && (
-                      <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                        {actualStartIndex + index + 1}
-                      </td>
-                    )}
-                    {visibleColumns.user_id && (
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="flex items-center">
-                          <div className="w-8 h-8 bg-gradient-to-r from-blue-500 to-blue-600 rounded-full flex items-center justify-center mr-3">
-                            <Users className="w-4 h-4 text-white" />
-                          </div>
-                          <span className="text-sm font-medium text-gray-900">
-                            {enrollment?.user_id || 'N/A'}
-                          </span>
-                        </div>
-                      </td>
-                    )}
-                    {visibleColumns.training_course_id && (
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700">
-                        {enrollment?.training_course_id || 'N/A'}
-                      </td>
-                    )}
-                    {visibleColumns.status && (
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        {getStatusBadge(enrollment?.status)}
-                      </td>
-                    )}
-                    {visibleColumns.enrolled_at && (
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700">
-                        {formatDate(enrollment?.enrolled_at)}
-                      </td>
-                    )}
-                    {visibleColumns.actions && (
-                      <td className="px-6 py-4 whitespace-nowrap text-sm">
-                        <div className="flex items-center space-x-2">
-                          <button
-                            onClick={() => handleShowEdit(enrollment)}
-                            className="text-blue-600 hover:text-blue-800 p-1 rounded transition-colors"
-                            title="Edit"
-                          >
-                            <Edit className="w-4 h-4" />
-                          </button>
-                          <button
-                            onClick={() => handleDeleteClick(enrollment)}
-                            className="text-red-600 hover:text-red-800 p-1 rounded transition-colors"
-                            title="Delete"
-                          >
-                            <Trash2 className="w-4 h-4" />
-                          </button>
-                        </div>
-                      </td>
-                    )}
-                  </tr>
+                  <MobileCard key={enrollment?.id} enrollment={enrollment} index={index} />
                 ))}
-              </tbody>
-            </table>
-          </div>
-        ) : (
-          <div className="p-6">
-            {paginatedEnrollments.map((enrollment, index) => (
-              <MobileCard key={enrollment?.id || index} enrollment={enrollment} index={index} />
-            ))}
+              </div>
+              <PaginationControls />
+            </>
+          )}
+        </div>
+
+        {/* Show message when no results found after filtering */}
+        {filteredEnrollments.length === 0 && searchTerm && (
+          <div className="flex items-center justify-center py-16 bg-white rounded-xl shadow-sm mt-4">
+            <div className="text-center">
+              <Search className="w-16 h-16 text-gray-300 mx-auto mb-4" />
+              <h3 className="text-lg font-semibold text-gray-900 mb-2">No Results Found</h3>
+              <p className="text-gray-500 mb-6">
+                No enrollments match your search for "{searchTerm}"
+              </p>
+              <button 
+                onClick={() => setSearchTerm('')}
+                className="bg-blue-500 hover:bg-blue-600 text-white px-6 py-3 rounded-xl flex items-center gap-2 transition-all duration-200 shadow-sm hover:shadow-md font-medium mx-auto"
+              >
+                <X className="w-4 h-4" />
+                Clear Search
+              </button>
+            </div>
           </div>
         )}
-        
-        {/* Pagination */}
-        {filteredEnrollments.length > 0 && <PaginationControls />}
       </div>
+
+      {/* Modals */}
+      <EnrollmentForm
+        showModal={showCreateModal}
+        setShowModal={handleCloseEnrollmentForm}
+        onEnrollmentSaved={handleEnrollmentSaved}
+        enrollmentToEdit={enrollmentToEdit}
+        isEditMode={isEditMode}
+      />
+
+      <DeleteConfirmation
+        isOpen={deleteModal.isOpen}
+        enrollmentToDelete={deleteModal.enrollmentToDelete}
+        onConfirm={handleDeleteConfirm}
+        onCancel={handleDeleteCancel}
+      />
     </div>
-
-    {/* Modals */}
-    <EnrollmentForm
-      showModal={showCreateModal}
-      setShowModal={handleCloseEnrollmentForm}
-      onEnrollmentSaved={handleEnrollmentSaved}
-      enrollmentToEdit={enrollmentToEdit}
-      isEditMode={isEditMode}
-    />
-
-    <DeleteConfirmation
-      isOpen={deleteModal.isOpen}
-      enrollmentToDelete={deleteModal.enrollmentToDelete}
-      onConfirm={handleDeleteConfirm}
-      onCancel={handleDeleteCancel}
-    />
-  </div>
-);
-
+  );
 };
 
 export default ModernEnrollmentManagement;

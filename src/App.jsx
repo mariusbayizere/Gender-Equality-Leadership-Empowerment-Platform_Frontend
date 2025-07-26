@@ -240,6 +240,8 @@ import DashboardLayout from './components/Dashboard/DashboardLayout.jsx';
 import DashboardMain from './components/Dashboard/DashboardMain.jsx';
 import ModernCourseModulesManagement from './components/ModernCourseModules/ModernCourseModulesManagement'
 import ModernEnrollmentManagement from './components/Enrollment/ModernEnrollmentManagement'
+import ModernCertificationManagement from './components/Certification/ModernCertificationManagement'
+import LeadershipTrainingDevelopment from './components/TrainingCourse/LeadershipTrainingDevelopment'
 
 // Dashboard Page Components
 const DashboardUsersPage = () => (
@@ -523,8 +525,16 @@ function App() {
             element: <SignUp />,
         },
         {
+            path: "/certification",
+            element: <ModernCertificationManagement/>
+        },
+        {
             path: "/update-password",
             element: <UpdatePassword />,
+        },
+        {
+            path: "/leadershipTraining",
+            element: <LeadershipTrainingDevelopment/>
         },
         {
             path: "/user",
