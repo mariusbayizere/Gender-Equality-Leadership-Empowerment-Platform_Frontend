@@ -1,8 +1,10 @@
-// import React, { useState, useEffect } from 'react';
-// import { Calendar, Clock, Users, Award, BookOpen, Video, CheckCircle, Star, Filter, Search, Play, ExternalLink, Globe, Download, ChevronRight } from 'lucide-react';
+// import React, { useState } from 'react';
+// import { 
+//   Calendar, Clock, Users, Award, BookOpen, Video, CheckCircle, Star, 
+//   Play, ExternalLink, Globe, Loader2
+// } from 'lucide-react';
 
-// // OnlineCourse Component
-// const OnlineCourse = ({ 
+// const OnlineCourseCard = ({ 
 //   course, 
 //   enrollment, 
 //   certification, 
@@ -11,9 +13,41 @@
 //   onViewModules, 
 //   onPlayVideo 
 // }) => {
-//   const [loading, setLoading] = useState(false);
+//   const [enrolling, setEnrolling] = useState(false);
 
-//   // Extract YouTube video ID from URL
+//   const handleEnroll = async () => {
+//     if (onEnroll) {
+//       setEnrolling(true);
+//       try {
+//         await onEnroll(course.id);
+//       } catch (error) {
+//         console.error('Enrollment failed:', error);
+//       } finally {
+//         setEnrolling(false);
+//       }
+//     }
+//   };
+
+//   const handlePlayVideo = () => {
+//     if (onPlayVideo && course.video_url) {
+//       onPlayVideo(course.video_url);
+//     }
+//   };
+
+//   const handleViewModules = () => {
+//     if (onViewModules) {
+//       onViewModules(course);
+//     }
+//   };
+
+//   const formatDate = (dateString) => {
+//     try {
+//       return new Date(dateString).toLocaleDateString();
+//     } catch (err) {
+//       return new Date().toLocaleDateString();
+//     }
+//   };
+
 //   const getYouTubeVideoId = (url) => {
 //     if (!url) return null;
 //     const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|&v=)([^#&?]*).*/;
@@ -21,1007 +55,810 @@
 //     return (match && match[2].length === 11) ? match[2] : null;
 //   };
 
-//   // Generate Google Meet link (for demonstration)
-//   const generateMeetLink = (courseId) => {
-//     return `https://meet.google.com/${courseId}-${Math.random().toString(36).substr(2, 9)}`;
-//   };
-
-//   const handleEnroll = async () => {
-//     setLoading(true);
-//     try {
-//       await onEnroll(course.id);
-//     } catch (error) {
-//       console.error('Error enrolling:', error);
-//     } finally {
-//       setLoading(false);
+//   const generateThumbnailUrl = (title) => {
+//     const keywords = title.toLowerCase();
+//     if (keywords.includes('leadership')) {
+//       return 'https://images.unsplash.com/photo-1552664730-d307ca884978?w=800&h=600&fit=crop';
+//     } else if (keywords.includes('gender') || keywords.includes('equality')) {
+//       return 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=800&h=600&fit=crop';
+//     } else if (keywords.includes('digital')) {
+//       return 'https://images.unsplash.com/photo-1551434678-e076c223a692?w=800&h=600&fit=crop';
 //     }
+//     return 'https://images.unsplash.com/photo-1552664730-d307ca884978?w=800&h=600&fit=crop';
 //   };
 
-//   const handlePlayPreview = () => {
-//     const firstModule = courseModules[0];
-//     if (firstModule) {
-//       const videoId = getYouTubeVideoId(firstModule.media_url);
-//       if (videoId) {
-//         onPlayVideo(`https://www.youtube.com/embed/${videoId}`);
-//       }
-//     }
+//   const generateTagsFromTitle = (title) => {
+//     const keywords = title.toLowerCase();
+//     const tags = [];
+    
+//     if (keywords.includes('leadership')) tags.push('Leadership');
+//     if (keywords.includes('gender')) tags.push('Gender Equality');
+//     if (keywords.includes('equality')) tags.push('Diversity');
+//     if (keywords.includes('digital')) tags.push('Digital Leadership');
+//     if (keywords.includes('management')) tags.push('Management');
+//     if (keywords.includes('training')) tags.push('Professional Development');
+    
+//     return tags.length > 0 ? tags : ['Professional Development'];
 //   };
 
-//   const videoId = courseModules.length > 0 ? getYouTubeVideoId(courseModules[0]?.media_url) : null;
+//   // Ensure course has all required properties with defaults
+//   const courseData = {
+//     id: course.id,
+//     title: course.title || 'Untitled Course',
+//     description: course.description || 'No description available',
+//     instructor_name: course.instructor_name || 'Unknown Instructor',
+//     duration: course.duration || '1 hour',
+//     rating: course.rating || 4.5,
+//     enrolled: course.enrolled || 0,
+//     video_url: course.video_url || course.media_url,
+//     thumbnail_url: course.thumbnail_url || generateThumbnailUrl(course.title || ''),
+//     status: course.status || (course.is_active !== false ? 'active' : 'inactive'),
+//     created_at: course.created_at || new Date().toISOString(),
+//     tags: course.tags || generateTagsFromTitle(course.title || ''),
+//     modules_count: courseModules.length || 0
+//   };
+
+//   const isEnrolled = !!enrollment;
+//   const isCertified = !!certification;
+//   const hasModules = courseModules.length > 0;
 
 //   return (
-//     <div className="group bg-white rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300 overflow-hidden border border-gray-100 hover:border-blue-200">
-//       {/* Course Header with Gradient */}
-//       <div className="h-32 bg-gradient-to-br from-blue-500 to-blue-600 relative overflow-hidden">
-//         <div className="absolute inset-0 bg-black bg-opacity-20"></div>
+//     <div className="bg-white rounded-2xl shadow-lg overflow-hidden border border-gray-100 hover:shadow-xl transition-all duration-300 group">
+//       {/* Course Thumbnail */}
+//       <div className="h-48 relative overflow-hidden">
+//         <img 
+//           src={courseData.thumbnail_url} 
+//           alt={courseData.title}
+//           className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+//           onError={(e) => {
+//             e.target.src = generateThumbnailUrl(courseData.title);
+//           }}
+//         />
+//         <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent"></div>
+        
+//         {/* Status Badge */}
 //         <div className="absolute top-4 left-4">
-//           <div className="px-3 py-1 rounded-full text-xs font-semibold text-white backdrop-blur-sm bg-blue-500 bg-opacity-30">
+//           <div className={`px-3 py-1 rounded-full text-xs font-semibold text-white backdrop-blur-sm ${
+//             courseData.status === 'active' 
+//               ? 'bg-green-500 bg-opacity-80' 
+//               : 'bg-orange-500 bg-opacity-80'
+//           }`}>
 //             <div className="flex items-center">
-//               <BookOpen className="w-3 h-3 mr-1" />
-//               Online Course
+//               <Video className="w-3 h-3 mr-1" />
+//               {courseData.status === 'active' ? 'Live' : 'Coming Soon'}
 //             </div>
 //           </div>
 //         </div>
+
+//         {/* Rating Badge */}
 //         <div className="absolute top-4 right-4">
 //           <div className="flex items-center space-x-1 bg-white bg-opacity-20 backdrop-blur-sm rounded-full px-2 py-1">
 //             <Star className="w-3 h-3 text-yellow-300 fill-current" />
-//             <span className="text-xs font-medium text-white">{course.rating || '4.5'}</span>
+//             <span className="text-xs font-medium text-white">{courseData.rating}</span>
 //           </div>
+//         </div>
+
+//         {/* Play Button Overlay */}
+//         {courseData.video_url && (
+//           <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+//             <button
+//               onClick={handlePlayVideo}
+//               className="bg-white bg-opacity-90 rounded-full p-4 hover:bg-opacity-100 transition-all duration-200 transform hover:scale-110"
+//             >
+//               <Play className="w-6 h-6 text-blue-600 fill-current" />
+//             </button>
+//           </div>
+//         )}
+
+//         {/* Course Title Overlay */}
+//         <div className="absolute bottom-4 left-4 right-4">
+//           <h3 className="text-lg font-bold text-white mb-1 line-clamp-2 leading-tight">
+//             {courseData.title}
+//           </h3>
 //         </div>
 //       </div>
 
+//       {/* Course Content */}
 //       <div className="p-6">
-//         <div className="mb-4">
-//           <h3 className="text-xl font-bold text-gray-900 mb-2 group-hover:text-blue-600 transition-colors">
-//             {course.title}
-//           </h3>
-//           <p className="text-gray-600 text-sm leading-relaxed">{course.description}</p>
-//         </div>
+//         {/* Description */}
+//         <p className="text-gray-600 text-sm leading-relaxed mb-4 line-clamp-3">
+//           {courseData.description}
+//         </p>
 
+//         {/* Course Meta */}
 //         <div className="flex items-center justify-between mb-4 text-sm text-gray-500">
 //           <div className="flex items-center space-x-4">
 //             <div className="flex items-center">
 //               <Clock className="w-4 h-4 mr-1 text-blue-500" />
-//               {course.duration}
+//               <span>{courseData.duration}</span>
 //             </div>
 //             <div className="flex items-center">
 //               <Users className="w-4 h-4 mr-1 text-green-500" />
-//               {course.enrolled || 0}
+//               <span>{courseData.enrolled}</span>
 //             </div>
-//           </div>
-//           <div className="text-xs bg-gray-100 px-2 py-1 rounded-full">
-//             by {course.instructor_name}
+//             {hasModules && (
+//               <div className="flex items-center">
+//                 <BookOpen className="w-4 h-4 mr-1 text-purple-500" />
+//                 <span>{courseData.modules_count}</span>
+//               </div>
+//             )}
 //           </div>
 //         </div>
 
-//         {/* Progress Bar for Enrolled Courses */}
-//         {enrollment && (
-//           <div className="mb-4">
-//             <div className="flex justify-between items-center mb-2">
-//               <span className="text-sm font-medium text-gray-700">Progress</span>
-//               <span className="text-sm text-blue-600 font-semibold">{enrollment.progress || 0}%</span>
-//             </div>
-//             <div className="w-full bg-gray-200 rounded-full h-2 overflow-hidden">
-//               <div 
-//                 className="bg-gradient-to-r from-blue-500 to-blue-600 h-2 rounded-full transition-all duration-500 ease-out"
-//                 style={{ width: `${enrollment.progress || 0}%` }}
-//               ></div>
-//             </div>
+//         {/* Instructor */}
+//         <div className="flex items-center mb-4">
+//           <div className="w-8 h-8 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full flex items-center justify-center text-white text-xs font-bold mr-3">
+//             {courseData.instructor_name.charAt(0).toUpperCase()}
+//           </div>
+//           <div>
+//             <p className="text-sm font-medium text-gray-900">{courseData.instructor_name}</p>
+//             <p className="text-xs text-gray-500">Instructor</p>
+//           </div>
+//         </div>
+
+//         {/* Tags */}
+//         <div className="flex flex-wrap gap-2 mb-4">
+//           {courseData.tags.slice(0, 3).map((tag, idx) => (
+//             <span key={idx} className="text-xs bg-blue-100 text-blue-700 px-2 py-1 rounded-full font-medium">
+//               {tag}
+//             </span>
+//           ))}
+//         </div>
+
+//         {/* Enrollment Status */}
+//         {isEnrolled && (
+//           <div className="flex items-center mb-4 p-3 bg-green-50 rounded-lg border border-green-200">
+//             <CheckCircle className="w-5 h-5 text-green-500 mr-2" />
+//             <span className="text-sm font-medium text-green-700">
+//               {isCertified ? 'Certified' : 'Enrolled'}
+//             </span>
+//             {isCertified && <Award className="w-4 h-4 text-yellow-500 ml-2" />}
 //           </div>
 //         )}
 
-//         {/* Certification Badge */}
-//         {certification && (
-//           <div className="mb-4 p-3 bg-gradient-to-r from-green-50 to-emerald-50 border border-green-200 rounded-xl">
-//             <div className="flex items-center justify-between">
-//               <div className="flex items-center">
-//                 <Award className="w-5 h-5 text-green-600 mr-2" />
-//                 <span className="text-green-800 font-semibold">Certified</span>
-//               </div>
-//               <button className="text-green-600 hover:text-green-800 text-sm font-medium flex items-center">
-//                 <Download className="w-4 h-4 mr-1" />
-//                 Download
-//               </button>
-//             </div>
-//           </div>
-//         )}
-
-//         {/* Online Course Specific Features */}
-//         <div className="mb-4 space-y-2">
-//           {videoId && (
-//             <button
-//               onClick={handlePlayPreview}
-//               className="w-full flex items-center justify-center py-2 px-4 bg-red-50 hover:bg-red-100 border border-red-200 rounded-lg transition-colors group"
-//             >
-//               <Play className="w-4 h-4 mr-2 text-red-600" />
-//               <span className="text-red-700 font-medium">Watch Preview</span>
-//             </button>
-//           )}
-//           <button
-//             onClick={() => window.open(generateMeetLink(course.id), '_blank')}
-//             className="w-full flex items-center justify-center py-2 px-4 bg-blue-50 hover:bg-blue-100 border border-blue-200 rounded-lg transition-colors"
-//           >
-//             <Globe className="w-4 h-4 mr-2 text-blue-600" />
-//             <span className="text-blue-700 font-medium">Join Live Session</span>
-//           </button>
+//         {/* Creation Date */}
+//         <div className="text-xs text-gray-500 mb-4">
+//           Created: {formatDate(courseData.created_at)}
 //         </div>
 
 //         {/* Action Buttons */}
-//         <div className="flex space-x-2">
-//           {!enrollment ? (
+//         <div className="space-y-3">
+//           {/* Primary Action */}
+//           {!isEnrolled ? (
 //             <button
 //               onClick={handleEnroll}
-//               disabled={loading}
-//               className="flex-1 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white py-3 px-4 rounded-xl font-semibold transition-all duration-200 transform hover:scale-105 shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
+//               disabled={enrolling || courseData.status !== 'active'}
+//               className="w-full bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white py-3 px-4 rounded-xl font-semibold transition-all duration-200 shadow-lg disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
 //             >
-//               {loading ? 'Enrolling...' : 'Enroll Now'}
+//               {enrolling ? (
+//                 <>
+//                   <Loader2 className="w-4 h-4 animate-spin mr-2" />
+//                   Enrolling...
+//                 </>
+//               ) : courseData.status === 'active' ? (
+//                 'Enroll Now'
+//               ) : (
+//                 'Coming Soon'
+//               )}
 //             </button>
 //           ) : (
-//             <button className="flex-1 bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-white py-3 px-4 rounded-xl font-semibold transition-all duration-200 transform hover:scale-105 shadow-lg hover:shadow-xl">
+//             <button
+//               onClick={handlePlayVideo}
+//               disabled={!courseData.video_url}
+//               className="w-full bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-white py-3 px-4 rounded-xl font-semibold transition-all duration-200 shadow-lg flex items-center justify-center"
+//             >
+//               <Play className="w-4 h-4 mr-2" />
 //               Continue Learning
 //             </button>
 //           )}
-          
-//           <button
-//             onClick={() => onViewModules(course)}
-//             className="px-4 py-3 border border-gray-300 text-gray-700 rounded-xl hover:bg-gray-50 hover:border-gray-400 transition-all duration-200 flex items-center"
-//           >
-//             <ChevronRight className="w-4 h-4" />
-//           </button>
-//         </div>
-//       </div>
-//     </div>
-//   );
-// };
 
-// // Regular CourseCard Component (for non-online courses)
-// const CourseCard = ({ course, enrollment, certification, courseModules, onEnroll, onShowModules, generateMeetLink, getYouTubeVideoId }) => {
-//   const [loading, setLoading] = useState(false);
-
-//   const handleEnroll = async () => {
-//     setLoading(true);
-//     try {
-//       await onEnroll(course.id);
-//     } catch (error) {
-//       console.error('Error enrolling:', error);
-//     } finally {
-//       setLoading(false);
-//     }
-//   };
-
-//   const getTypeColor = (type) => {
-//     switch (type) {
-//       case 'webinar': return 'from-green-500 to-green-600';
-//       case 'certification': return 'from-purple-500 to-purple-600';
-//       default: return 'from-blue-500 to-blue-600';
-//     }
-//   };
-
-//   const getTypeIcon = (type) => {
-//     switch (type) {
-//       case 'webinar': return Video;
-//       case 'certification': return Award;
-//       default: return BookOpen;
-//     }
-//   };
-
-//   const TypeIcon = getTypeIcon(course.course_type);
-
-//   return (
-//     <div className="group bg-white rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300 overflow-hidden border border-gray-100 hover:border-blue-200">
-//       <div className={`h-32 bg-gradient-to-br ${getTypeColor(course.course_type)} relative overflow-hidden`}>
-//         <div className="absolute inset-0 bg-black bg-opacity-20"></div>
-//         <div className="absolute top-4 left-4">
-//           <div className="px-3 py-1 rounded-full text-xs font-semibold text-white backdrop-blur-sm bg-white bg-opacity-30">
-//             <div className="flex items-center">
-//               <TypeIcon className="w-3 h-3 mr-1" />
-//               {course.course_type === 'webinar' ? 'Live Webinar' : 
-//                course.course_type === 'certification' ? 'Certification' : 'Course'}
-//             </div>
-//           </div>
-//         </div>
-//         <div className="absolute top-4 right-4">
-//           <div className="flex items-center space-x-1 bg-white bg-opacity-20 backdrop-blur-sm rounded-full px-2 py-1">
-//             <Star className="w-3 h-3 text-yellow-300 fill-current" />
-//             <span className="text-xs font-medium text-white">{course.rating || '4.5'}</span>
-//           </div>
-//         </div>
-//       </div>
-
-//       <div className="p-6">
-//         <div className="mb-4">
-//           <h3 className="text-xl font-bold text-gray-900 mb-2 group-hover:text-blue-600 transition-colors">
-//             {course.title}
-//           </h3>
-//           <p className="text-gray-600 text-sm leading-relaxed">{course.description}</p>
-//         </div>
-
-//         <div className="flex items-center justify-between mb-4 text-sm text-gray-500">
-//           <div className="flex items-center space-x-4">
-//             <div className="flex items-center">
-//               <Clock className="w-4 h-4 mr-1 text-blue-500" />
-//               {course.duration}
-//             </div>
-//             <div className="flex items-center">
-//               <Users className="w-4 h-4 mr-1 text-green-500" />
-//               {course.enrolled || 0}
-//             </div>
-//           </div>
-//           <div className="text-xs bg-gray-100 px-2 py-1 rounded-full">
-//             by {course.instructor_name}
-//           </div>
-//         </div>
-
-//         {enrollment && (
-//           <div className="mb-4">
-//             <div className="flex justify-between items-center mb-2">
-//               <span className="text-sm font-medium text-gray-700">Progress</span>
-//               <span className="text-sm text-blue-600 font-semibold">{enrollment.progress || 0}%</span>
-//             </div>
-//             <div className="w-full bg-gray-200 rounded-full h-2 overflow-hidden">
-//               <div 
-//                 className="bg-gradient-to-r from-blue-500 to-blue-600 h-2 rounded-full transition-all duration-500 ease-out"
-//                 style={{ width: `${enrollment.progress || 0}%` }}
-//               ></div>
-//             </div>
-//           </div>
-//         )}
-
-//         {certification && (
-//           <div className="mb-4 p-3 bg-gradient-to-r from-green-50 to-emerald-50 border border-green-200 rounded-xl">
-//             <div className="flex items-center justify-between">
-//               <div className="flex items-center">
-//                 <Award className="w-5 h-5 text-green-600 mr-2" />
-//                 <span className="text-green-800 font-semibold">Certified</span>
-//               </div>
-//               <button className="text-green-600 hover:text-green-800 text-sm font-medium flex items-center">
-//                 <Download className="w-4 h-4 mr-1" />
-//                 Download
+//           {/* Secondary Actions */}
+//           <div className="flex space-x-2">
+//             {hasModules && (
+//               <button
+//                 onClick={handleViewModules}
+//                 className="flex-1 border border-gray-300 text-gray-700 hover:bg-gray-50 py-2 px-4 rounded-lg font-medium transition-colors text-sm flex items-center justify-center"
+//               >
+//                 <BookOpen className="w-4 h-4 mr-1" />
+//                 Modules
 //               </button>
-//             </div>
-//           </div>
-//         )}
+//             )}
+            
+//             {courseData.video_url && (
+//               <button
+//                 onClick={handlePlayVideo}
+//                 className="flex-1 border border-gray-300 text-gray-700 hover:bg-gray-50 py-2 px-4 rounded-lg font-medium transition-colors text-sm flex items-center justify-center"
+//               >
+//                 <Play className="w-4 h-4 mr-1" />
+//                 Preview
+//               </button>
+//             )}
 
-//         <div className="flex space-x-2">
-//           {!enrollment ? (
-//             <button
-//               onClick={handleEnroll}
-//               disabled={loading}
-//               className="flex-1 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white py-3 px-4 rounded-xl font-semibold transition-all duration-200 transform hover:scale-105 shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
-//             >
-//               {loading ? 'Enrolling...' : 'Enroll Now'}
-//             </button>
-//           ) : (
-//             <button className="flex-1 bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-white py-3 px-4 rounded-xl font-semibold transition-all duration-200 transform hover:scale-105 shadow-lg hover:shadow-xl">
-//               Continue Learning
-//             </button>
-//           )}
-          
-//           <button
-//             onClick={() => onShowModules(course)}
-//             className="px-4 py-3 border border-gray-300 text-gray-700 rounded-xl hover:bg-gray-50 hover:border-gray-400 transition-all duration-200 flex items-center"
-//           >
-//             <ChevronRight className="w-4 h-4" />
-//           </button>
+//             {getYouTubeVideoId(courseData.video_url) && (
+//               <button
+//                 onClick={() => window.open(courseData.video_url, '_blank')}
+//                 className="flex-1 border border-gray-300 text-gray-700 hover:bg-gray-50 py-2 px-4 rounded-lg font-medium transition-colors text-sm flex items-center justify-center"
+//               >
+//                 <ExternalLink className="w-4 h-4 mr-1" />
+//                 YouTube
+//               </button>
+//             )}
+//           </div>
 //         </div>
 //       </div>
 //     </div>
 //   );
 // };
 
-// export default OnlineCourse;
+// export default OnlineCourseCard;
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { 
   Calendar, Clock, Users, Award, BookOpen, Video, CheckCircle, Star, 
-  Filter, Search, Play, ExternalLink, Globe, Download, ChevronRight,
-  MessageCircle, Send, Mic, MicOff, Camera, CameraOff, Monitor,
-  Settings, Phone, PhoneOff, Volume2, VolumeX, MoreVertical,
-  ArrowLeft, Share2, Edit3, Smile, Paperclip, X, Loader2, AlertCircle
+  Play, Loader2, MessageCircle, Send, Mic, MicOff,
+  VideoIcon, VideoOff, PhoneOff, Settings, Maximize2, Minimize2,
+  UserPlus, PlayCircle
 } from 'lucide-react';
+import ExpandedCourseView from './ExpandedCourseView'; // Import the separate component
 
-const OnlineCourse = () => {
-  const [currentView, setCurrentView] = useState('courses'); // 'courses' or 'meeting'
-  const [selectedCourse, setSelectedCourse] = useState(null);
+const OnlineCourseCard = ({ 
+  course, 
+  enrollment, 
+  certification, 
+  courseModules = [], 
+  onEnroll, 
+  onViewModules, 
+  onPlayVideo,
+  onJoinLiveSession,
+  liveSessionData = null,
+  currentUser = null
+}) => {
+  const [enrolling, setEnrolling] = useState(false);
+  const [showLiveSession, setShowLiveSession] = useState(false);
+  const [showExpandedView, setShowExpandedView] = useState(false);
   const [chatMessages, setChatMessages] = useState([]);
   const [newMessage, setNewMessage] = useState('');
-  const [isMuted, setIsMuted] = useState(false);
-  const [isCameraOff, setIsCameraOff] = useState(false);
-  const [isRecording, setIsRecording] = useState(true);
+  const [isAudioMuted, setIsAudioMuted] = useState(true);
+  const [isVideoOff, setIsVideoOff] = useState(true);
+  const [isFullscreen, setIsFullscreen] = useState(false);
   
-  // Loading and error states
-  const [courses, setCourses] = useState([]);
-  const [participants, setParticipants] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
-  const [chatLoading, setChatLoading] = useState(false);
-  const [sendingMessage, setSendingMessage] = useState(false);
+  const chatContainerRef = useRef(null);
 
-  // API Base URL - Replace with your actual API endpoint
-  const API_BASE_URL = 'http://localhost:3000/api/v1';
-
-  // Fixed auth token management - now matches your main component
-  const getAuthToken = () => {
-    // Get token from localStorage first, then fallback
-    const token = localStorage.getItem('authToken');
-    
-    if (!token) {
-      console.warn('No auth token found in localStorage');
-      return null;
-    }
-    
-    return token;
-  };
-
-  // Enhanced API request helper with better error handling
-  const makeApiRequest = async (url, options = {}) => {
-    const token = getAuthToken();
-    
-    // If no token, don't make the request and use fallback data
-    if (!token) {
-      console.warn('No authentication token available, using fallback data');
-      throw new Error('No authentication token');
-    }
-    
-    const defaultOptions = {
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token}`,
-        ...options.headers
-      },
-      ...options
-    };
-
-    try {
-      const response = await fetch(url, defaultOptions);
-      
-      // Handle different types of responses
-      if (response.status === 401) {
-        console.warn('Authentication failed - token may be expired');
-        // Clear invalid token
-        localStorage.removeItem('authToken');
-        throw new Error('Authentication failed');
-      }
-      
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-      
-      const contentType = response.headers.get('content-type');
-      if (contentType && contentType.includes('application/json')) {
-        return await response.json();
-      } else {
-        return await response.text();
-      }
-    } catch (error) {
-      console.error('API request failed:', error);
-      throw error;
-    }
-  };
-
-  // Fetch courses from API with fallback data
-  const fetchCourses = async () => {
-    try {
-      setLoading(true);
-      setError(null);
-      
-      const data = await makeApiRequest(`${API_BASE_URL}/training_courses?type=online`);
-      
-      // Handle different response structures
-      const coursesData = data.courses || data.data || data || [];
-      const onlineCourses = Array.isArray(coursesData) 
-        ? coursesData.filter(course => course.course_type === 'online' || course.type === 'online')
-        : [];
-      
-      setCourses(onlineCourses);
-      
-    } catch (err) {
-      console.error('Error fetching courses:', err);
-      setError('Unable to connect to server. Please check your connection and login status.');
-      
-      // Enhanced fallback data
-      setCourses([
-        {
-          id: 1,
-          title: 'Leadership Training and Development',
-          description: 'Comprehensive leadership development program focusing on modern management techniques and team building strategies. Learn essential skills for effective leadership in today\'s dynamic workplace.',
-          instructor_name: 'Dr. Sarah Johnson',
-          duration: '6 weeks',
-          course_type: 'online',
-          rating: 4.8,
-          enrolled: 1247,
-          video_url: 'https://www.youtube.com/embed/dQw4w9WgXcQ',
-          thumbnail_url: 'https://images.unsplash.com/photo-1552664730-d307ca884978?w=800&h=600&fit=crop',
-          status: 'active',
-          created_at: new Date().toISOString(),
-          tags: ['Leadership', 'Management', 'Professional Development']
-        },
-        {
-          id: 2,
-          title: 'Gender Equality in Workplace',
-          description: 'Understanding and implementing gender equality practices in professional environments. Create inclusive workplaces that promote diversity and equal opportunities.',
-          instructor_name: 'Prof. Maria Rodriguez',
-          duration: '4 weeks',
-          course_type: 'online',
-          rating: 4.9,
-          enrolled: 892,
-          video_url: 'https://www.youtube.com/embed/dQw4w9WgXcQ',
-          thumbnail_url: 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=800&h=600&fit=crop',
-          status: 'active',
-          created_at: new Date().toISOString(),
-          tags: ['Gender Equality', 'Diversity', 'Workplace Culture']
-        },
-        {
-          id: 3,
-          title: 'Digital Leadership Excellence',
-          description: 'Master digital transformation leadership skills for the modern era. Learn to lead remote teams and navigate digital workplace challenges.',
-          instructor_name: 'Dr. Michael Chen',
-          duration: '8 weeks',
-          course_type: 'online',
-          rating: 4.7,
-          enrolled: 654,
-          video_url: 'https://www.youtube.com/embed/dQw4w9WgXcQ',
-          thumbnail_url: 'https://images.unsplash.com/photo-1551434678-e076c223a692?w=800&h=600&fit=crop',
-          status: 'active',
-          created_at: new Date().toISOString(),
-          tags: ['Digital Leadership', 'Remote Work', 'Technology']
-        }
-      ]);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  // Fetch participants for a specific course
-  const fetchParticipants = async (courseId) => {
-    try {
-      const data = await makeApiRequest(`${API_BASE_URL}/courses/${courseId}/participants`);
-      const participantsData = data.participants || data.data || data || [];
-      setParticipants(participantsData);
-    } catch (err) {
-      console.error('Error fetching participants:', err);
-      // Enhanced fallback participants data
-      setParticipants([
-        { 
-          id: 1,
-          name: 'Raissa Abjuru', 
-          avatar: 'https://images.unsplash.com/photo-1494790108755-2616b612b77c?w=150&h=150&fit=crop&crop=face',
-          status: 'online',
-          role: 'participant'
-        },
-        { 
-          id: 2,
-          name: 'Ishimwe Noala', 
-          avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&h=150&fit=crop&crop=face',
-          status: 'online',
-          role: 'participant'
-        },
-        { 
-          id: 3,
-          name: 'Ketty Leina', 
-          avatar: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=150&h=150&fit=crop&crop=face',
-          status: 'online',
-          role: 'participant'
-        },
-        { 
-          id: 4,
-          name: 'Raissa Ingabire', 
-          avatar: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face',
-          status: 'online',
-          role: 'participant'
-        },
-        { 
-          id: 5,
-          name: 'Pamella Uwicyeza', 
-          avatar: 'https://images.unsplash.com/photo-1517841905240-472988babdf9?w=150&h=150&fit=crop&crop=face',
-          status: 'online',
-          role: 'participant'
-        },
-        { 
-          id: 6,
-          name: 'Gefly Jessica', 
-          avatar: 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=150&h=150&fit=crop&crop=face',
-          status: 'online',
-          role: 'participant'
-        }
-      ]);
-    }
-  };
-
-  // Fetch chat messages for a course
-  const fetchChatMessages = async (courseId) => {
-    try {
-      setChatLoading(true);
-      const data = await makeApiRequest(`${API_BASE_URL}/training_courses/${courseId}/messages`);
-      const messagesData = data.messages || data.data || data || [];
-      setChatMessages(messagesData);
-    } catch (err) {
-      console.error('Error fetching messages:', err);
-      // Enhanced fallback messages
+  // Sample chat messages for demo
+  useEffect(() => {
+    if (showLiveSession && chatMessages.length === 0) {
       setChatMessages([
         {
           id: 1,
-          user_id: 1,
-          user_name: 'Amir',
-          message: 'Hello everyone! How are you all doing today?',
-          timestamp: new Date(Date.now() - 3600000).toISOString(),
-          avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&h=150&fit=crop&crop=face'
+          user: { name: 'Sarah Johnson', avatar: 'SJ' },
+          message: 'Great insights on leadership strategies!',
+          timestamp: new Date(Date.now() - 300000)
         },
         {
           id: 2,
-          user_id: 2,
-          user_name: 'Jessica',
-          message: 'Hi Amir! Great to be here for this session.',
-          timestamp: new Date(Date.now() - 3500000).toISOString(),
-          avatar: 'https://images.unsplash.com/photo-1494790108755-2616b612b77c?w=150&h=150&fit=crop&crop=face'
-        },
-        {
-          id: 3,
-          user_id: 3,
-          user_name: 'Anna',
-          message: 'Hey everyone! What\'s the main topic for this week\'s discussion?',
-          timestamp: new Date(Date.now() - 3000000).toISOString(),
-          avatar: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=150&h=150&fit=crop&crop=face'
+          user: { name: 'Mike Chen', avatar: 'MC' },
+          message: 'Could you share the presentation slides?',
+          timestamp: new Date(Date.now() - 240000)
         }
       ]);
-    } finally {
-      setChatLoading(false);
+    }
+  }, [showLiveSession]);
+
+  // Auto-scroll chat to bottom
+  useEffect(() => {
+    if (chatContainerRef.current) {
+      chatContainerRef.current.scrollTop = chatContainerRef.current.scrollHeight;
+    }
+  }, [chatMessages]);
+
+  const handleEnroll = async () => {
+    if (onEnroll) {
+      setEnrolling(true);
+      try {
+        await onEnroll(course.id);
+      } catch (error) {
+        console.error('Enrollment failed:', error);
+      } finally {
+        setEnrolling(false);
+      }
     }
   };
 
-  // Send a new message
-  const sendMessage = async (courseId, message) => {
-    try {
-      setSendingMessage(true);
-      
-      const data = await makeApiRequest(`${API_BASE_URL}/courses/${courseId}/messages`, {
-        method: 'POST',
-        body: JSON.stringify({
-          message: message,
-          course_id: courseId,
-          timestamp: new Date().toISOString()
-        })
-      });
+  const handleJoinLiveSession = async () => {
+    if (onJoinLiveSession) {
+      try {
+        await onJoinLiveSession(course.id);
+        setShowLiveSession(true);
+      } catch (error) {
+        console.error('Failed to join live session:', error);
+      }
+    } else {
+      setShowLiveSession(true);
+    }
+  };
 
-      // Add the new message to the chat
-      const newMsg = {
-        id: data.id || Date.now(),
-        user_id: 'current_user',
-        user_name: 'You',
-        message: message,
-        timestamp: new Date().toISOString(),
-        isCurrentUser: true
-      };
-      
-      setChatMessages(prev => [...prev, newMsg]);
-      
-    } catch (err) {
-      console.error('Error sending message:', err);
-      // Fallback: add message locally even if API fails
-      const newMsg = {
+  const handleContinueLearning = () => {
+    setShowExpandedView(true);
+    if (onPlayVideo && course.video_url) {
+      onPlayVideo(course.video_url);
+    }
+  };
+
+  const handleCloseExpandedView = () => {
+    setShowExpandedView(false);
+  };
+
+  const handleSendMessage = () => {
+    if (newMessage.trim() && currentUser) {
+      const message = {
         id: Date.now(),
-        user_id: 'current_user',
-        user_name: 'You',
-        message: message,
-        timestamp: new Date().toISOString(),
-        isCurrentUser: true
+        user: {
+          name: currentUser.name || 'Anonymous User',
+          avatar: currentUser.name ? currentUser.name.split(' ').map(n => n[0]).join('').toUpperCase() : 'AU'
+        },
+        message: newMessage.trim(),
+        timestamp: new Date()
       };
-      setChatMessages(prev => [...prev, newMsg]);
-    } finally {
-      setSendingMessage(false);
-    }
-  };
-
-  // Enroll in a course
-  const enrollInCourse = async (courseId) => {
-    try {
-      const data = await makeApiRequest(`${API_BASE_URL}/courses/${courseId}/enroll`, {
-        method: 'POST'
-      });
-
-      console.log('Enrolled successfully:', data);
-      
-      // Refresh courses to update enrollment status
-      await fetchCourses();
-      alert('Successfully enrolled in the course!');
-      
-    } catch (err) {
-      console.error('Error enrolling in course:', err);
-      alert('Unable to enroll at this time. Please check your connection and try again.');
-    }
-  };
-
-  // Format timestamp to readable time
-  const formatTime = (timestamp) => {
-    try {
-      return new Date(timestamp).toLocaleTimeString([], { 
-        hour: '2-digit', 
-        minute: '2-digit' 
-      });
-    } catch (err) {
-      return new Date().toLocaleTimeString([], { 
-        hour: '2-digit', 
-        minute: '2-digit' 
-      });
-    }
-  };
-
-  // Handle sending messages
-  const handleSendMessage = async () => {
-    if (newMessage.trim() && selectedCourse) {
-      await sendMessage(selectedCourse.id, newMessage);
+      setChatMessages(prev => [...prev, message]);
       setNewMessage('');
     }
   };
 
-  // Handle joining a course
-  const handleJoinCourse = async (course) => {
-    const token = getAuthToken();
-    if (!token) {
-      alert('Please log in to join the course session.');
-      return;
+  const handleKeyPress = (e) => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      handleSendMessage();
     }
+  };
 
-    setSelectedCourse(course);
-    setCurrentView('meeting');
+  const formatTime = (date) => {
+    return new Date(date).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+  };
+
+  const handlePlayVideo = () => {
+    if (onPlayVideo && course.video_url) {
+      onPlayVideo(course.video_url);
+    }
+  };
+
+  const handleViewModules = () => {
+    if (onViewModules) {
+      onViewModules(course);
+    }
+  };
+
+  const formatDate = (dateString) => {
+    try {
+      return new Date(dateString).toLocaleDateString();
+    } catch (err) {
+      return new Date().toLocaleDateString();
+    }
+  };
+
+  const generateThumbnailUrl = (title) => {
+    const keywords = title.toLowerCase();
+    if (keywords.includes('leadership')) {
+      return 'https://images.unsplash.com/photo-1552664730-d307ca884978?w=800&h=600&fit=crop';
+    } else if (keywords.includes('gender') || keywords.includes('equality')) {
+      return 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=800&h=600&fit=crop';
+    } else if (keywords.includes('digital')) {
+      return 'https://images.unsplash.com/photo-1551434678-e076c223a692?w=800&h=600&fit=crop';
+    }
+    return 'https://images.unsplash.com/photo-1552664730-d307ca884978?w=800&h=600&fit=crop';
+  };
+
+  const generateTagsFromTitle = (title) => {
+    const keywords = title.toLowerCase();
+    const tags = [];
     
-    // Fetch course-specific data
-    await Promise.all([
-      fetchParticipants(course.id),
-      fetchChatMessages(course.id)
-    ]);
+    if (keywords.includes('leadership')) tags.push('Leadership');
+    if (keywords.includes('gender')) tags.push('Gender Equality');
+    if (keywords.includes('equality')) tags.push('Diversity');
+    if (keywords.includes('digital')) tags.push('Digital Leadership');
+    if (keywords.includes('management')) tags.push('Management');
+    if (keywords.includes('training')) tags.push('Professional Development');
+    
+    return tags.length > 0 ? tags : ['Professional Development'];
   };
 
-  // Handle leaving meeting
-  const handleLeaveMeeting = () => {
-    setCurrentView('courses');
-    setSelectedCourse(null);
-    setChatMessages([]);
-    setParticipants([]);
+  // Ensure course has all required properties with defaults
+  const courseData = {
+    id: course.id,
+    title: course.title || 'Untitled Course',
+    description: course.description || 'No description available',
+    instructor_name: course.instructor_name || 'Unknown Instructor',
+    duration: course.duration || '1 hour',
+    rating: course.rating || 4.5,
+    enrolled: course.enrolled || 0,
+    video_url: course.video_url || course.media_url,
+    thumbnail_url: course.thumbnail_url || generateThumbnailUrl(course.title || ''),
+    status: course.status || (course.is_active !== false ? 'active' : 'inactive'),
+    created_at: course.created_at || new Date().toISOString(),
+    tags: course.tags || generateTagsFromTitle(course.title || ''),
+    modules_count: courseModules.length || 0,
+    is_live: course.is_live || false,
+    live_session_url: course.live_session_url || null
   };
 
-  // Initial data fetch
-  useEffect(() => {
-    fetchCourses();
-  }, []);
+  const isEnrolled = !!enrollment;
+  const isCertified = !!certification;
+  const hasModules = courseModules.length > 0;
+  const isLiveActive = courseData.is_live && liveSessionData?.is_active;
 
-  // Auto-refresh chat messages when in meeting - only if authenticated
-  useEffect(() => {
-    let interval;
-    if (currentView === 'meeting' && selectedCourse && getAuthToken()) {
-      interval = setInterval(() => {
-        fetchChatMessages(selectedCourse.id);
-      }, 30000); // Refresh every 30 seconds to reduce server load
-    }
-    return () => {
-      if (interval) clearInterval(interval);
-    };
-  }, [currentView, selectedCourse]);
-
-  // Loading state
-  if (loading) {
-    return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
-        <div className="text-center">
-          <Loader2 className="w-8 h-8 animate-spin text-blue-600 mx-auto mb-4" />
-          <p className="text-gray-600">Loading courses...</p>
+  // Live Session Component
+  const LiveSessionInterface = () => (
+    <div className="fixed inset-0 bg-black z-50 flex flex-col">
+      {/* Header */}
+      <div className="bg-gray-900 text-white p-4 flex items-center justify-between">
+        <div className="flex items-center space-x-4">
+          <div className="flex items-center space-x-2">
+            <div className="w-3 h-3 bg-red-500 rounded-full animate-pulse"></div>
+            <span className="text-sm font-medium">LIVE</span>
+          </div>
+          <h2 className="text-lg font-semibold">{courseData.title}</h2>
+          <div className="flex items-center space-x-1 text-sm text-gray-300">
+            <Users className="w-4 h-4" />
+            <span>{liveSessionData?.participants_count || 24} participants</span>
+          </div>
+        </div>
+        <div className="flex items-center space-x-2">
+          <button
+            onClick={() => setIsFullscreen(!isFullscreen)}
+            className="p-2 hover:bg-gray-700 rounded-lg transition-colors"
+          >
+            {isFullscreen ? <Minimize2 className="w-5 h-5" /> : <Maximize2 className="w-5 h-5" />}
+          </button>
+          <button
+            onClick={() => setShowLiveSession(false)}
+            className="p-2 hover:bg-gray-700 rounded-lg transition-colors"
+          >
+            <PhoneOff className="w-5 h-5 text-red-400" />
+          </button>
         </div>
       </div>
-    );
-  }
 
-  // Courses List View - Mobile Only
-  if (currentView === 'courses') {
-    return (
-      <div className="min-h-screen bg-gray-50 p-4">
-        <div className="max-w-sm mx-auto">
-          <div className="mb-6">
-            <h1 className="text-xl font-bold text-gray-900 mb-2">
-              Gender Equality Leadership Empowerment Platform
-            </h1>
-            <p className="text-gray-600 text-sm">Professional Online Courses</p>
-            {error && (
-              <div className="mt-2 p-3 bg-yellow-100 border border-yellow-400 text-yellow-700 rounded-lg text-sm">
-                <AlertCircle className="w-4 h-4 inline mr-2" />
-                {error}
+      <div className="flex-1 flex">
+        {/* Main Video Area */}
+        <div className="flex-1 bg-gray-800 relative flex items-center justify-center">
+          {courseData.live_session_url ? (
+            <iframe
+              src={courseData.live_session_url}
+              className="w-full h-full"
+              frameBorder="0"
+              allowFullScreen
+            />
+          ) : (
+            <div className="text-center text-white">
+              <Video className="w-16 h-16 mx-auto mb-4 text-gray-400" />
+              <h3 className="text-xl font-semibold mb-2">Live Session</h3>
+              <p className="text-gray-300">Instructor: {courseData.instructor_name}</p>
+            </div>
+          )}
+
+          {/* Video Controls */}
+          <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2">
+            <div className="flex items-center space-x-4 bg-black bg-opacity-50 backdrop-blur-sm rounded-full px-6 py-3">
+              <button
+                onClick={() => setIsAudioMuted(!isAudioMuted)}
+                className={`p-2 rounded-full transition-colors ${
+                  isAudioMuted ? 'bg-red-500 hover:bg-red-600' : 'bg-gray-600 hover:bg-gray-700'
+                }`}
+              >
+                {isAudioMuted ? <MicOff className="w-5 h-5 text-white" /> : <Mic className="w-5 h-5 text-white" />}
+              </button>
+              <button
+                onClick={() => setIsVideoOff(!isVideoOff)}
+                className={`p-2 rounded-full transition-colors ${
+                  isVideoOff ? 'bg-red-500 hover:bg-red-600' : 'bg-gray-600 hover:bg-gray-700'
+                }`}
+              >
+                {isVideoOff ? <VideoOff className="w-5 h-5 text-white" /> : <VideoIcon className="w-5 h-5 text-white" />}
+              </button>
+              <button className="p-2 rounded-full bg-gray-600 hover:bg-gray-700 transition-colors">
+                <Settings className="w-5 h-5 text-white" />
+              </button>
+            </div>
+          </div>
+        </div>
+
+        {/* Chat Sidebar */}
+        <div className="w-80 bg-white border-l border-gray-300 flex flex-col">
+          {/* Chat Header */}
+          <div className="p-4 border-b border-gray-200">
+            <div className="flex items-center justify-between">
+              <h3 className="font-semibold text-gray-900">Live Chat</h3>
+              <div className="flex items-center text-sm text-gray-500">
+                <MessageCircle className="w-4 h-4 mr-1" />
+                <span>{chatMessages.length}</span>
               </div>
-            )}
+            </div>
           </div>
 
-          <div className="space-y-4">
-            {courses.map((course) => (
-              <div key={course.id} className="bg-white rounded-xl shadow-lg overflow-hidden border border-gray-100">
-                {/* Course Header */}
-                <div className="h-48 relative overflow-hidden">
-                  <img 
-                    src={course.thumbnail_url || course.thumbnailUrl || 'https://images.unsplash.com/photo-1552664730-d307ca884978?w=800&h=600&fit=crop'} 
-                    alt={course.title}
-                    className="w-full h-full object-cover"
-                    onError={(e) => {
-                      e.target.src = 'https://images.unsplash.com/photo-1552664730-d307ca884978?w=800&h=600&fit=crop';
-                    }}
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
-                  <div className="absolute top-3 left-3">
-                    <div className="px-2 py-1 rounded-full text-xs font-semibold text-white backdrop-blur-sm bg-blue-500 bg-opacity-80">
-                      <div className="flex items-center">
-                        <Video className="w-3 h-3 mr-1" />
-                        {course.status === 'live' ? 'Live Now' : 'Online Course'}
-                      </div>
-                    </div>
-                  </div>
-                  <div className="absolute top-3 right-3">
-                    <div className="flex items-center space-x-1 bg-white bg-opacity-20 backdrop-blur-sm rounded-full px-2 py-1">
-                      <Star className="w-3 h-3 text-yellow-300 fill-current" />
-                      <span className="text-xs font-medium text-white">{course.rating || '4.5'}</span>
-                    </div>
-                  </div>
-                  <div className="absolute bottom-3 left-3 right-3">
-                    <h3 className="text-lg font-bold text-white mb-1 line-clamp-2 leading-tight">
-                      {course.title}
-                    </h3>
-                  </div>
+          {/* Chat Messages */}
+          <div 
+            ref={chatContainerRef}
+            className="flex-1 overflow-y-auto p-4 space-y-3"
+          >
+            {chatMessages.map((msg) => (
+              <div key={msg.id} className="flex space-x-2">
+                <div className="w-8 h-8 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full flex items-center justify-center text-white text-xs font-bold flex-shrink-0">
+                  {msg.user.avatar}
                 </div>
-
-                <div className="p-4">
-                  <p className="text-gray-600 text-sm leading-relaxed mb-4 line-clamp-3">{course.description}</p>
-
-                  <div className="flex items-center justify-between mb-4 text-sm text-gray-500">
-                    <div className="flex items-center space-x-3">
-                      <div className="flex items-center">
-                        <Clock className="w-4 h-4 mr-1 text-blue-500" />
-                        <span className="text-xs">{course.duration}</span>
-                      </div>
-                      <div className="flex items-center">
-                        <Users className="w-4 h-4 mr-1 text-green-500" />
-                        <span className="text-xs">{course.enrolled || 0}</span>
-                      </div>
-                    </div>
-                    <div className="text-xs bg-gray-100 px-2 py-1 rounded-full">
-                      by {course.instructor_name}
-                    </div>
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center space-x-2">
+                    <span className="text-sm font-medium text-gray-900">{msg.user.name}</span>
+                    <span className="text-xs text-gray-500">{formatTime(msg.timestamp)}</span>
                   </div>
-
-                  <div className="space-y-2">
-                    <button
-                      onClick={() => handleJoinCourse(course)}
-                      className="w-full bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white py-3 px-4 rounded-xl font-semibold transition-all duration-200 shadow-lg text-sm"
-                    >
-                      Join Live Session
-                    </button>
-                    <button
-                      onClick={() => enrollInCourse(course.id)}
-                      className="w-full border border-blue-600 text-blue-600 hover:bg-blue-50 py-3 px-4 rounded-xl font-medium transition-colors text-sm"
-                    >
-                      Enroll Now
-                    </button>
-                  </div>
+                  <p className="text-sm text-gray-700 mt-1 break-words">{msg.message}</p>
                 </div>
               </div>
             ))}
           </div>
+
+          {/* Chat Input */}
+          <div className="p-4 border-t border-gray-200">
+            <div className="flex space-x-2">
+              <input
+                type="text"
+                value={newMessage}
+                onChange={(e) => setNewMessage(e.target.value)}
+                onKeyPress={handleKeyPress}
+                placeholder="Type a message..."
+                className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
+              />
+              <button
+                onClick={handleSendMessage}
+                disabled={!newMessage.trim()}
+                className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+              >
+                <Send className="w-4 h-4" />
+              </button>
+            </div>
+          </div>
         </div>
       </div>
+    </div>
+  );
+
+  // Render expanded view if active
+  if (showExpandedView) {
+    return (
+      <ExpandedCourseView
+        courseData={courseData}
+        onClose={handleCloseExpandedView}
+        isEnrolled={isEnrolled}
+        isCertified={isCertified}
+      />
     );
   }
 
-  // Meeting View - Mobile Only
+  // Render live session if active
+  if (showLiveSession) {
+    return <LiveSessionInterface />;
+  }
+
+  // Regular card view
   return (
-    <div className="min-h-screen bg-gray-100 flex flex-col">
-      {/* Mobile Header */}
-      <div className="bg-white border-b border-gray-200 p-4">
-        <div className="flex items-center justify-between mb-2">
-          <button 
-            onClick={handleLeaveMeeting}
-            className="flex items-center text-gray-600 hover:text-gray-800"
-          >
-            <ArrowLeft className="w-4 h-4 mr-2" />
-            Back
-          </button>
-          <div className="flex items-center space-x-2">
-            <button
-              onClick={() => setIsMuted(!isMuted)}
-              className={`p-2 rounded-full ${isMuted ? 'bg-red-500 text-white' : 'bg-gray-200 text-gray-700'}`}
-            >
-              {isMuted ? <MicOff className="w-4 h-4" /> : <Mic className="w-4 h-4" />}
-            </button>
-            <button
-              onClick={() => setIsCameraOff(!isCameraOff)}
-              className={`p-2 rounded-full ${isCameraOff ? 'bg-red-500 text-white' : 'bg-gray-200 text-gray-700'}`}
-            >
-              {isCameraOff ? <CameraOff className="w-4 h-4" /> : <Camera className="w-4 h-4" />}
-            </button>
-          </div>
-        </div>
-        <h2 className="font-semibold text-gray-900 text-sm truncate">{selectedCourse?.title}</h2>
-        <div className="flex items-center text-xs text-gray-500 mt-1">
-          <div className={`w-2 h-2 ${isRecording ? 'bg-red-500' : 'bg-gray-400'} rounded-full mr-2`}></div>
-          {isRecording ? 'Recording' : 'Not Recording'} 26:32
-          <span className="ml-4">{new Date().toLocaleDateString()}</span>
-        </div>
-      </div>
-
-      {/* Main Video Area */}
-      <div className="flex-1 bg-gray-900 relative min-h-[250px]">
-        <div className="absolute inset-0">
-          <iframe
-            src={selectedCourse?.video_url || selectedCourse?.videoUrl}
-            className="w-full h-full"
-            frameBorder="0"
-            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-            allowFullScreen
-          ></iframe>
-        </div>
+    <div className="bg-white rounded-2xl shadow-lg overflow-hidden border border-gray-100 hover:shadow-xl transition-all duration-300 group">
+      {/* Course Thumbnail */}
+      <div className="h-48 relative overflow-hidden">
+        <img 
+          src={courseData.thumbnail_url} 
+          alt={courseData.title}
+          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+          onError={(e) => {
+            e.target.src = generateThumbnailUrl(courseData.title);
+          }}
+        />
+        <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent"></div>
         
-        {/* Overlay with course information */}
-        <div className="absolute top-4 left-4 z-10">
-          <div className="bg-white bg-opacity-10 backdrop-blur-sm rounded-lg p-3 text-white">
-            <div className="flex items-center space-x-2">
-              <div className="w-10 h-8 bg-gradient-to-r from-blue-500 to-yellow-400 rounded overflow-hidden flex items-center justify-center">
-                <div className="w-5 h-5 bg-yellow-400 rounded-full flex items-center justify-center">
-                  <div className="w-2 h-2 bg-orange-400 rounded-full"></div>
-                </div>
-              </div>
-              <div>
-                <h3 className="font-semibold text-sm line-clamp-1">{selectedCourse?.title}</h3>
-                <p className="text-xs opacity-90">with {selectedCourse?.instructor_name}</p>
-              </div>
+        {/* Status Badge */}
+        <div className="absolute top-4 left-4">
+          <div className={`px-3 py-1 rounded-full text-xs font-semibold ${
+            courseData.status === 'active' ? 'bg-green-500 text-white' : 'bg-gray-500 text-white'
+          }`}>
+            {courseData.status === 'active' ? 'Active' : 'Inactive'}
+          </div>
+        </div>
+
+        {/* Live Badge */}
+        {isLiveActive && (
+          <div className="absolute top-4 right-4">
+            <div className="bg-red-500 text-white px-3 py-1 rounded-full text-xs font-semibold flex items-center space-x-1">
+              <div className="w-2 h-2 bg-white rounded-full animate-pulse"></div>
+              <span>LIVE</span>
+            </div>
+          </div>
+        )}
+
+        {/* Play Button Overlay */}
+        {courseData.video_url && (
+          <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+            <button
+              onClick={handleContinueLearning}
+              className="bg-white/90 backdrop-blur-sm text-gray-900 rounded-full p-4 hover:bg-white transition-colors shadow-lg"
+            >
+              <Play className="w-8 h-8 fill-current" />
+            </button>
+          </div>
+        )}
+
+        {/* Progress Bar for Enrolled Users */}
+        {isEnrolled && (
+          <div className="absolute bottom-0 left-0 right-0">
+            <div className="bg-blue-500 h-1" style={{ width: '40%' }}></div>
+          </div>
+        )}
+      </div>
+
+      {/* Course Content */}
+      <div className="p-6">
+        {/* Course Title */}
+        <h3 className="text-xl font-bold text-gray-900 mb-2 line-clamp-2 leading-tight">
+          {courseData.title}
+        </h3>
+
+        {/* Instructor Info */}
+        <div className="flex items-center space-x-3 mb-4">
+          <div className="w-10 h-10 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full flex items-center justify-center text-white text-sm font-bold">
+            {courseData.instructor_name.charAt(0).toUpperCase()}
+          </div>
+          <div>
+            <p className="font-medium text-gray-900 text-sm">{courseData.instructor_name}</p>
+            <p className="text-xs text-gray-500">Instructor</p>
+          </div>
+        </div>
+
+        {/* Course Stats */}
+        <div className="flex items-center justify-between mb-4 text-sm text-gray-600">
+          <div className="flex items-center space-x-4">
+            <div className="flex items-center">
+              <Clock className="w-4 h-4 mr-1 text-blue-500" />
+              <span>{courseData.duration}</span>
+            </div>
+            <div className="flex items-center">
+              <Users className="w-4 h-4 mr-1 text-green-500" />
+              <span>{courseData.enrolled}</span>
+            </div>
+            <div className="flex items-center">
+              <Star className="w-4 h-4 mr-1 text-yellow-500 fill-current" />
+              <span>{courseData.rating}</span>
             </div>
           </div>
         </div>
-      </div>
 
-      {/* Participants Grid - Mobile */}
-      <div className="bg-white p-4 border-b border-gray-200">
-        <h3 className="text-sm font-semibold text-gray-900 mb-3">Participants ({participants.length})</h3>
-        <div className="grid grid-cols-3 gap-2">
-          {participants.slice(0, 6).map((participant, index) => (
-            <div key={participant.id || index} className="relative">
-              <div className="aspect-square bg-gray-200 rounded-lg overflow-hidden">
-                <img 
-                  src={participant.avatar} 
-                  alt={participant.name}
-                  className="w-full h-full object-cover"
-                  onError={(e) => {
-                    e.target.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(participant.name)}&background=6366f1&color=fff`;
-                  }}
-                />
-              </div>
-              <div className="absolute bottom-1 left-1 right-1">
-                <div className="bg-black bg-opacity-60 text-white text-xs px-1 py-1 rounded text-center truncate">
-                  {participant.name}
-                  {participant.status === 'online' && (
-                    <div className="w-1 h-1 bg-green-400 rounded-full inline-block ml-1"></div>
-                  )}
-                </div>
-              </div>
-            </div>
+        {/* Course Description */}
+        <p className="text-gray-700 text-sm mb-4 line-clamp-2 leading-relaxed">
+          {courseData.description}
+        </p>
+
+        {/* Tags */}
+        <div className="flex flex-wrap gap-2 mb-4">
+          {courseData.tags.slice(0, 3).map((tag, idx) => (
+            <span key={idx} className="text-xs bg-blue-100 text-blue-700 px-2 py-1 rounded-full font-medium">
+              {tag}
+            </span>
           ))}
-        </div>
-      </div>
-
-      {/* Chat Section */}
-      <div className="flex-1 bg-white flex flex-col max-h-[300px]">
-        {/* Chat Header */}
-        <div className="p-3 border-b border-gray-200 flex-shrink-0">
-          <div className="flex items-center justify-between">
-            <h3 className="font-semibold text-gray-900 text-sm">Live Chat</h3>
-            <div className="flex items-center text-xs text-gray-500">
-              <div className="w-2 h-2 bg-green-500 rounded-full mr-1"></div>
-              {participants.length} online
-            </div>
-          </div>
-        </div>
-
-        {/* Chat Messages */}
-        <div className="flex-1 overflow-y-auto p-3 space-y-3 min-h-0">
-          {chatLoading ? (
-            <div className="flex justify-center py-4">
-              <Loader2 className="w-5 h-5 animate-spin text-gray-400" />
-            </div>
-          ) : chatMessages.length === 0 ? (
-            <div className="text-center py-6 text-gray-500">
-              <MessageCircle className="w-6 h-6 mx-auto mb-2 opacity-50" />
-              <p className="text-xs">No messages yet. Start the conversation!</p>
-            </div>
-          ) : (
-            chatMessages.map((message) => (
-              <div
-                key={message.id}
-                className={`flex items-start space-x-2 ${
-                  message.isCurrentUser ? 'flex-row-reverse space-x-reverse' : ''
-                }`}
-              >
-                <img
-                  src={message.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(message.user_name)}&background=6366f1&color=fff`}
-                  alt={message.user_name}
-                  className="w-6 h-6 rounded-full flex-shrink-0"
-                  onError={(e) => {
-                    e.target.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(message.user_name)}&background=6366f1&color=fff`;
-                  }}
-                />
-                <div className={`flex-1 ${message.isCurrentUser ? 'text-right' : ''}`}>
-                  <div className="flex items-center space-x-1 mb-1">
-                    <span className="text-xs font-medium text-gray-900">
-                      {message.user_name}
-                    </span>
-                    <span className="text-xs text-gray-500">
-                      {formatTime(message.timestamp)}
-                    </span>
-                  </div>
-                  <div
-                    className={`inline-block px-2 py-1 rounded-lg text-xs max-w-xs break-words ${
-                      message.isCurrentUser
-                        ? 'bg-blue-600 text-white'
-                        : 'bg-gray-100 text-gray-900'
-                    }`}
-                  >
-                    {message.message}
-                  </div>
-                </div>
-              </div>
-            ))
+          {courseData.tags.length > 3 && (
+            <span className="text-xs text-gray-500 px-2 py-1">
+              +{courseData.tags.length - 3} more
+            </span>
           )}
         </div>
 
-        {/* Chat Input */}
-        <div className="p-3 border-t border-gray-200 flex-shrink-0">
-          <div className="flex items-center space-x-2">
-            <input
-              type="text"
-              value={newMessage}
-              onChange={(e) => setNewMessage(e.target.value)}
-              onKeyPress={(e) => e.key === 'Enter' && !sendingMessage && handleSendMessage()}
-              placeholder="Type a message..."
-              className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
-              disabled={sendingMessage}
-            />
+        {/* Course Modules Preview */}
+        {hasModules && (
+          <div className="mb-4 p-3 bg-gray-50 rounded-lg">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center text-sm text-gray-600">
+                <BookOpen className="w-4 h-4 mr-1 text-purple-500" />
+                <span>{courseData.modules_count} modules available</span>
+              </div>
+              <button
+                onClick={handleViewModules}
+                className="text-xs text-blue-600 hover:text-blue-700 font-medium"
+              >
+                View All
+              </button>
+            </div>
+          </div>
+        )}
+
+        {/* Certification Badge */}
+        {isCertified && (
+          <div className="flex items-center p-3 bg-yellow-50 rounded-lg border border-yellow-200 mb-4">
+            <Award className="w-5 h-5 text-yellow-500 mr-2" />
+            <span className="text-sm font-medium text-yellow-700">Certificate Earned!</span>
+          </div>
+        )}
+
+        {/* Action Buttons */}
+        <div className="space-y-3">
+          {/* Main Action Button */}
+          {!isEnrolled ? (
             <button
-              onClick={handleSendMessage}
-              disabled={!newMessage.trim() || sendingMessage}
-              className="p-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex-shrink-0"
+              onClick={handleEnroll}
+              disabled={enrolling || courseData.status !== 'active'}
+              className="w-full bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 disabled:from-gray-400 disabled:to-gray-500 text-white py-3 px-4 rounded-xl font-semibold transition-all duration-200 shadow-lg disabled:cursor-not-allowed flex items-center justify-center"
             >
-              {sendingMessage ? (
-                <Loader2 className="w-4 h-4 animate-spin" />
+              {enrolling ? (
+                <>
+                  <Loader2 className="w-5 h-5 mr-2 animate-spin" />
+                  Enrolling...
+                </>
               ) : (
-                <Send className="w-4 h-4" />
+                <>
+                  <UserPlus className="w-5 h-5 mr-2" />
+                  Enroll Now
+                </>
               )}
             </button>
-          </div>
-        </div>
-      </div>
+          ) : (
+            <div className="space-y-2">
+              <button
+                onClick={handleContinueLearning}
+                className="w-full bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-white py-3 px-4 rounded-xl font-semibold transition-all duration-200 shadow-lg flex items-center justify-center"
+              >
+                <PlayCircle className="w-5 h-5 mr-2" />
+                Continue Learning
+              </button>
+              
+              {/* Live Session Button */}
+              {isLiveActive && (
+                <button
+                  onClick={handleJoinLiveSession}
+                  className="w-full bg-red-600 hover:bg-red-700 text-white py-2 px-4 rounded-lg font-medium transition-colors flex items-center justify-center"
+                >
+                  <Video className="w-4 h-4 mr-2" />
+                  Join Live Session
+                </button>
+              )}
+            </div>
+          )}
 
-      {/* Bottom Controls */}
-      <div className="bg-white border-t border-gray-200 p-3">
-        <div className="flex justify-center space-x-4">
-          <button
-            onClick={() => setIsMuted(!isMuted)}
-            className={`p-3 rounded-full ${isMuted ? 'bg-red-500 text-white' : 'bg-gray-200 text-gray-700'} hover:bg-opacity-80 transition-colors`}
-          >
-            {isMuted ? <MicOff className="w-5 h-5" /> : <Mic className="w-5 h-5" />}
-          </button>
-          <button
-            onClick={() => setIsCameraOff(!isCameraOff)}
-            className={`p-3 rounded-full ${isCameraOff ? 'bg-red-500 text-white' : 'bg-gray-200 text-gray-700'} hover:bg-opacity-80 transition-colors`}
-          >
-            {isCameraOff ? <CameraOff className="w-5 h-5" /> : <Camera className="w-5 h-5" />}
-          </button>
-          <button
-            onClick={handleLeaveMeeting}
-            className="p-3 rounded-full bg-red-500 text-white hover:bg-red-600 transition-colors"
-          >
-            <PhoneOff className="w-5 h-5" />
-          </button>
-          <button className="p-3 rounded-full bg-blue-500 text-white hover:bg-blue-600 transition-colors">
-            <Share2 className="w-5 h-5" />
-          </button>
-          <button className="p-3 rounded-full bg-gray-200 text-gray-700 hover:bg-gray-300 transition-colors">
-            <MoreVertical className="w-5 h-5" />
-          </button>
+          {/* Secondary Actions */}
+          {isEnrolled && (
+            <div className="grid grid-cols-2 gap-2">
+              {courseData.video_url && (
+                <button
+                  onClick={handlePlayVideo}
+                  className="border border-gray-300 text-gray-700 hover:bg-gray-50 py-2 px-4 rounded-lg font-medium transition-colors text-sm flex items-center justify-center"
+                >
+                  <Play className="w-4 h-4 mr-1" />
+                  Watch
+                </button>
+              )}
+              {hasModules && (
+                <button
+                  onClick={handleViewModules}
+                  className="border border-gray-300 text-gray-700 hover:bg-gray-50 py-2 px-4 rounded-lg font-medium transition-colors text-sm flex items-center justify-center"
+                >
+                  <BookOpen className="w-4 h-4 mr-1" />
+                  Modules
+                </button>
+              )}
+            </div>
+          )}
+        </div>
+
+        {/* Course Date */}
+        <div className="mt-4 pt-4 border-t border-gray-100">
+          <div className="flex items-center justify-between text-xs text-gray-500">
+            <div className="flex items-center">
+              <Calendar className="w-3 h-3 mr-1" />
+              <span>Created: {formatDate(courseData.created_at)}</span>
+            </div>
+            {isEnrolled && (
+              <div className="flex items-center text-green-600">
+                <CheckCircle className="w-3 h-3 mr-1" />
+                <span>Enrolled</span>
+              </div>
+            )}
+          </div>
         </div>
       </div>
     </div>
   );
 };
 
-export default OnlineCourse;
+export default OnlineCourseCard;
