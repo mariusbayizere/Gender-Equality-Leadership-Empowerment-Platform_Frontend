@@ -243,6 +243,9 @@ import ModernEnrollmentManagement from './components/Enrollment/ModernEnrollment
 import ModernCertificationManagement from './components/Certification/ModernCertificationManagement'
 import LeadershipTrainingDevelopment from './components/online_course/LeadershipTrainingDevelopment'
 import OnlineCourse from './components/online_course/OnlineCourse';
+import LeadershipExam from './components/online_course/LeadershipExam'
+
+
 
 // Dashboard Page Components
 const DashboardUsersPage = () => (
@@ -542,6 +545,13 @@ function App() {
             element: <OnlineCourse/>
         }
         ,
+
+
+        {
+            path : "/exam",
+            element: <LeadershipExam/>
+        },
+
         {
             path: "/user",
             element: <GELEPAdminDashboard />,
