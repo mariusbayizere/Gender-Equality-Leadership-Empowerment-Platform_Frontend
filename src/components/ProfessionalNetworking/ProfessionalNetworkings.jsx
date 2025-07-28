@@ -271,151 +271,88 @@
 
 import React, { useState, useEffect } from 'react';
 import { Users, Calendar, MessageSquare, Search, Bell, Plus, Filter, Star, MapPin, Clock, User, Send, Heart, Share2, Eye, MessageCircle, Loader, AlertCircle } from 'lucide-react';
+import {apiService } from './apiService'
 
-// API Service Functions
-const apiService = {
-  baseURL: 'http://localhost:3000/api/v1',
+
+// ProfileAvatar Component - Handles avatar display with fallback to User icon
+const ProfileAvatar = ({ avatar, name, size = "w-12 h-12" }) => {
+  const [imageError, setImageError] = useState(false);
   
-  getAuthHeaders: () => ({
-    'Content-Type': 'application/json',
-    'Authorization': `Bearer ${localStorage.getItem('token')}`
-  }),
-
-  // Get all professionals for networking
-  async getProfessionals(params = {}) {
-    const URL = 'http://localhost:3000/api/v1'
-    const queryParams = new URLSearchParams(params).toString();
-    const response = await fetch(`${URL}/connections/professionals?${queryParams}`, {
-      headers: this.getAuthHeaders()
-    });
-    if (!response.ok) {
-      const error = await response.json();
-      throw new Error(error.message || 'Failed to fetch professionals');
-    }
-    return response.json();
-  },
-
-  // Send connection request
-  async sendConnectionRequest(recipientId, message = '') {
-    const URL = 'http://localhost:3000/api/v1'
-    const response = await fetch(`${URL}/connections`, {
-      method: 'POST',
-      headers: this.getAuthHeaders(),
-      body: JSON.stringify({
-        requester_id: this.getCurrentUserId(),
-        recipient_id: recipientId,
-        message: message || 'I would like to connect with you for professional networking.'
-      })
-    });
-    if (!response.ok) {
-      const error = await response.json();
-      throw new Error(error.message || 'Failed to send connection request');
-    }
-    return response.json();
-  },
-
-  // Get user's connections
-  async getMyConnections() {
-    const URL = 'http://localhost:3000/api/v1'
-    const response = await fetch(`${URL}/connections/my-connections`, {
-      headers: this.getAuthHeaders()
-    });
-    if (!response.ok) {
-      const error = await response.json();
-      throw new Error(error.message || 'Failed to fetch connections');
-    }
-    return response.json();
-  },
-
-  // Get pending connection requests
-  async getPendingRequests() {
-    const URL = 'http://localhost:3000/api/v1'
-    const response = await fetch(`${URL}/connections/requests`, {
-      headers: this.getAuthHeaders()
-    });
-    if (!response.ok) {
-      const error = await response.json();
-      throw new Error(error.message || 'Failed to fetch requests');
-    }
-    return response.json();
-  },
-
-  // Respond to connection request - FIXED
-  async respondToRequest(requestId, status, message = '') {
-    const URL = 'http://localhost:3000/api/v1'
-    
-    // Validate status before sending
-    const validStatuses = ['accepted', 'rejected'];
-    if (!validStatuses.includes(status)) {
-      throw new Error(`Invalid status: ${status}. Must be 'accepted' or 'rejected'`);
-    }
-
-    const requestBody = {
-      status: status,
-      ...(message && { message: message })
-    };
-
-    console.log('Sending request to:', `${URL}/connections/${requestId}/respond`);
-    console.log('Request body:', requestBody);
-
-    const response = await fetch(`${URL}/connections/${requestId}/respond`, {
-      method: 'PUT',
-      headers: this.getAuthHeaders(),
-      body: JSON.stringify(requestBody)
-    });
-
-    if (!response.ok) {
-      const error = await response.json();
-      console.error('Backend error response:', error);
-      throw new Error(error.message || error.error || 'Failed to respond to request');
-    }
-    return response.json();
-  },
-
-  // Remove connection
-  async removeConnection(connectionId) {
-    const URL = 'http://localhost:3000/api/v1'
-    const response = await fetch(`${URL}/connections/${connectionId}`, {
-      method: 'DELETE',
-      headers: this.getAuthHeaders()
-    });
-    if (!response.ok) {
-      const error = await response.json();
-      throw new Error(error.message || 'Failed to remove connection');
-    }
-    return response.json();
-  },
-
-  // Get connection statistics
-  async getConnectionStats() {
-    const URL = 'http://localhost:3000/api/v1'
-
-    const response = await fetch(`${URL}/connections/stats`, {
-      headers: this.getAuthHeaders()
-    });
-    if (!response.ok) {
-      const error = await response.json();
-      throw new Error(error.message || 'Failed to fetch stats');
-    }
-    return response.json();
-  },
-
-  // Get current user ID (you might need to implement this based on your auth system)
-  getCurrentUserId() {
-    // This should return the current user's ID from your auth state/token
-    // For now, returning a placeholder - implement based on your auth system
-    const token = localStorage.getItem('token');
-    if (token) {
-      try {
-        const payload = JSON.parse(atob(token.split('.')[1]));
-        return payload.id || payload.userId || payload.user_id;
-      } catch (e) {
-        console.error('Error parsing token:', e);
-        return null;
-      }
-    }
-    return null;
+  // Check if avatar exists and is not empty/null
+  const hasValidAvatar = avatar && avatar.trim() !== '' && !imageError;
+  
+  if (hasValidAvatar) {
+    return (
+      <img
+        src={avatar}
+        alt={name}
+        className={`${size} rounded-full bg-gray-200 object-cover`}
+        onError={() => setImageError(true)}
+      />
+    );
   }
+  
+  // Fallback to User icon with circular background
+  return (
+    <div className={`${size} rounded-full bg-blue-500 flex items-center justify-center`}>
+      <User className="w-6 h-6 text-white" />
+    </div>
+  );
+};
+
+// Connection Request Modal Component (you need to implement this)
+const ConnectionRequestModal = ({ isOpen, onClose, recipient, onSend }) => {
+  const [message, setMessage] = useState('');
+  
+  if (!isOpen) return null;
+  
+  const handleSend = () => {
+    if (recipient) {
+      onSend(recipient.id, message);
+      setMessage('');
+      onClose();
+    }
+  };
+  
+  return (
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+      <div className="bg-white rounded-lg p-6 w-full max-w-md">
+        <h3 className="text-lg font-semibold mb-4">Send Connection Request</h3>
+        <div className="flex items-center gap-3 mb-4">
+          <ProfileAvatar 
+            avatar={recipient?.avatar} 
+            name={recipient?.name} 
+            size="w-10 h-10" 
+          />
+          <div>
+            <p className="font-medium">{recipient?.name}</p>
+            <p className="text-sm text-gray-600">{recipient?.title}</p>
+          </div>
+        </div>
+        <textarea
+          placeholder="Add a personal message (optional)"
+          className="w-full p-3 border rounded-lg mb-4 resize-none"
+          rows="4"
+          value={message}
+          onChange={(e) => setMessage(e.target.value)}
+        />
+        <div className="flex gap-2 justify-end">
+          <button
+            onClick={onClose}
+            className="px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50"
+          >
+            Cancel
+          </button>
+          <button
+            onClick={handleSend}
+            className="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700"
+          >
+            Send Request
+          </button>
+        </div>
+      </div>
+    </div>
+  );
 };
 
 // Loading Component
@@ -443,63 +380,6 @@ const ErrorMessage = ({ message, onRetry }) => (
     </div>
   </div>
 );
-
-// Connection Request Modal
-const ConnectionRequestModal = ({ isOpen, onClose, recipient, onSend }) => {
-  const [message, setMessage] = useState('');
-  const [isLoading, setIsLoading] = useState(false);
-
-  const handleSend = async () => {
-    setIsLoading(true);
-    try {
-      await onSend(recipient.id, message);
-      onClose();
-      setMessage('');
-    } catch (error) {
-      console.error('Error sending request:', error);
-      alert('Failed to send connection request: ' + error.message);
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  if (!isOpen) return null;
-
-  return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-      <div className="bg-white rounded-lg p-6 w-full max-w-md">
-        <h3 className="text-lg font-semibold mb-4">Connect with {recipient?.name}</h3>
-        <textarea
-          value={message}
-          onChange={(e) => setMessage(e.target.value)}
-          placeholder="Add a personal message (optional)"
-          className="w-full p-3 border rounded-lg resize-none h-24 focus:ring-2 focus:ring-purple-500 focus:border-transparent"
-          maxLength={200}
-        />
-        <div className="text-right text-xs text-gray-500 mb-4">
-          {message.length}/200
-        </div>
-        <div className="flex gap-2 justify-end">
-          <button
-            onClick={onClose}
-            className="px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50"
-            disabled={isLoading}
-          >
-            Cancel
-          </button>
-          <button
-            onClick={handleSend}
-            disabled={isLoading}
-            className="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 disabled:opacity-50 flex items-center gap-2"
-          >
-            {isLoading && <Loader className="w-4 h-4 animate-spin" />}
-            Send Request
-          </button>
-        </div>
-      </div>
-    </div>
-  );
-};
 
 // Professional Networking Component
 const ProfessionalNetworking = ({ activeTab, setActiveTab }) => {
@@ -659,10 +539,9 @@ const ProfessionalNetworking = ({ activeTab, setActiveTab }) => {
           {professionals.map((professional) => (
             <div key={professional.id} className="flex items-center justify-between p-4 border rounded-lg hover:bg-gray-50">
               <div className="flex items-center gap-4">
-                <img
-                  src={professional.avatar}
-                  alt={professional.name}
-                  className="w-12 h-12 rounded-full bg-gray-200"
+                <ProfileAvatar 
+                  avatar={professional.avatar} 
+                  name={professional.name} 
                 />
                 <div>
                   <h3 className="font-medium text-gray-900">{professional.name}</h3>
@@ -675,7 +554,7 @@ const ProfessionalNetworking = ({ activeTab, setActiveTab }) => {
                     <span className="text-xs text-gray-500">{professional.mutual} mutual connections</span>
                   </div>
                   <div className="flex gap-1 mt-2">
-                    {professional.expertise.slice(0, 3).map((skill, index) => (
+                    {professional.expertise && professional.expertise.slice(0, 3).map((skill, index) => (
                       <span key={index} className="px-2 py-1 bg-purple-100 text-purple-700 text-xs rounded-full">
                         {skill}
                       </span>
@@ -750,10 +629,9 @@ const ProfessionalNetworking = ({ activeTab, setActiveTab }) => {
           {connections.map((connection) => (
             <div key={connection.id} className="flex items-center justify-between p-4 border rounded-lg">
               <div className="flex items-center gap-4">
-                <img
-                  src={connection.avatar}
-                  alt={connection.name}
-                  className="w-12 h-12 rounded-full bg-gray-200"
+                <ProfileAvatar 
+                  avatar={connection.avatar} 
+                  name={connection.name} 
                 />
                 <div>
                   <h3 className="font-medium text-gray-900">{connection.name}</h3>
@@ -791,14 +669,13 @@ const ProfessionalNetworking = ({ activeTab, setActiveTab }) => {
           {pendingRequests.map((request) => (
             <div key={request.id} className="p-4 border rounded-lg">
               <div className="flex items-center gap-4 mb-3">
-                <img
-                  src={request.requester.avatar}
-                  alt={request.requester.name}
-                  className="w-12 h-12 rounded-full bg-gray-200"
+                <ProfileAvatar 
+                  avatar={request.requester?.avatar} 
+                  name={request.requester?.name} 
                 />
                 <div>
-                  <h3 className="font-medium text-gray-900">{request.requester.name}</h3>
-                  <p className="text-sm text-gray-600">{request.requester.title}</p>
+                  <h3 className="font-medium text-gray-900">{request.requester?.name}</h3>
+                  <p className="text-sm text-gray-600">{request.requester?.title}</p>
                   <p className="text-xs text-gray-500">
                     Sent {new Date(request.createdAt).toLocaleDateString()}
                   </p>
@@ -968,10 +845,10 @@ const GELEPPlatform = () => {
               </button>
               
               <div className="flex items-center gap-2">
-                <img
-                  src="/api/placeholder/32/32"
-                  alt="Profile"
-                  className="w-8 h-8 rounded-full bg-gray-200"
+                <ProfileAvatar 
+                  avatar={null} 
+                  name="Current User" 
+                  size="w-8 h-8" 
                 />
                 <span className="text-sm font-medium text-gray-700">Welcome back!</span>
               </div>
@@ -1014,7 +891,8 @@ const GELEPPlatform = () => {
       <footer className="bg-white border-t mt-12">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           <div className="text-center text-gray-500">
-            <p>&copy; 2024 GELEP - Gender Equality Leadership Empowerment Platform. Empowering women leaders in Rwanda and beyond.</p>
+            <p>&copy; 2024 GELEP - Gender Equality Leadership Empowerment Platform. All rights reserved.</p>
+            <p className="mt-2 text-sm">Empowering women leaders through professional networking and mentorship.</p>
           </div>
         </div>
       </footer>
