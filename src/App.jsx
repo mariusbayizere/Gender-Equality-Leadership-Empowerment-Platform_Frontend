@@ -244,6 +244,7 @@ import ModernCertificationManagement from './components/Certification/ModernCert
 import LeadershipTrainingDevelopment from './components/online_course/LeadershipTrainingDevelopment'
 import OnlineCourse from './components/online_course/OnlineCourse';
 import LeadershipExam from './components/online_course/LeadershipExam'
+import GELEPMentorshipPlat from './components/GELEPMentorship/GELEPMentorshipPlatform'
 
 
 
@@ -543,8 +544,12 @@ function App() {
                 {
             path: "/testTraining",
             element: <OnlineCourse/>
-        }
-        ,
+        },
+        {
+            path: '/GELEPMentorship',
+            element: <GELEPMentorshipPlat/>
+        },
+        
 
 
         {
