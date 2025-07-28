@@ -82,7 +82,7 @@
 //         <div className="flex items-center justify-between mb-4">
 //           <h2 className="text-xl font-semibold text-gray-900">Professional Network</h2>
 //           <div className="flex gap-2">
-//             <button className="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 flex items-center gap-2">
+//             <button className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 flex items-center gap-2">
 //               <Plus className="w-4 h-4" />
 //               Invite
 //             </button>
@@ -191,7 +191,7 @@
 //         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
 //           <div className="flex items-center justify-between h-16">
 //             <div className="flex items-center gap-3">
-//               <div className="w-10 h-10 bg-gradient-to-r from-purple-600 to-pink-600 rounded-lg flex items-center justify-center">
+//               <div className="w-10 h-10 bg-gradient-to-r from-purple-600 to-blue-600 rounded-lg flex items-center justify-center">
 //                 <span className="text-white font-bold text-lg">G</span>
 //               </div>
 //               <div>
@@ -345,7 +345,7 @@ const ConnectionRequestModal = ({ isOpen, onClose, recipient, onSend }) => {
           </button>
           <button
             onClick={handleSend}
-            className="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700"
+            className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
           >
             Send Request
           </button>
@@ -358,7 +358,7 @@ const ConnectionRequestModal = ({ isOpen, onClose, recipient, onSend }) => {
 // Loading Component
 const LoadingSpinner = ({ message = "Loading..." }) => (
   <div className="flex items-center justify-center py-8">
-    <Loader className="w-6 h-6 animate-spin text-purple-600 mr-2" />
+    <Loader className="w-6 h-6 animate-spin text-blue-600 mr-2" />
     <span className="text-gray-600">{message}</span>
   </div>
 );
@@ -372,7 +372,7 @@ const ErrorMessage = ({ message, onRetry }) => (
       {onRetry && (
         <button
           onClick={onRetry}
-          className="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700"
+          className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
         >
           Try Again
         </button>
@@ -508,7 +508,7 @@ const ProfessionalNetworking = ({ activeTab, setActiveTab }) => {
           <input
             type="text"
             placeholder="Search professionals by name, title, or expertise..."
-            className="w-full pl-10 pr-4 py-2 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+            className="w-full pl-10 pr-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
           />
@@ -516,7 +516,7 @@ const ProfessionalNetworking = ({ activeTab, setActiveTab }) => {
         <select
           value={selectedRole}
           onChange={(e) => setSelectedRole(e.target.value)}
-          className="px-4 py-2 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+          className="px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
         >
           <option value="all">All Roles</option>
           <option value="mentor">Mentors</option>
@@ -555,7 +555,7 @@ const ProfessionalNetworking = ({ activeTab, setActiveTab }) => {
                   </div>
                   <div className="flex gap-1 mt-2">
                     {professional.expertise && professional.expertise.slice(0, 3).map((skill, index) => (
-                      <span key={index} className="px-2 py-1 bg-purple-100 text-purple-700 text-xs rounded-full">
+                      <span key={index} className="px-2 py-1 bg-blue-100 text-blue-700 text-xs rounded-full">
                         {skill}
                       </span>
                     ))}
@@ -575,7 +575,7 @@ const ProfessionalNetworking = ({ activeTab, setActiveTab }) => {
                 ) : (
                   <button
                     onClick={() => handleConnectionRequest(professional)}
-                    className="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700"
+                    className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
                   >
                     Connect
                   </button>
@@ -619,7 +619,7 @@ const ProfessionalNetworking = ({ activeTab, setActiveTab }) => {
           <p className="text-gray-600">You don't have any connections yet.</p>
           <button
             onClick={() => setActiveSubTab('discover')}
-            className="mt-4 px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700"
+            className="mt-4 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
           >
             Discover Professionals
           </button>
@@ -719,7 +719,7 @@ const ProfessionalNetworking = ({ activeTab, setActiveTab }) => {
         <div className="flex items-center justify-between mb-4">
           <h2 className="text-xl font-semibold text-gray-900">Professional Network</h2>
           <div className="flex gap-2">
-            <button className="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 flex items-center gap-2">
+            <button className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 flex items-center gap-2">
               <Plus className="w-4 h-4" />
               Invite
             </button>
@@ -734,13 +734,13 @@ const ProfessionalNetworking = ({ activeTab, setActiveTab }) => {
               onClick={() => setActiveSubTab(tab.id)}
               className={`pb-3 px-1 border-b-2 font-medium text-sm flex items-center gap-2 ${
                 activeSubTab === tab.id
-                  ? 'border-purple-500 text-purple-600'
+                  ? 'border-blue-500 text-blue-600'
                   : 'border-transparent text-gray-500 hover:text-gray-700'
               }`}
             >
               {tab.label}
               {tab.count !== null && tab.count > 0 && (
-                <span className="bg-purple-100 text-purple-800 text-xs px-2 py-1 rounded-full">
+                <span className="bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded-full">
                   {tab.count}
                 </span>
               )}
@@ -825,7 +825,7 @@ const GELEPPlatform = () => {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-gradient-to-r from-purple-600 to-pink-600 rounded-lg flex items-center justify-center">
+              <div className="w-10 h-10 bg-gradient-to-r from-blue-600 to-blue-600 rounded-lg flex items-center justify-center">
                 <span className="text-white font-bold text-lg">G</span>
               </div>
               <div>
@@ -869,7 +869,7 @@ const GELEPPlatform = () => {
                   onClick={() => setActiveTab(tab.id)}
                   className={`flex items-center gap-2 px-1 py-4 border-b-2 font-medium text-sm ${
                     activeTab === tab.id
-                      ? 'border-purple-500 text-purple-600'
+                      ? 'border-blue-500 text-blue-600'
                       : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
                   }`}
                 >

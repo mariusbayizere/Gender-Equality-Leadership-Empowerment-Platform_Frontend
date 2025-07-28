@@ -784,7 +784,7 @@ export const ConnectionRequestModal = ({ isOpen, onClose, recipient, onSend }) =
           value={message}
           onChange={(e) => setMessage(e.target.value)}
           placeholder="Add a personal message (optional)"
-          className="w-full p-3 border rounded-lg resize-none h-24 focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+          className="w-full p-3 border rounded-lg resize-none h-24 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
           maxLength={200}
         />
         <div className="text-right text-xs text-gray-500 mb-4">
@@ -801,7 +801,7 @@ export const ConnectionRequestModal = ({ isOpen, onClose, recipient, onSend }) =
           <button
             onClick={handleSend}
             disabled={isLoading}
-            className="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 disabled:opacity-50 flex items-center gap-2"
+            className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 flex items-center gap-2"
           >
             {isLoading && <Loader className="w-4 h-4 animate-spin" />}
             Send Request
