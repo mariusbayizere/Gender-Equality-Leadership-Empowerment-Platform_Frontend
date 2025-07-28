@@ -245,6 +245,8 @@ import LeadershipTrainingDevelopment from './components/online_course/Leadership
 import OnlineCourse from './components/online_course/OnlineCourse';
 import LeadershipExam from './components/online_course/LeadershipExam'
 import GELEPMentorshipPlat from './components/GELEPMentorship/GELEPMentorshipPlatform'
+import GELEPPlatform from './components/ProfessionalNetworking/ProfessionalNetworkings'
+
 
 
 
@@ -550,7 +552,10 @@ function App() {
             element: <GELEPMentorshipPlat/>
         },
         
-
+            {
+                path: "/GELEPPlatform",
+                element: <GELEPPlatform/>
+            },
 
         {
             path : "/exam",
