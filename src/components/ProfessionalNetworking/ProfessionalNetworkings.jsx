@@ -274,7 +274,7 @@ import { Users, Calendar, MessageSquare, Search, Bell, Plus, Filter, Star, MapPi
 
 // API Service Functions
 const apiService = {
-  baseURL: 'http:localhost:3000/api/v1',
+  baseURL: 'http://localhost:3000/api/v1',
   
   getAuthHeaders: () => ({
     'Content-Type': 'application/json',
@@ -288,7 +288,10 @@ const apiService = {
     const response = await fetch(`${URL}/connections/professionals?${queryParams}`, {
       headers: this.getAuthHeaders()
     });
-    if (!response.ok) throw new Error('Failed to fetch professionals');
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(error.message || 'Failed to fetch professionals');
+    }
     return response.json();
   },
 
@@ -304,7 +307,10 @@ const apiService = {
         message: message || 'I would like to connect with you for professional networking.'
       })
     });
-    if (!response.ok) throw new Error('Failed to send connection request');
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(error.message || 'Failed to send connection request');
+    }
     return response.json();
   },
 
@@ -314,7 +320,10 @@ const apiService = {
     const response = await fetch(`${URL}/connections/my-connections`, {
       headers: this.getAuthHeaders()
     });
-    if (!response.ok) throw new Error('Failed to fetch connections');
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(error.message || 'Failed to fetch connections');
+    }
     return response.json();
   },
 
@@ -324,20 +333,42 @@ const apiService = {
     const response = await fetch(`${URL}/connections/requests`, {
       headers: this.getAuthHeaders()
     });
-    if (!response.ok) throw new Error('Failed to fetch requests');
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(error.message || 'Failed to fetch requests');
+    }
     return response.json();
   },
 
-  // Respond to connection request
+  // Respond to connection request - FIXED
   async respondToRequest(requestId, status, message = '') {
     const URL = 'http://localhost:3000/api/v1'
+    
+    // Validate status before sending
+    const validStatuses = ['accepted', 'rejected'];
+    if (!validStatuses.includes(status)) {
+      throw new Error(`Invalid status: ${status}. Must be 'accepted' or 'rejected'`);
+    }
+
+    const requestBody = {
+      status: status,
+      ...(message && { message: message })
+    };
+
+    console.log('Sending request to:', `${URL}/connections/${requestId}/respond`);
+    console.log('Request body:', requestBody);
 
     const response = await fetch(`${URL}/connections/${requestId}/respond`, {
       method: 'PUT',
       headers: this.getAuthHeaders(),
-      body: JSON.stringify({ status, message })
+      body: JSON.stringify(requestBody)
     });
-    if (!response.ok) throw new Error('Failed to respond to request');
+
+    if (!response.ok) {
+      const error = await response.json();
+      console.error('Backend error response:', error);
+      throw new Error(error.message || error.error || 'Failed to respond to request');
+    }
     return response.json();
   },
 
@@ -348,7 +379,10 @@ const apiService = {
       method: 'DELETE',
       headers: this.getAuthHeaders()
     });
-    if (!response.ok) throw new Error('Failed to remove connection');
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(error.message || 'Failed to remove connection');
+    }
     return response.json();
   },
 
@@ -359,7 +393,10 @@ const apiService = {
     const response = await fetch(`${URL}/connections/stats`, {
       headers: this.getAuthHeaders()
     });
-    if (!response.ok) throw new Error('Failed to fetch stats');
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(error.message || 'Failed to fetch stats');
+    }
     return response.json();
   },
 
@@ -371,7 +408,7 @@ const apiService = {
     if (token) {
       try {
         const payload = JSON.parse(atob(token.split('.')[1]));
-        return payload.id || payload.userId;
+        return payload.id || payload.userId || payload.user_id;
       } catch (e) {
         console.error('Error parsing token:', e);
         return null;
@@ -420,6 +457,7 @@ const ConnectionRequestModal = ({ isOpen, onClose, recipient, onSend }) => {
       setMessage('');
     } catch (error) {
       console.error('Error sending request:', error);
+      alert('Failed to send connection request: ' + error.message);
     } finally {
       setIsLoading(false);
     }
@@ -528,7 +566,7 @@ const ProfessionalNetworking = ({ activeTab, setActiveTab }) => {
       setStats(prev => ({ ...prev, sentRequests: prev.sentRequests + 1 }));
     } catch (error) {
       console.error('Error sending connection request:', error);
-      alert('Failed to send connection request. Please try again.');
+      alert('Failed to send connection request: ' + error.message);
     }
   };
 
@@ -537,11 +575,16 @@ const ProfessionalNetworking = ({ activeTab, setActiveTab }) => {
     setShowConnectionModal(true);
   };
 
+  // FIXED: Handle connection request response
   const handleRespondToRequest = async (requestId, status) => {
+    console.log('Responding to request:', requestId, 'with status:', status);
+    
     try {
       await apiService.respondToRequest(requestId, status);
+      
       // Remove from pending requests
       setPendingRequests(prev => prev.filter(req => req.id !== requestId));
+      
       // Update stats
       if (status === 'accepted') {
         setStats(prev => ({
@@ -549,12 +592,17 @@ const ProfessionalNetworking = ({ activeTab, setActiveTab }) => {
           totalConnections: prev.totalConnections + 1,
           pendingRequests: prev.pendingRequests - 1
         }));
+        
+        // Optionally reload connections to show the new connection
+        const connectionsData = await apiService.getMyConnections();
+        setConnections(connectionsData || []);
       } else {
         setStats(prev => ({ ...prev, pendingRequests: prev.pendingRequests - 1 }));
       }
+      
     } catch (error) {
       console.error('Error responding to request:', error);
-      alert('Failed to respond to request. Please try again.');
+      alert('Failed to respond to request: ' + error.message);
     }
   };
 
@@ -566,7 +614,7 @@ const ProfessionalNetworking = ({ activeTab, setActiveTab }) => {
         setStats(prev => ({ ...prev, totalConnections: prev.totalConnections - 1 }));
       } catch (error) {
         console.error('Error removing connection:', error);
-        alert('Failed to remove connection. Please try again.');
+        alert('Failed to remove connection: ' + error.message);
       }
     }
   };
