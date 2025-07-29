@@ -248,6 +248,7 @@ import GELEPMentorshipPlat from './components/GELEPMentorship/GELEPMentorshipPla
 import GELEPPlatform from './components/ProfessionalNetworking/GELEPPlatform'
 
 import ForumDetail from './components/ProfessionalNetworking/ForumDetail';
+import JobBoard from './components/JobBoardOpportunites/JobBoard'
 
 
 
@@ -523,6 +524,10 @@ function App() {
         {
             path: "/login",
             element: <Login />,
+        },
+        {
+            path: "/JobBoard",
+            element: <JobBoard/>
         },
         {
             path : "/modules",
