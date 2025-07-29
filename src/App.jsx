@@ -245,8 +245,9 @@ import LeadershipTrainingDevelopment from './components/online_course/Leadership
 import OnlineCourse from './components/online_course/OnlineCourse';
 import LeadershipExam from './components/online_course/LeadershipExam'
 import GELEPMentorshipPlat from './components/GELEPMentorship/GELEPMentorshipPlatform'
-import GELEPPlatform from './components/ProfessionalNetworking/ProfessionalNetworkings'
+import GELEPPlatform from './components/ProfessionalNetworking/GELEPPlatform'
 
+import ForumDetail from './components/ProfessionalNetworking/ForumDetail';
 
 
 
@@ -539,6 +540,10 @@ function App() {
             path: "/update-password",
             element: <UpdatePassword />,
         },
+        {
+    path: "/forum/:forumId",
+    element: <ForumDetail />,
+},
         {
             path: "/leadershipTraining",
             element: <LeadershipTrainingDevelopment/>
