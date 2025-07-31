@@ -249,7 +249,9 @@ import GELEPPlatform from './components/ProfessionalNetworking/GELEPPlatform'
 
 import ForumDetail from './components/ProfessionalNetworking/ForumDetail';
 import JobBoard from './components/JobBoardOpportunites/JobBoard'
-
+import JobApplicationsPage from './components/JobBoardOpportunites/JobApplicationsPage'
+import GELEPDashboard from './components/UserDashboard/GELEPDashboard'
+import EventsCalendar from './components/ProfessionalNetworking/EventsCalendar'
 
 
 // Dashboard Page Components
@@ -530,6 +532,10 @@ function App() {
             element: <JobBoard/>
         },
         {
+            path: "/applicationstatus",
+            element: <JobApplicationsPage/>
+        },
+        {
             path : "/modules",
             element : <ModernCourseModulesManagement/>
         },
@@ -561,11 +567,18 @@ function App() {
             path: '/GELEPMentorship',
             element: <GELEPMentorshipPlat/>
         },
-        
-            {
+        {
+            path: "/farmer",
+            element : <GELEPDashboard/>
+        },
+        {
+            path: "/eventsCalendar",
+            element: <EventsCalendar/>
+        },
+        {
                 path: "/GELEPPlatform",
                 element: <GELEPPlatform/>
-            },
+        },
 
         {
             path : "/exam",

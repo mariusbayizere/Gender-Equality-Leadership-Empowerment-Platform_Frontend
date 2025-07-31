@@ -1,7 +1,15 @@
 import React, { useState, useEffect } from 'react';
 import { Search, MapPin, Building2, Calendar, Users, BookOpen, Award, Filter, ChevronLeft, ChevronRight, Eye, ExternalLink } from 'lucide-react';
+import JobApplicationForm from './JobApplicationForm'; 
+
 
 const JobBoard = () => {
+
+
+    // Add these state variables after your existing useState declarations
+const [showApplicationForm, setShowApplicationForm] = useState(false);
+const [applicationJob, setApplicationJob] = useState(null);
+
   const [activeTab, setActiveTab] = useState('all');
   const [jobs, setJobs] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -59,6 +67,8 @@ const JobBoard = () => {
     }
   ];
 
+
+
   // API base URL - adjust according to your setup
   const API_BASE = 'http://localhost:3000/api/v1/job-opportunities';
 
@@ -85,6 +95,165 @@ const JobBoard = () => {
     
     return null;
   };
+
+
+//   const handleApplicationSubmit = async (applicationData) => {
+//   try {
+//     // Submit the application to your API
+//     const response = await authenticatedFetch(`${API_BASE}/${applicationJob.id}/apply`, {
+//       method: 'POST',
+//       body: applicationData, // FormData object from JobApplicationForm
+//     });
+
+//     if (response.ok) {
+//       // Show success message
+//       alert('Application submitted successfully!');
+//       // You could also show a toast notification here
+      
+//       // Close the application form
+//       setShowApplicationForm(false);
+//       setApplicationJob(null);
+//     } else {
+//       throw new Error('Failed to submit application');
+//     }
+//   } catch (error) {
+//     console.error('Application submission error:', error);
+//     throw error; // Re-throw to let JobApplicationForm handle the error display
+//   }
+// };
+
+
+// In your JobBoard component, replace the handleApplicationSubmit function with this:
+
+// const handleApplicationSubmit = async (applicationData) => {
+//   try {
+//     // Use the correct endpoint for job applications
+//     const APPLICATION_API_BASE = 'http://localhost:3000/api/v1/job-applications';
+    
+//     const response = await authenticatedFetch(`${APPLICATION_API_BASE}/apply`, {
+//       method: 'POST',
+//       body: applicationData, // FormData object from JobApplicationForm
+//     });
+
+//     if (response.ok) {
+//       const result = await response.json();
+      
+//       // Show success message with more details
+//       alert(`Application submitted successfully! ${result.message || ''}`);
+      
+//       // Close the application form
+//       setShowApplicationForm(false);
+//       setApplicationJob(null);
+      
+//       // Optionally refresh the jobs list if needed
+//       // fetchJobs(pagination.currentPage);
+      
+//     } else {
+//       const errorData = await response.json();
+//       throw new Error(errorData.message || 'Failed to submit application');
+//     }
+//   } catch (error) {
+//     console.error('Application submission error:', error);
+    
+//     // Show user-friendly error message
+//     if (error.message.includes('entity too large')) {
+//       alert('Your files are too large. Please ensure each file is under 5MB.');
+//     } else if (error.message.includes('Authentication')) {
+//       alert('Authentication error. Please log in again.');
+//     } else {
+//       alert(`Error: ${error.message}`);
+//     }
+    
+//     throw error; // Re-throw to let JobApplicationForm handle the error display
+//   }
+// };
+
+
+// In your JobBoard component, replace the handleApplicationSubmit function with this:
+
+// Enhanced fetch function specifically for file uploads
+const authenticatedFileUploadFetch = async (url, formData) => {
+  const token = getAuthToken();
+  const headers = {};
+
+  if (token) {
+    headers['Authorization'] = `Bearer ${token}`;
+    headers['X-Auth-Token'] = token;
+    headers['X-Access-Token'] = token;
+  }
+
+  // Don't set Content-Type for FormData - let browser set it with boundary
+  const response = await fetch(url, {
+    method: 'POST',
+    headers: headers,
+    body: formData
+  });
+
+  if (response.status === 401) {
+    const token = getAuthToken();
+    if (!token) {
+      throw new Error('Authentication required. Please log in again.');
+    } else {
+      throw new Error('Authentication failed. Your session may have expired. Please log in again.');
+    }
+  }
+
+  if (!response.ok) {
+    throw new Error(`HTTP error! status: ${response.status}`);
+  }
+
+  return response;
+};
+
+const handleApplicationSubmit = async (applicationData) => {
+  try {
+    // Use the correct endpoint for job applications
+    const APPLICATION_API_BASE = 'http://localhost:3000/api/v1/job-applications';
+    
+    const response = await authenticatedFileUploadFetch(`${APPLICATION_API_BASE}/apply`, applicationData);
+
+    if (response.ok) {
+      const result = await response.json();
+      
+      // Show success message with more details
+      alert(`Application submitted successfully! ${result.message || ''}`);
+      
+      // Close the application form
+      setShowApplicationForm(false);
+      setApplicationJob(null);
+      
+      // Optionally refresh the jobs list if needed
+      // fetchJobs(pagination.currentPage);
+      
+    } else {
+      const errorData = await response.json();
+      throw new Error(errorData.message || 'Failed to submit application');
+    }
+  } catch (error) {
+    console.error('Application submission error:', error);
+    
+    // Show user-friendly error message
+    if (error.message.includes('entity too large')) {
+      alert('Your files are too large. Please ensure each file is under 5MB.');
+    } else if (error.message.includes('Authentication')) {
+      alert('Authentication error. Please log in again.');
+    } else {
+      alert(`Error: ${error.message}`);
+    }
+    
+    throw error; // Re-throw to let JobApplicationForm handle the error display
+  }
+};
+
+
+
+const handleApplyClick = (job) => {
+  setApplicationJob(job);
+  setShowApplicationForm(true);
+  setShowJobModal(false); // Close the job details modal
+};
+
+
 
   // Create headers with authentication
   const getAuthHeaders = () => {
@@ -270,14 +439,43 @@ const JobBoard = () => {
       job_type: ''
     });
   };
+const formatDate = (dateValue) => {
+  if (!dateValue) return 'N/A';
 
-  const formatDate = (dateString) => {
-    return new Date(dateString).toLocaleDateString('en-US', {
-      year: 'numeric',
-      month: 'short',
-      day: 'numeric'
-    });
-  };
+  try {
+    // Handle Firestore timestamp objects
+    if (typeof dateValue === 'object' && dateValue._seconds !== undefined) {
+      const millis = dateValue._seconds * 1000 + Math.floor((dateValue._nanoseconds || 0) / 1e6);
+      return new Date(millis).toLocaleDateString();
+    }
+
+    // Handle Firestore timestamp objects with toDate method
+    if (typeof dateValue === 'object' && typeof dateValue.toDate === 'function') {
+      return dateValue.toDate().toLocaleDateString();
+    }
+
+    // Handle Date objects
+    if (dateValue instanceof Date) {
+      return dateValue.toLocaleDateString();
+    }
+
+    // Handle ISO string dates (your case)
+    if (typeof dateValue === 'string') {
+      const date = new Date(dateValue);
+      return isNaN(date.getTime()) ? 'Invalid Date' : date.toLocaleDateString();
+    }
+
+    // Handle timestamp numbers
+    if (typeof dateValue === 'number') {
+      return new Date(dateValue).toLocaleDateString();
+    }
+
+    return 'N/A';
+  } catch (error) {
+    console.error('Error formatting date:', error);
+    return 'Invalid Date';
+  }
+};
 
   const getJobTypeColor = (type) => {
     switch (type) {
@@ -621,7 +819,7 @@ const JobBoard = () => {
               </div>
               
               <div className="flex gap-3">
-                <button className="flex-1 bg-purple-600 hover:bg-purple-700 text-white py-3 rounded-lg font-medium transition-colors duration-200">
+                <button  onClick={() => handleApplyClick(selectedJob)}  className="flex-1 bg-purple-600 hover:bg-purple-700 text-white py-3 rounded-lg font-medium transition-colors duration-200">
                   Apply Now
                 </button>
                 <button 
@@ -631,6 +829,18 @@ const JobBoard = () => {
                   Close
                 </button>
               </div>
+
+
+<JobApplicationForm
+  isOpen={showApplicationForm}
+  onClose={() => {
+    setShowApplicationForm(false);
+    setApplicationJob(null);
+  }}
+  jobDetails={applicationJob}
+  onSubmit={handleApplicationSubmit}
+/>
+
             </div>
           </div>
         </div>
