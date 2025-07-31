@@ -631,7 +631,9 @@ function App() {
                 },
                 {
                     path: "reports",
-                    element: <DashboardReportsPage />,
+                    element: <UserReportDownloader/>
+                    // element: <DashboardReportsPage />,
+
                 },
                 {
                     path: "settings",

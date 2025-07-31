@@ -1,3 +1,4 @@
+
 // import React, { useState } from 'react';
 // import { Outlet, useNavigate, useLocation } from 'react-router-dom';
 // import {
@@ -92,84 +93,100 @@
 //         />
 //       )}
 
-//       {/* Sidebar - Desktop */}
-//       <div className={`hidden lg:flex ${isSidebarOpen ? 'w-64' : 'w-20'} bg-white shadow-lg transition-all duration-300 ease-in-out flex-col`}>
-//         {/* Sidebar Header */}
-//         <div className="p-4 border-b border-gray-200">
-//           <div className="flex items-center justify-between">
-//             <h1 className={`font-bold text-xl text-gray-800 transition-opacity duration-300 ${!isSidebarOpen && 'opacity-0 hidden'}`}>
-//               GELEP Admin
-//             </h1>
-//             <button
-//               onClick={() => setIsSidebarOpen(!isSidebarOpen)}
-//               className="p-2 rounded-lg hover:bg-gray-100 transition-colors duration-200"
-//               title={isSidebarOpen ? 'Collapse sidebar' : 'Expand sidebar'}
+//       {/* Desktop Layout Container */}
+//       <div className="hidden lg:flex h-full w-full overflow-hidden">
+//         {/* Sidebar - Desktop */}
+//         <div className={`${isSidebarOpen ? 'w-64' : 'w-20'} bg-white shadow-lg transition-all duration-300 ease-in-out flex-col flex`}>
+//           {/* Sidebar Header */}
+//           <div className="p-4 border-b border-gray-200">
+//             <div className="flex items-center justify-between">
+//               <h1 className={`font-bold text-xl text-gray-800 transition-opacity duration-300 ${!isSidebarOpen && 'opacity-0 hidden'}`}>
+//                 GELEP Admin
+//               </h1>
+//               <button
+//                 onClick={() => setIsSidebarOpen(!isSidebarOpen)}
+//                 className="p-2 rounded-lg hover:bg-gray-100 transition-colors duration-200"
+//                 title={isSidebarOpen ? 'Collapse sidebar' : 'Expand sidebar'}
+//               >
+//                 {isSidebarOpen ? <ChevronLeft size={20} /> : <Menu size={20} />}
+//               </button>
+//             </div>
+//           </div>
+          
+//           {/* Navigation Items */}
+//           <nav className="mt-4 flex-1 overflow-y-auto">
+//             <div className="space-y-1 px-2">
+//               {sidebarItems.map((item, index) => {
+//                 const isActive = isActiveItem(item.path);
+//                 const Icon = item.icon;
+                
+//                 return (
+//                   <button
+//                     key={index}
+//                     onClick={() => handleNavigation(item.path)}
+//                     className={`w-full flex items-center px-3 py-3 rounded-lg transition-all duration-200 group relative ${
+//                       isActive 
+//                         ? 'bg-blue-500 text-white shadow-sm' 
+//                         : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
+//                     }`}
+//                     title={!isSidebarOpen ? item.name : ''}
+//                   >
+//                     <Icon 
+//                       size={20} 
+//                       className={`${isActive ? 'text-white' : 'text-gray-500 group-hover:text-gray-700'} transition-colors duration-200`}
+//                     />
+                    
+//                     {isSidebarOpen && (
+//                       <div className="ml-3 text-left">
+//                         <span className="block font-medium text-sm">{item.name}</span>
+//                       </div>
+//                     )}
+                    
+//                     {/* Tooltip for collapsed sidebar */}
+//                     {!isSidebarOpen && (
+//                       <div className="absolute left-full ml-2 px-2 py-1 bg-gray-900 text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none whitespace-nowrap z-50">
+//                         {item.name}
+//                       </div>
+//                     )}
+//                   </button>
+//                 );
+//               })}
+//             </div>
+//           </nav>
+          
+//           {/* Sidebar Footer */}
+//           <div className="p-4 border-t border-gray-200 mt-auto">
+//             <button 
+//               onClick={handleLogout}
+//               className="flex items-center w-full px-3 py-3 text-red-600 hover:bg-red-50 rounded-lg transition-colors duration-200 group"
+//               title={!isSidebarOpen ? 'Logout' : ''}
 //             >
-//               {isSidebarOpen ? <ChevronLeft size={20} /> : <Menu size={20} />}
+//               <LogOut size={20} className="text-red-500" />
+//               {isSidebarOpen && (
+//                 <span className="ml-3 font-medium">Logout</span>
+//               )}
+              
+//               {/* Tooltip for collapsed sidebar */}
+//               {!isSidebarOpen && (
+//                 <div className="absolute left-full ml-2 px-2 py-1 bg-gray-900 text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none whitespace-nowrap z-50">
+//                   Logout
+//                 </div>
+//               )}
 //             </button>
 //           </div>
 //         </div>
-        
-//         {/* Navigation Items */}
-//         <nav className="mt-4 flex-1 overflow-y-auto">
-//           <div className="space-y-1 px-2">
-//             {sidebarItems.map((item, index) => {
-//               const isActive = isActiveItem(item.path);
-//               const Icon = item.icon;
-              
-//               return (
-//                 <button
-//                   key={index}
-//                   onClick={() => handleNavigation(item.path)}
-//                   className={`w-full flex items-center px-3 py-3 rounded-lg transition-all duration-200 group relative ${
-//                     isActive 
-//                       ? 'bg-blue-500 text-white shadow-sm' 
-//                       : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
-//                   }`}
-//                   title={!isSidebarOpen ? item.name : ''}
-//                 >
-//                   <Icon 
-//                     size={20} 
-//                     className={`${isActive ? 'text-white' : 'text-gray-500 group-hover:text-gray-700'} transition-colors duration-200`}
-//                   />
-                  
-//                   {isSidebarOpen && (
-//                     <div className="ml-3 text-left">
-//                       <span className="block font-medium text-sm">{item.name}</span>
-//                     </div>
-//                   )}
-                  
-//                   {/* Tooltip for collapsed sidebar */}
-//                   {!isSidebarOpen && (
-//                     <div className="absolute left-full ml-2 px-2 py-1 bg-gray-900 text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none whitespace-nowrap z-50">
-//                       {item.name}
-//                     </div>
-//                   )}
-//                 </button>
-//               );
-//             })}
-//           </div>
-//         </nav>
-        
-//         {/* Sidebar Footer */}
-//         <div className="p-4 border-t border-gray-200 mt-auto">
-//           <button 
-//             onClick={handleLogout}
-//             className="flex items-center w-full px-3 py-3 text-red-600 hover:bg-red-50 rounded-lg transition-colors duration-200 group"
-//             title={!isSidebarOpen ? 'Logout' : ''}
-//           >
-//             <LogOut size={20} className="text-red-500" />
-//             {isSidebarOpen && (
-//               <span className="ml-3 font-medium">Logout</span>
-//             )}
-            
-//             {/* Tooltip for collapsed sidebar */}
-//             {!isSidebarOpen && (
-//               <div className="absolute left-full ml-2 px-2 py-1 bg-gray-900 text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none whitespace-nowrap z-50">
-//                 Logout
-//               </div>
-//             )}
-//           </button>
+
+//         {/* Main Content Area - Desktop */}
+//         <div className="flex-1 overflow-hidden flex flex-col min-w-0">
+//           {/* Desktop Header */}
+//           <Header />
+          
+//           {/* Page Content */}
+//           <main className="flex-1 overflow-auto bg-gray-50">
+//             <div className="h-full">
+//               <Outlet />
+//             </div>
+//           </main>
 //         </div>
 //       </div>
 
@@ -232,10 +249,10 @@
 //         </div>
 //       </div>
 
-//       {/* Main Content Area */}
+//       {/* Main Content Area - Works for both desktop and mobile */}
 //       <div className="flex-1 overflow-hidden flex flex-col min-w-0">
 //         {/* Mobile Header with Menu Button */}
-//         <div className="lg:hidden bg-white border-b border-gray-200 px-4 py-3">
+//         <div className="lg:hidden bg-white border-b border-gray-200 px-4 py-3 z-10">
 //           <div className="flex items-center justify-between">
 //             <button
 //               onClick={toggleMobileMenu}
@@ -261,8 +278,8 @@
 //         </div>
         
 //         {/* Page Content */}
-//         <main className="flex-1 overflow-auto bg-gray-50">
-//           <div className="h-full">
+//         <main className="flex-1 overflow-auto bg-gray-50 min-h-0">
+//           <div className="h-full min-h-full">
 //             <Outlet />
 //           </div>
 //         </main>
@@ -272,6 +289,7 @@
 // };
 
 // export default DashboardLayout;
+
 
 import React, { useState } from 'react';
 import { Outlet, useNavigate, useLocation } from 'react-router-dom';
@@ -284,6 +302,7 @@ import { Header } from './header';
 const DashboardLayout = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false); // Start closed on mobile
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [isLoggingOut, setIsLoggingOut] = useState(false); // Loading state for logout
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -346,10 +365,55 @@ const DashboardLayout = () => {
     setIsMobileMenuOpen(false);
   };
 
-  // Handle logout
-  const handleLogout = () => {
-    localStorage.removeItem('authToken');
-    navigate('/login');
+  // Handle logout with API call
+  const handleLogout = async () => {
+    setIsLoggingOut(true);
+    
+    try {
+      const token = localStorage.getItem('authToken');
+      
+      if (!token) {
+        // If no token, just redirect to login
+        navigate('/login');
+        return;
+      }
+
+      const response = await fetch('http://localhost:3000/api/v1/auth/logout', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        // Successfully logged out
+        console.log('Logout successful:', data.message);
+        
+        // Clear token from localStorage
+        localStorage.removeItem('authToken');
+        
+        // Redirect to login page
+        navigate('/login');
+      } else {
+        // Handle error response
+        console.error('Logout failed:', data.error);
+        
+        // Even if logout failed, clear token and redirect
+        localStorage.removeItem('authToken');
+        navigate('/login');
+      }
+    } catch (error) {
+      console.error('Logout error:', error);
+      
+      // Even if network error, clear token and redirect
+      localStorage.removeItem('authToken');
+      navigate('/login');
+    } finally {
+      setIsLoggingOut(false);
+    }
   };
 
   // Toggle mobile menu
@@ -432,18 +496,23 @@ const DashboardLayout = () => {
           <div className="p-4 border-t border-gray-200 mt-auto">
             <button 
               onClick={handleLogout}
-              className="flex items-center w-full px-3 py-3 text-red-600 hover:bg-red-50 rounded-lg transition-colors duration-200 group"
+              disabled={isLoggingOut}
+              className={`flex items-center w-full px-3 py-3 text-red-600 hover:bg-red-50 rounded-lg transition-colors duration-200 group ${
+                isLoggingOut ? 'opacity-50 cursor-not-allowed' : ''
+              }`}
               title={!isSidebarOpen ? 'Logout' : ''}
             >
               <LogOut size={20} className="text-red-500" />
               {isSidebarOpen && (
-                <span className="ml-3 font-medium">Logout</span>
+                <span className="ml-3 font-medium">
+                  {isLoggingOut ? 'Logging out...' : 'Logout'}
+                </span>
               )}
               
               {/* Tooltip for collapsed sidebar */}
               {!isSidebarOpen && (
                 <div className="absolute left-full ml-2 px-2 py-1 bg-gray-900 text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none whitespace-nowrap z-50">
-                  Logout
+                  {isLoggingOut ? 'Logging out...' : 'Logout'}
                 </div>
               )}
             </button>
@@ -515,10 +584,15 @@ const DashboardLayout = () => {
         <div className="p-4 border-t border-gray-200 mt-auto">
           <button 
             onClick={handleLogout}
-            className="flex items-center w-full px-3 py-3 text-red-600 hover:bg-red-50 rounded-lg transition-colors duration-200"
+            disabled={isLoggingOut}
+            className={`flex items-center w-full px-3 py-3 text-red-600 hover:bg-red-50 rounded-lg transition-colors duration-200 ${
+              isLoggingOut ? 'opacity-50 cursor-not-allowed' : ''
+            }`}
           >
             <LogOut size={20} className="text-red-500" />
-            <span className="ml-3 font-medium">Logout</span>
+            <span className="ml-3 font-medium">
+              {isLoggingOut ? 'Logging out...' : 'Logout'}
+            </span>
           </button>
         </div>
       </div>
