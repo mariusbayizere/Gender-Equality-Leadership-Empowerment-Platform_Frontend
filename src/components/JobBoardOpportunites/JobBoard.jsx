@@ -479,7 +479,7 @@ const formatDate = (dateValue) => {
 
   const getJobTypeColor = (type) => {
     switch (type) {
-      case 'leadership': return 'bg-purple-100 text-purple-800';
+      case 'leadership': return 'bg-blue-100 text-blue-800';
       case 'internship': return 'bg-blue-100 text-blue-800';
       case 'fellowship': return 'bg-green-100 text-green-800';
       default: return 'bg-gray-100 text-gray-800';
@@ -518,7 +518,7 @@ const formatDate = (dateValue) => {
         </div>
         <button
           onClick={() => fetchJobDetails(job.id)}
-          className="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-md text-sm font-medium transition-colors duration-200 flex items-center"
+          className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md text-sm font-medium transition-colors duration-200 flex items-center"
         >
           <Eye className="w-4 h-4 mr-1" />
           View Details
@@ -538,7 +538,7 @@ const formatDate = (dateValue) => {
             {resource.description}
           </p>
         </div>
-        <BookOpen className="w-6 h-6 text-purple-600 flex-shrink-0 ml-4" />
+        <BookOpen className="w-6 h-6 text-blue-600 flex-shrink-0 ml-4" />
       </div>
       
       <div className="flex justify-between items-center text-sm text-gray-600 mb-4">
@@ -549,7 +549,7 @@ const formatDate = (dateValue) => {
         <span>{resource.level}</span>
       </div>
       
-      <button className="w-full bg-purple-600 hover:bg-purple-700 text-white py-2 rounded-md font-medium transition-colors duration-200 flex items-center justify-center">
+      <button className="w-full bg-blue-600 hover:bg-blue-700 text-white py-2 rounded-md font-medium transition-colors duration-200 flex items-center justify-center">
         <ExternalLink className="w-4 h-4 mr-2" />
         Access Resource
       </button>
@@ -574,7 +574,7 @@ const formatDate = (dateValue) => {
           {stats && (
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-6">
               <div className="text-center">
-                <div className="text-2xl font-bold text-purple-600">{stats.active}</div>
+                <div className="text-2xl font-bold text-blue-600">{stats.active}</div>
                 <div className="text-sm text-gray-600">Active Jobs</div>
               </div>
               <div className="text-center">
@@ -613,7 +613,7 @@ const formatDate = (dateValue) => {
                   onClick={() => setActiveTab(tab.id)}
                   className={`py-4 px-1 border-b-2 font-medium text-sm flex items-center ${
                     activeTab === tab.id
-                      ? 'border-purple-500 text-purple-600'
+                      ? 'border-blue-500 text-blue-600'
                       : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
                   }`}
                 >
@@ -639,7 +639,7 @@ const formatDate = (dateValue) => {
                     placeholder="Search jobs, companies, or locations..."
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
-                    className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                    className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                   />
                 </div>
               </div>
@@ -648,7 +648,7 @@ const formatDate = (dateValue) => {
                 <select
                   value={filters.job_type}
                   onChange={(e) => handleFilterChange('job_type', e.target.value)}
-                  className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                  className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 >
                   <option value="">All Types</option>
                   <option value="leadership">Leadership</option>
@@ -661,7 +661,7 @@ const formatDate = (dateValue) => {
                   placeholder="Location"
                   value={filters.location}
                   onChange={(e) => handleFilterChange('location', e.target.value)}
-                  className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                  className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 />
                 
                 <input
@@ -669,7 +669,7 @@ const formatDate = (dateValue) => {
                   placeholder="Company"
                   value={filters.company}
                   onChange={(e) => handleFilterChange('company', e.target.value)}
-                  className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                  className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 />
                 
                 {(searchQuery || Object.values(filters).some(filter => filter)) && (
@@ -707,7 +707,7 @@ const formatDate = (dateValue) => {
 
         {loading ? (
           <div className="flex justify-center items-center py-12">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-600"></div>
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
           </div>
         ) : (
           <>
@@ -819,7 +819,7 @@ const formatDate = (dateValue) => {
               </div>
               
               <div className="flex gap-3">
-                <button  onClick={() => handleApplyClick(selectedJob)}  className="flex-1 bg-purple-600 hover:bg-purple-700 text-white py-3 rounded-lg font-medium transition-colors duration-200">
+                <button  onClick={() => handleApplyClick(selectedJob)}  className="flex-1 bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-lg font-medium transition-colors duration-200">
                   Apply Now
                 </button>
                 <button 

@@ -189,7 +189,7 @@
 //               onChange={handleInputChange}
 //               placeholder="Explain why you're interested in this position and how your background makes you a strong candidate for leadership roles..."
 //               rows={6}
-//               className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-colors ${
+//               className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors ${
 //                 errors.coverLetter ? 'border-red-300' : 'border-gray-300'
 //               }`}
 //             />
@@ -208,7 +208,7 @@
 //               CV/Resume *
 //             </label>
 //             <div className={`border-2 border-dashed rounded-lg p-6 text-center transition-colors ${
-//               errors.cvFile ? 'border-red-300 bg-red-50' : 'border-gray-300 hover:border-purple-400'
+//               errors.cvFile ? 'border-red-300 bg-red-50' : 'border-gray-300 hover:border-blue-400'
 //             }`}>
 //               <Upload className="w-8 h-8 text-gray-400 mx-auto mb-2" />
 //               <input
@@ -219,7 +219,7 @@
 //                 id="cv-upload"
 //               />
 //               <label htmlFor="cv-upload" className="cursor-pointer">
-//                 <span className="text-purple-600 hover:text-purple-700 font-medium">
+//                 <span className="text-blue-600 hover:text-blue-700 font-medium">
 //                   Click to upload
 //                 </span>
 //                 <span className="text-gray-500"> or drag and drop</span>
@@ -250,7 +250,7 @@
 //                 onChange={handleInputChange}
 //                 placeholder="Describe your leadership experience, achievements, and relevant work history..."
 //                 rows={4}
-//                 className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-colors ${
+//                 className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors ${
 //                   errors.experience ? 'border-red-300' : 'border-gray-300'
 //                 }`}
 //               />
@@ -271,7 +271,7 @@
 //                 onChange={handleInputChange}
 //                 placeholder="List your educational qualifications, certifications, and relevant training..."
 //                 rows={4}
-//                 className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-colors ${
+//                 className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors ${
 //                   errors.education ? 'border-red-300' : 'border-gray-300'
 //                 }`}
 //               />
@@ -292,7 +292,7 @@
 //               onChange={handleInputChange}
 //               placeholder="List your key skills, technical competencies, and leadership abilities..."
 //               rows={3}
-//               className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-colors ${
+//               className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors ${
 //                 errors.skills ? 'border-red-300' : 'border-gray-300'
 //               }`}
 //             />
@@ -312,7 +312,7 @@
 //               onChange={handleInputChange}
 //               placeholder="What motivates you to pursue leadership roles? How do you envision contributing to gender equality in leadership?"
 //               rows={4}
-//               className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-colors ${
+//               className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors ${
 //                 errors.motivationStatement ? 'border-red-300' : 'border-gray-300'
 //               }`}
 //             />
@@ -333,7 +333,7 @@
 //                 value={formData.linkedinProfile}
 //                 onChange={handleInputChange}
 //                 placeholder="https://linkedin.com/in/your-profile"
-//                 className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-colors"
+//                 className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
 //               />
 //             </div>
 
@@ -347,7 +347,7 @@
 //                 value={formData.portfolioUrl}
 //                 onChange={handleInputChange}
 //                 placeholder="https://your-portfolio.com"
-//                 className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-colors"
+//                 className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
 //               />
 //             </div>
 //           </div>
@@ -364,7 +364,7 @@
 //               value={formData.availability}
 //               onChange={handleInputChange}
 //               placeholder="When can you start? Any notice period requirements?"
-//               className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-colors"
+//               className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
 //             />
 //           </div>
 
@@ -379,7 +379,7 @@
 //               onChange={handleInputChange}
 //               placeholder="Any additional information you'd like to share..."
 //               rows={3}
-//               className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-colors"
+//               className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
 //             />
 //           </div>
 
@@ -396,7 +396,7 @@
 //             <button
 //               type="submit"
 //               disabled={isSubmitting}
-//               className="px-8 py-3 bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-lg font-medium hover:from-purple-700 hover:to-pink-700 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center space-x-2"
+//               className="px-8 py-3 bg-gradient-to-r from-blue-600 to-pink-600 text-white rounded-lg font-medium hover:from-blue-700 hover:to-pink-700 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center space-x-2"
 //             >
 //               {isSubmitting ? (
 //                 <>
@@ -475,7 +475,7 @@ const JobApplicationForm = ({ isOpen, onClose, jobDetails, onSubmit }) => {
       } else {
         setCertificateFile(file);
       }
-      
+
       setErrors(prev => ({
         ...prev,
         [fileType]: ''
@@ -611,7 +611,7 @@ const JobApplicationForm = ({ isOpen, onClose, jobDetails, onSubmit }) => {
               onChange={handleInputChange}
               placeholder="Explain why you're interested in this position and how your background makes you a strong candidate for leadership roles..."
               rows={6}
-              className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-colors ${
+              className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors ${
                 errors.coverLetter ? 'border-red-300' : 'border-gray-300'
               }`}
             />
@@ -630,7 +630,7 @@ const JobApplicationForm = ({ isOpen, onClose, jobDetails, onSubmit }) => {
               CV/Resume *
             </label>
             <div className={`border-2 border-dashed rounded-lg p-6 text-center transition-colors ${
-              errors.cv ? 'border-red-300 bg-red-50' : 'border-gray-300 hover:border-purple-400'
+              errors.cv ? 'border-red-300 bg-red-50' : 'border-gray-300 hover:border-blue-400'
             }`}>
               <Upload className="w-8 h-8 text-gray-400 mx-auto mb-2" />
               <input
@@ -641,7 +641,7 @@ const JobApplicationForm = ({ isOpen, onClose, jobDetails, onSubmit }) => {
                 id="cv-upload"
               />
               <label htmlFor="cv-upload" className="cursor-pointer">
-                <span className="text-purple-600 hover:text-purple-700 font-medium">
+                <span className="text-blue-600 hover:text-blue-700 font-medium">
                   Click to upload
                 </span>
                 <span className="text-gray-500"> or drag and drop</span>
@@ -664,7 +664,7 @@ const JobApplicationForm = ({ isOpen, onClose, jobDetails, onSubmit }) => {
               <Award className="w-4 h-4 inline mr-1" />
               Certificate (Optional)
             </label>
-            <div className="border-2 border-dashed border-gray-300 hover:border-purple-400 rounded-lg p-6 text-center transition-colors">
+            <div className="border-2 border-dashed border-gray-300 hover:border-blue-400 rounded-lg p-6 text-center transition-colors">
               <Upload className="w-8 h-8 text-gray-400 mx-auto mb-2" />
               <input
                 type="file"
@@ -674,7 +674,7 @@ const JobApplicationForm = ({ isOpen, onClose, jobDetails, onSubmit }) => {
                 id="certificate-upload"
               />
               <label htmlFor="certificate-upload" className="cursor-pointer">
-                <span className="text-purple-600 hover:text-purple-700 font-medium">
+                <span className="text-blue-600 hover:text-blue-700 font-medium">
                   Click to upload
                 </span>
                 <span className="text-gray-500"> or drag and drop</span>
@@ -703,7 +703,7 @@ const JobApplicationForm = ({ isOpen, onClose, jobDetails, onSubmit }) => {
               onChange={handleInputChange}
               placeholder="Describe your leadership experience, achievements, and relevant work history..."
               rows={5}
-              className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-colors ${
+              className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors ${
                 errors.experience ? 'border-red-300' : 'border-gray-300'
               }`}
             />
@@ -727,7 +727,7 @@ const JobApplicationForm = ({ isOpen, onClose, jobDetails, onSubmit }) => {
               onChange={handleInputChange}
               placeholder="List your educational qualifications, certifications, and relevant training..."
               rows={4}
-              className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-colors ${
+              className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors ${
                 errors.education ? 'border-red-300' : 'border-gray-300'
               }`}
             />
@@ -774,7 +774,7 @@ const JobApplicationForm = ({ isOpen, onClose, jobDetails, onSubmit }) => {
               type="button"
               onClick={handleSubmit}
               disabled={isSubmitting}
-              className="px-6 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center"
+              className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center"
             >
               {isSubmitting ? (
                 <>

@@ -616,15 +616,15 @@ const GELEPMentorshipPlatform = () => {
             
             <div className="flex items-center space-x-4">
               <div className="relative">
-                <button className="p-2 text-gray-600 hover:text-blue-600 transition-colors">
+                {/* <button className="p-2 text-gray-600 hover:text-blue-600 transition-colors">
                   <Bell className="w-6 h-6" />
                   <span className="absolute -top-1 -right-1 w-3 h-3 bg-red-500 rounded-full"></span>
-                </button>
+                </button> */}
               </div>
               {/* <div className="w-8 h-8 bg-gradient-to-br from-blue-400 to-blue-400 rounded-full flex items-center justify-center shadow-lg"> */}
-              <div className="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center shadow-lg">
+              {/* <div className="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center shadow-lg">
                 <User className="w-4 h-4 text-white" />
-              </div>
+              </div> */}
             </div>
           </div>
         </div>

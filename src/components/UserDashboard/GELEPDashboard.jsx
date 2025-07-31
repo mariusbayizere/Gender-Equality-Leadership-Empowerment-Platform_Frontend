@@ -1,6 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { Users, Award, Calendar, Briefcase, MessageSquare, BookOpen, TrendingUp, UserCheck, Clock, CheckCircle, AlertTriangle, XCircle, Bell, Menu, Sun, Moon, User, Home, BarChart3, Settings, LogOut, Target, Network, GraduationCap, Building2 } from 'lucide-react';
 import JobBoard from '../JobBoardOpportunites/JobBoard'
+import { EventsCalendar }from '../ProfessionalNetworking/EventsCalendar'
+import  GELEPMentorshipPlat  from '../GELEPMentorship/GELEPMentorshipPlatform'
+import LeadershipTrainingDevelopment from '../online_course/LeadershipTrainingDevelopment';
+import GELEPPlatform from '../ProfessionalNetworking/GELEPPlatform';
+
+// eventsCalendar
 
 
 
@@ -69,7 +75,7 @@ const Header = ({ isCollapsed, setIsCollapsed, isDarkMode, setIsDarkMode, userDa
           </button>
           
           <div className="flex items-center space-x-3">
-            <div className="w-8 h-8 bg-gradient-to-r from-purple-600 to-pink-600 rounded-full flex items-center justify-center">
+            <div className="w-8 h-8 bg-gradient-to-r from-blue-600 to-blue-600 rounded-full flex items-center justify-center">
               <Users className="h-4 w-4 text-white" />
             </div>
             <h1 className="text-xl font-semibold text-gray-900 dark:text-white">GELEP Dashboard</h1>
@@ -122,7 +128,7 @@ const Header = ({ isCollapsed, setIsCollapsed, isDarkMode, setIsDarkMode, userDa
           </button>
           
           <div className="flex items-center space-x-3 pl-4 border-l border-gray-200 dark:border-gray-700">
-            <div className="w-8 h-8 bg-purple-600 rounded-full flex items-center justify-center">
+            <div className="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center">
               <User className="h-4 w-4 text-white" />
             </div>
             <div className="text-sm">
@@ -139,12 +145,17 @@ const Header = ({ isCollapsed, setIsCollapsed, isDarkMode, setIsDarkMode, userDa
 const Sidebar = ({ isCollapsed, setIsCollapsed, activeTab, setActiveTab }) => {
   const menuItems = [
     { id: 'overview', icon: Home, label: 'Overview' },
-    { id: 'mentorship', icon: Users, label: 'Mentorship' },
-    { id: 'events', icon: Calendar, label: 'Events' },
+    // { id: 'mentorship', icon: Users, label: 'Mentorship' },
+    // { id: 'events', icon: Calendar, label: 'Events' },
     // { id: 'jobs', icon: Briefcase, label: 'Job Opportunities' },
-    {id: 'jobBoard' , icon: Briefcase, label: 'Job Opportunities'},
-    { id: 'training', icon: BookOpen, label: 'Training Courses' },
-    { id: 'forums', icon: MessageSquare, label: 'Community Forums' },
+    // { id: 'training', icon: BookOpen, label: 'Training Courses' },
+    // { id: 'forums', icon: MessageSquare, label: 'Community Forums' },
+
+    { id: 'GELEPMentorship', icon: Users, label: 'Mentorship' },
+    { id: 'jobBoard' , icon: Briefcase, label: 'Job Opportunities'},
+    { id : 'eventsCalendar', icon: Calendar, label: 'Events'},
+    { id: 'leadershipTraining', icon: BookOpen, label: 'Training Courses' },
+    { id: 'GELEPPlatform', icon: MessageSquare, label: 'Community Forums' },
     { id: 'analytics', icon: BarChart3, label: 'Analytics' },
     { id: 'profile', icon: User, label: 'My Profile' }
   ];
@@ -182,7 +193,7 @@ const Sidebar = ({ isCollapsed, setIsCollapsed, activeTab, setActiveTab }) => {
               onClick={() => setActiveTab(item.id)}
               className={`w-full flex items-center ${isCollapsed ? 'justify-center' : 'space-x-3'} px-3 py-2 rounded-lg transition-colors ${
                 activeTab === item.id 
-                  ? 'bg-purple-500 text-white' 
+                  ? 'bg-blue-500 text-white' 
                   : 'text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700'
               }`}
             >
@@ -206,13 +217,13 @@ const Sidebar = ({ isCollapsed, setIsCollapsed, activeTab, setActiveTab }) => {
   );
 };
 
-const StatsCard = ({ title, value, icon: Icon, trend, trendValue, color = "purple" }) => {
+const StatsCard = ({ title, value, icon: Icon, trend, trendValue, color = "blue" }) => {
   const colorClasses = {
-    purple: 'bg-purple-100 text-purple-600',
+    purple: 'bg-purple-100 text-blue-600',
     blue: 'bg-blue-100 text-blue-600',
     green: 'bg-green-100 text-green-600',
     orange: 'bg-orange-100 text-orange-600',
-    pink: 'bg-pink-100 text-pink-600',
+    pink: 'bg-pink-100 text-blue-600',
     indigo: 'bg-indigo-100 text-indigo-600'
   };
 
@@ -241,14 +252,14 @@ const OverviewTab = ({ data }) => {
   return (
     <div className="space-y-6">
       {/* Welcome Section */}
-      <div className="bg-gradient-to-r from-purple-600 to-pink-600 rounded-xl p-6 text-white">
+      <div className="bg-gradient-to-r from-blue-600 to-blue-600 rounded-xl p-6 text-white">
         <div className="flex items-center justify-between">
           <div>
             <h2 className="text-2xl font-bold">Welcome back, {data.userData.firstName}!</h2>
-            <p className="text-purple-100 mt-1">Empowering women leaders, one connection at a time</p>
+            <p className="text-blue-100 mt-1">Empowering women leaders, one connection at a time</p>
           </div>
           <div className="text-right">
-            <p className="text-purple-100 text-sm">Your Role</p>
+            <p className="text-blue-100 text-sm">Your Role</p>
             <p className="text-xl font-bold capitalize">{data.userData.userRole}</p>
           </div>
         </div>
@@ -262,7 +273,7 @@ const OverviewTab = ({ data }) => {
           icon={Users} 
           trend={true} 
           trendValue="+12% this month"
-          color="purple"
+          color="blue"
         />
         <StatsCard 
           title="Active Mentorships" 
@@ -293,7 +304,7 @@ const OverviewTab = ({ data }) => {
           icon={GraduationCap} 
           trend={true} 
           trendValue="+15 this month"
-          color="pink"
+          color="blue"
         />
         <StatsCard 
           title="Forum Discussions" 
@@ -313,11 +324,11 @@ const OverviewTab = ({ data }) => {
             {data.recentActivities.map((activity) => {
               const getActivityIcon = (type) => {
                 switch(type) {
-                  case 'mentorship': return <Users className="h-4 w-4 text-purple-500" />;
+                  case 'mentorship': return <Users className="h-4 w-4 text-blue-500" />;
                   case 'event': return <Calendar className="h-4 w-4 text-green-500" />;
                   case 'job': return <Briefcase className="h-4 w-4 text-blue-500" />;
                   case 'forum': return <MessageSquare className="h-4 w-4 text-orange-500" />;
-                  case 'training': return <BookOpen className="h-4 w-4 text-pink-500" />;
+                  case 'training': return <BookOpen className="h-4 w-4 text-blue-500" />;
                   default: return <CheckCircle className="h-4 w-4 text-gray-500" />;
                 }
               };
@@ -327,7 +338,7 @@ const OverviewTab = ({ data }) => {
                   pending: 'bg-yellow-100 text-yellow-800',
                   confirmed: 'bg-green-100 text-green-800',
                   active: 'bg-blue-100 text-blue-800',
-                  trending: 'bg-purple-100 text-purple-800',
+                  trending: 'bg-blue-100 text-blue-800',
                   completed: 'bg-gray-100 text-gray-800'
                 };
                 return (
@@ -362,7 +373,7 @@ const OverviewTab = ({ data }) => {
               <div key={event.id} className="p-4 border border-gray-200 dark:border-gray-600 rounded-lg">
                 <div className="flex items-center justify-between mb-2">
                   <h4 className="font-medium text-gray-900 dark:text-white">{event.title}</h4>
-                  <span className="text-xs bg-purple-100 text-purple-800 px-2 py-1 rounded-full">
+                  <span className="text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded-full">
                     {event.type.replace('_', ' ')}
                   </span>
                 </div>
@@ -391,7 +402,7 @@ const OverviewTab = ({ data }) => {
                 <div className="flex items-center">
                   <div className="w-32 bg-gray-200 dark:bg-gray-700 rounded-full h-2 mr-3">
                     <div 
-                      className="bg-purple-500 h-2 rounded-full" 
+                      className="bg-blue-500 h-2 rounded-full" 
                       style={{width: `${percentage}%`}}
                     ></div>
                   </div>
@@ -408,7 +419,7 @@ const OverviewTab = ({ data }) => {
             {Object.entries(data.roleDistribution).map(([role, count]) => (
               <div key={role} className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-700 rounded-lg">
                 <div className="flex items-center">
-                  <div className="w-3 h-3 bg-purple-500 rounded-full mr-3"></div>
+                  <div className="w-3 h-3 bg-blue-500 rounded-full mr-3"></div>
                   <span className="font-medium text-gray-900 dark:text-white capitalize">{role}</span>
                 </div>
                 <span className="text-lg font-bold text-gray-900 dark:text-white">{count.toLocaleString()}</span>
@@ -456,23 +467,36 @@ const GELEPDashboard = () => {
           <div className="p-6">
             {activeTab === 'overview' && <OverviewTab data={mockData} />}
             
-            {activeTab === 'mentorship' && (
+            {activeTab === 'GELEPMentorship' && (
               <div className="text-center py-20">
-                <Users className="h-16 w-16 text-purple-500 mx-auto mb-4" />
+                <GELEPMentorshipPlat/>
+                {/* <Users className="h-16 w-16 text-blue-500 mx-auto mb-4" />
                 <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">Mentorship Hub</h2>
-                <p className="text-gray-600 dark:text-gray-400">Connect with mentors and mentees, manage relationships</p>
+                <p className="text-gray-600 dark:text-gray-400">Connect with mentors and mentees, manage relationships</p> */}
               </div>
             )}
             
-            {activeTab === 'events' && (
+            {/* {activeTab === 'events' && (
               <div className="text-center py-20">
                 <Calendar className="h-16 w-16 text-green-500 mx-auto mb-4" />
                 <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">Events & Workshops</h2>
                 <p className="text-gray-600 dark:text-gray-400">Discover and manage leadership development events</p>
               </div>
             )}
+             */}
             
-            
+
+       {activeTab === 'eventsCalendar' && (
+              <div className="text-center py-20">
+                <EventsCalendar/>
+                {/* <Calendar className="h-16 w-16 text-green-500 mx-auto mb-4" />
+                <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">Events & Workshops</h2>
+                <p className="text-gray-600 dark:text-gray-400">Discover and manage leadership development events</p> */}
+              </div>
+            )}
+                    
+
+
 
         {activeTab === 'jobBoard' && (
             <div className="text-center py-20">
@@ -491,19 +515,21 @@ const GELEPDashboard = () => {
               </div>
             )} */}
 
-            {activeTab === 'training' && (
+            {activeTab === 'leadershipTraining' && (
               <div className="text-center py-20">
-                <BookOpen className="h-16 w-16 text-pink-500 mx-auto mb-4" />
+                {/* <BookOpen className="h-16 w-16 text-blue-500 mx-auto mb-4" />
                 <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">Training Courses</h2>
-                <p className="text-gray-600 dark:text-gray-400">Access leadership development courses and certifications</p>
+                <p className="text-gray-600 dark:text-gray-400">Access leadership development courses and certifications</p> */}
+                <LeadershipTrainingDevelopment/>
               </div>
             )}
             
-            {activeTab === 'forums' && (
+            {activeTab === 'GELEPPlatform' && (
               <div className="text-center py-20">
-                <MessageSquare className="h-16 w-16 text-orange-500 mx-auto mb-4" />
+                {/* <MessageSquare className="h-16 w-16 text-orange-500 mx-auto mb-4" />
                 <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">Community Forums</h2>
-                <p className="text-gray-600 dark:text-gray-400">Engage in discussions about leadership and career growth</p>
+                <p className="text-gray-600 dark:text-gray-400">Engage in discussions about leadership and career growth</p> */}
+              <GELEPPlatform/>
               </div>
             )}
             
@@ -517,7 +543,7 @@ const GELEPDashboard = () => {
             
             {activeTab === 'profile' && (
               <div className="text-center py-20">
-                <User className="h-16 w-16 text-purple-500 mx-auto mb-4" />
+                <User className="h-16 w-16 text-blue-500 mx-auto mb-4" />
                 <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">My Profile</h2>
                 <p className="text-gray-600 dark:text-gray-400">Manage your profile and account settings</p>
               </div>

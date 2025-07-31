@@ -180,7 +180,7 @@ export const DiscussionForums = () => {
             disabled={!currentUser}
             className={`px-4 py-2 rounded-lg flex items-center gap-2 ${
               currentUser 
-                ? 'bg-purple-600 text-white hover:bg-purple-700' 
+                ? 'bg-blue-600 text-white hover:bg-blue-700' 
                 : 'bg-gray-300 text-gray-500 cursor-not-allowed'
             }`}
             title={!currentUser ? 'Please log in to create topics' : 'Create new topic'}
@@ -197,7 +197,7 @@ export const DiscussionForums = () => {
               onClick={() => setSelectedCategory(category.id)}
               className={`px-3 py-1 rounded-full text-sm transition-colors ${
                 selectedCategory === category.id
-                  ? 'bg-purple-100 text-purple-700'
+                  ? 'bg-blue-100 text-blue-700'
                   : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
               }`}
             >
@@ -235,7 +235,7 @@ export const DiscussionForums = () => {
                 type="text"
                 value={newForum.title}
                 onChange={(e) => setNewForum(prev => ({ ...prev, title: e.target.value }))}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 placeholder="Enter topic title..."
                 maxLength={100}
                 required
@@ -253,7 +253,7 @@ export const DiscussionForums = () => {
               <select
                 value={newForum.category}
                 onChange={(e) => setNewForum(prev => ({ ...prev, category: e.target.value }))}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 disabled={submitting}
               >
                 {categories.slice(1).map((category) => (
@@ -271,7 +271,7 @@ export const DiscussionForums = () => {
               <textarea
                 value={newForum.content}
                 onChange={(e) => setNewForum(prev => ({ ...prev, content: e.target.value }))}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 rows={4}
                 placeholder="Share your thoughts, ask questions, or start a discussion..."
                 maxLength={500}
@@ -291,7 +291,7 @@ export const DiscussionForums = () => {
                 className={`px-4 py-2 rounded-lg flex items-center gap-2 ${
                   submitting 
                     ? 'bg-gray-400 cursor-not-allowed' 
-                    : 'bg-purple-600 hover:bg-purple-700'
+                    : 'bg-blue-600 hover:bg-blue-700'
                 } text-white`}
               >
                 {submitting && <Loader className="w-4 h-4 animate-spin" />}
@@ -318,7 +318,7 @@ export const DiscussionForums = () => {
       <div className="p-6">
         {loading ? (
           <div className="flex items-center justify-center py-8">
-            <Loader className="w-6 h-6 animate-spin text-purple-600" />
+            <Loader className="w-6 h-6 animate-spin text-blue-600" />
             <span className="ml-2 text-gray-600">Loading forums...</span>
           </div>
         ) : forums.length === 0 ? (
@@ -392,10 +392,10 @@ export const DiscussionForums = () => {
                       >
                         <Heart className={`w-4 h-4 ${forum.isLiked ? 'fill-current' : ''}`} />
                       </button>
-                      <button className="p-2 text-gray-400 hover:text-purple-600 hover:bg-purple-50 rounded transition-colors">
+                      <button className="p-2 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded transition-colors">
                         <Share2 className="w-4 h-4" />
                       </button>
-                      <button className="px-3 py-1 text-sm bg-purple-100 text-purple-700 rounded hover:bg-purple-200 transition-colors">
+                      <button className="px-3 py-1 text-sm bg-blue-100 text-blue-700 rounded hover:bg-blue-200 transition-colors">
                         Join Discussion
                       </button>
                     </div>
