@@ -313,7 +313,7 @@ const UserForm = ({
             {isEditMode ? (
               <Edit className="w-5 h-5 mr-2 text-blue-500" />
             ) : (
-              <UserPlus className="w-5 h-5 mr-2 text-green-500" />
+              <UserPlus className="w-5 h-5 mr-2 text-blue-500" />
             )}
             <span className="hidden sm:inline">
               {isEditMode ? 'Edit User' : 'Create New User'}
@@ -501,7 +501,7 @@ const UserForm = ({
               <select
                 value={formData.userRole}
                 onChange={(e) => handleInputChange('userRole', e.target.value)}
-                className={`w-full px-3 py-2 text-sm sm:text-base border rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 transition-colors ${
+                className={`w-full px-3 py-2 text-sm sm:text-base border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors ${
                   validationErrors.userRole ? 'border-red-500 bg-red-50' : 'border-gray-300'
                 }`}
                 disabled={isSubmitting}
@@ -528,7 +528,7 @@ const UserForm = ({
               <select
                 value={formData.gender}
                 onChange={(e) => handleInputChange('gender', e.target.value)}
-                className={`w-full px-3 py-2 text-sm sm:text-base border rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 transition-colors ${
+                className={`w-full px-3 py-2 text-sm sm:text-base border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors ${
                   validationErrors.gender ? 'border-red-500 bg-red-50' : 'border-gray-300'
                 }`}
                 disabled={isSubmitting}
@@ -557,7 +557,7 @@ const UserForm = ({
               <select
                 value={formData.countryCode}
                 onChange={(e) => handleInputChange('countryCode', e.target.value)}
-                className="px-2 py-2 text-sm sm:text-base border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 bg-white min-w-[130px]"
+                className="px-2 py-2 text-sm sm:text-base border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white min-w-[130px]"
                 disabled={isSubmitting}
               >
                 {countries.map(({ dial_code, code, flag, name }) => (
@@ -570,7 +570,7 @@ const UserForm = ({
                 type="tel"
                 value={formData.telephone}
                 onChange={(e) => handleInputChange('telephone', e.target.value.replace(/\D/g, ''))}
-                className={`flex-1 px-3 py-2 text-sm sm:text-base border rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 transition-colors ${
+                className={`flex-1 px-3 py-2 text-sm sm:text-base border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors ${
                   validationErrors.telephone ? 'border-red-500 bg-red-50' : 'border-gray-300'
                 }`}
                 placeholder="788123456"
@@ -608,7 +608,7 @@ const UserForm = ({
             <button
               onClick={handleSubmit}
               disabled={isSubmitting}
-              className="flex-1 px-4 py-2 text-sm sm:text-base bg-green-600 hover:bg-green-700 disabled:bg-green-400 text-white rounded-lg transition-colors flex items-center justify-center"
+              className="flex-1 px-4 py-2 text-sm sm:text-base bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 text-white rounded-lg transition-colors flex items-center justify-center"
             >
               {isSubmitting ? (
                 <>

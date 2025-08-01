@@ -5,6 +5,7 @@ import {
   AlertTriangle, Server, Database, Cpu, Clock, XCircle, Eye,
   Briefcase, GraduationCap, HandHeart, MessageCircle, Award
 } from 'lucide-react';
+import UserGrowthAnalytics from './UserGrowthAnalytics';
 
 const DashboardMain = () => {
   const [showAllActivities, setShowAllActivities] = useState(false);
@@ -382,7 +383,7 @@ const DashboardMain = () => {
         </div>
 
         {/* Quick Actions */}
-        <div className="mb-4 sm:mb-6 lg:mb-8">
+        {/* <div className="mb-4 sm:mb-6 lg:mb-8">
           <h3 className="text-sm sm:text-base lg:text-lg font-semibold text-gray-800 mb-3 sm:mb-4">Quick Actions</h3>
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-2 sm:gap-3 lg:gap-4">
             {quickActions.map((action, index) => (
@@ -395,7 +396,7 @@ const DashboardMain = () => {
               </button>
             ))}
           </div>
-        </div>
+        </div> */}
 
         {/* Recent Activity and System Health */}
         <div className="grid grid-cols-1 xl:grid-cols-3 gap-4 sm:gap-6">
@@ -564,9 +565,9 @@ const DashboardMain = () => {
         </div>
 
         {/* Detailed System Metrics */}
-        {healthData && healthData.details && (
+        {/* Server Metrics */}
+        {/* {healthData && healthData.details && (
           <div className="mt-4 sm:mt-6 lg:mt-8 grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-3 sm:gap-4 lg:gap-6">
-            {/* Server Metrics */}
             <div className="bg-white p-3 sm:p-4 lg:p-6 rounded-xl shadow-sm border border-gray-200">
               <div className="flex items-center mb-3 sm:mb-4">
                 <Server size={14} className="text-blue-600 mr-2 flex-shrink-0 sm:w-4 sm:h-4 lg:w-5 lg:h-5" />
@@ -598,10 +599,10 @@ const DashboardMain = () => {
                   </span>
                 </div>
               </div>
-            </div>
+            </div> */}
 
             {/* Database Metrics */}
-            <div className="bg-white p-3 sm:p-4 lg:p-6 rounded-xl shadow-sm border border-gray-200">
+            {/* <div className="bg-white p-3 sm:p-4 lg:p-6 rounded-xl shadow-sm border border-gray-200">
               <div className="flex items-center mb-3 sm:mb-4">
                 <Database size={14} className="text-green-600 mr-2 flex-shrink-0 sm:w-4 sm:h-4 lg:w-5 lg:h-5" />
                 <h3 className="text-xs sm:text-sm lg:text-base font-semibold text-gray-800 truncate">Database Metrics</h3>
@@ -626,10 +627,10 @@ const DashboardMain = () => {
                   </span>
                 </div>
               </div>
-            </div>
+            </div> */}
 
             {/* System Metrics */}
-            <div className="bg-white p-3 sm:p-4 lg:p-6 rounded-xl shadow-sm border border-gray-200">
+            {/* <div className="bg-white p-3 sm:p-4 lg:p-6 rounded-xl shadow-sm border border-gray-200">
               <div className="flex items-center mb-3 sm:mb-4">
                 <Cpu size={14} className="text-purple-600 mr-2 flex-shrink-0 sm:w-4 sm:h-4 lg:w-5 lg:h-5" />
                 <h3 className="text-xs sm:text-sm lg:text-base font-semibold text-gray-800 truncate">System Metrics</h3>
@@ -656,7 +657,9 @@ const DashboardMain = () => {
               </div>
             </div>
           </div>
-        )}
+        )} */}
+
+        <UserGrowthAnalytics/>
 
         {/* Last Updated Timestamp */}
         {healthData && healthData.details && (

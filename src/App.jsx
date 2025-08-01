@@ -422,6 +422,7 @@ import JobApplicationsPage from './components/JobBoardOpportunites/JobApplicatio
 import GELEPDashboard from './components/UserDashboard/GELEPDashboard'
 import { EventsCalendar } from './components/ProfessionalNetworking/EventsCalendar.jsx'
 import UserReportDownloader from './components/Report/UserReportssDashboard';
+import MentorshipProgram from './components/User/MentorshipProgram';
 
 
 // Dashboard Page Components
@@ -678,6 +679,10 @@ function App() {
         {
             path: "/training-courses",
             element: <ModernTrainingCourseManagement />,
+        },
+        {
+            path: "/one",
+            element: <MentorshipProgram/>
         },
         
         // Authentication Routes

@@ -190,35 +190,58 @@ const SignUp = () => {
   };
 
   // Handle form submission
-  const handleSubmit = async (e) => {
-    e.preventDefault();
+const handleSubmit = async (e) => {
+  e.preventDefault();
+  
+  const validationErrors = validateFormData();
+  
+  if (Object.keys(validationErrors).length > 0) {
+    setErrors(validationErrors);
+    setSubmitStatus('error');
+    setSubmitMessage('Please fix the errors above and try again.');
+    return;
+  }
+  
+  setIsSubmitting(true);
+  setErrors({});
+  setSubmitStatus(null);
+  setSubmitMessage('');
+  
+  try {
+    // Prepare data for API
+    const submitData = {
+      firstName: formData.firstName.trim(),
+      lastName: formData.lastName.trim(),
+      email: formData.email.trim().toLowerCase(),
+      password: formData.password,
+      confirmPassword: formData.confirmPassword, 
+      userRole: formData.userRole,
+      gender: formData.gender,
+      telephone: selectedCountry.dial_code + formData.telephone.trim()
+    };
     
-    const validationErrors = validateFormData();
+    console.log('📤 Submitting registration data:', {
+      ...submitData,
+      password: '***hidden***' // Don't log the actual password
+    });
     
-    if (Object.keys(validationErrors).length > 0) {
-      setErrors(validationErrors);
-      setSubmitStatus('error');
-      setSubmitMessage('Please fix the errors above and try again.');
-      return;
-    }
+    // Make API call to register user
+    const response = await fetch('http://localhost:3000/api/v1/auth/', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(submitData)
+    });
     
-    setIsSubmitting(true);
-    setErrors({});
-    setSubmitStatus(null);
-    setSubmitMessage('');
+    const data = await response.json();
+    console.log('📥 Registration response:', data);
     
-    try {
-      // Prepare data for API
-      const submitData = {
-        ...formData,
-        telephone: selectedCountry.dial_code + formData.telephone
-      };
-      
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 2000));
-      
+    if (response.ok && data.success) {
       setSubmitStatus('success');
-      setSubmitMessage('Registration successful! Please check your email for welcome message.');
+      setSubmitMessage(data.message || 'Registration successful! Please check your email for welcome message.');
+      
+      console.log('✅ Registration successful:', data.user);
       
       // Reset form after successful registration
       setTimeout(() => {
@@ -232,21 +255,47 @@ const SignUp = () => {
           gender: '',
           telephone: ''
         });
+        setSelectedCountry(countries.find(country => country.code === "RW")); // Reset to Rwanda
         setErrors({});
         setSubmitStatus(null);
         setSubmitMessage('');
-        // Redirect to login or dashboard
+        
+        // Redirect to login page
         window.location.href = '/login';
       }, 3000);
-
-    } catch (error) {
+      
+    } else {
+      // Handle API error response
       setSubmitStatus('error');
-      setSubmitMessage(error.message || 'Registration failed. Please try again.');
-      console.error('Registration error:', error);
-    } finally {
-      setIsSubmitting(false);
+      setSubmitMessage(data.error || 'Registration failed. Please try again.');
+      console.error('❌ Registration failed:', data.error);
+      
+      // Handle specific validation errors from the server
+      if (data.error && typeof data.error === 'string') {
+        if (data.error.toLowerCase().includes('email')) {
+          setErrors({ email: data.error });
+        } else if (data.error.toLowerCase().includes('telephone')) {
+          setErrors({ telephone: data.error });
+        }
+      }
     }
-  };
+    
+  } catch (error) {
+    console.error('❌ Registration network error:', error);
+    setSubmitStatus('error');
+    
+    // Handle different types of network errors
+    if (error.name === 'TypeError' && error.message.includes('fetch')) {
+      setSubmitMessage('Unable to connect to server. Please check your internet connection and try again.');
+    } else if (error.name === 'AbortError') {
+      setSubmitMessage('Request timed out. Please try again.');
+    } else {
+      setSubmitMessage('An unexpected error occurred. Please try again later.');
+    }
+  } finally {
+    setIsSubmitting(false);
+  }
+};
 
   // User roles options
   const userRoles = [

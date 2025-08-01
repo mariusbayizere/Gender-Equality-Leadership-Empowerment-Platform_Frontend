@@ -460,7 +460,7 @@ const GELEPPlatform = () => {
           <div className="flex items-center justify-between h-14 sm:h-16">
             {/* Logo and Title */}
             <div className="flex items-center gap-2 sm:gap-3 min-w-0 flex-1">
-              <div className="w-8 h-8 sm:w-10 sm:h-10 bg-gradient-to-r from-blue-600 to-purple-600 rounded-lg flex items-center justify-center flex-shrink-0">
+              <div className="w-8 h-8 sm:w-10 sm:h-10 bg-gradient-to-r from-blue-600 to-blue-600 rounded-lg flex items-center justify-center flex-shrink-0">
                 <span className="text-white font-bold text-sm sm:text-lg">G</span>
               </div>
               <div className="min-w-0">
@@ -470,7 +470,7 @@ const GELEPPlatform = () => {
             </div>
             
             {/* Desktop Actions */}
-            <div className="hidden sm:flex items-center gap-4">
+            {/* <div className="hidden sm:flex items-center gap-4">
               <button className="relative p-2 text-gray-400 hover:text-gray-600">
                 <Bell className="w-6 h-6" />
                 {notifications > 0 && (
@@ -488,10 +488,10 @@ const GELEPPlatform = () => {
                 />
                 <span className="text-sm font-medium text-gray-700">Welcome back!</span>
               </div>
-            </div>
+            </div> */}
 
             {/* Mobile Actions */}
-            <div className="flex sm:hidden items-center gap-2">
+            {/* <div className="flex sm:hidden items-center gap-2">
               <button className="relative p-2 text-gray-400 hover:text-gray-600">
                 <Bell className="w-5 h-5" />
                 {notifications > 0 && (
@@ -505,7 +505,7 @@ const GELEPPlatform = () => {
                 name="Current User" 
                 size="w-8 h-8" 
               />
-            </div>
+            </div> */}
           </div>
         </div>
       </header>

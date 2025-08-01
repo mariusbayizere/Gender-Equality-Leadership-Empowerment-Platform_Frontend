@@ -269,7 +269,7 @@ const ModernUserManagement = () => {
               <div className="flex items-center space-x-3 pt-3">
                 <button
                 onClick={() => handleShowEdit(user)}
-                className="flex-1 bg-green-600 bg-opacity-1 hover:bg-opacity-30 text-white px-4 py-2.5 rounded-lg flex items-center justify-center gap-2 text-sm font-medium transition-all duration-200 backdrop-blur-sm disabled:opacity-50 disabled:cursor-not-allowed"
+                className="flex-1 bg-blue-600 bg-opacity-1 hover:bg-opacity-30 text-white px-4 py-2.5 rounded-lg flex items-center justify-center gap-2 text-sm font-medium transition-all duration-200 backdrop-blur-sm disabled:opacity-50 disabled:cursor-not-allowed"
                 title="Edit"
               >
                 <Edit className="w-4 h-4" />
@@ -307,7 +307,7 @@ const ModernUserManagement = () => {
               onClick={() => setCurrentPage(pageNum)}
               className={`px-4 py-2 text-sm rounded-lg border transition-colors ${
                 currentPage === pageNum
-                  ? 'bg-green-500 text-white border-green-500 shadow-lg'
+                  ? 'bg-blue-500 text-white border-blue-500 shadow-lg'
                   : 'text-gray-600 hover:text-gray-800 hover:bg-white border-gray-200 bg-white'
               }`}
             >
@@ -322,7 +322,7 @@ const ModernUserManagement = () => {
               onClick={() => setCurrentPage(totalPages)}
               className={`px-4 py-2 text-sm rounded-lg border transition-colors ${
                 currentPage === totalPages
-                  ? 'bg-green-500 text-white border-green-500 shadow-lg'
+                  ? 'bg-blue-500 text-white border-blue-500 shadow-lg'
                   : 'text-gray-600 hover:text-gray-800 hover:bg-white border-gray-200 bg-white'
               }`}
             >
@@ -338,7 +338,7 @@ const ModernUserManagement = () => {
   if (loading) {
     return (
       <div className="flex items-center justify-center h-64 px-4">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-green-500"></div>
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500"></div>
         <span className="ml-2 text-gray-600 text-sm sm:text-base">Loading users...</span>
       </div>
     );
@@ -353,7 +353,7 @@ const ModernUserManagement = () => {
             <div className="flex items-center gap-4">
               <button 
                 onClick={handleShowCreate}
-                className="bg-green-500 hover:bg-green-600 text-white px-4 py-2.5 rounded-xl flex items-center gap-2 transition-all duration-200 shadow-sm hover:shadow-md font-medium"
+                className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2.5 rounded-xl flex items-center gap-2 transition-all duration-200 shadow-sm hover:shadow-md font-medium"
               >
                 <UserPlus className="w-4 h-4" />
                 Create User
@@ -367,13 +367,13 @@ const ModernUserManagement = () => {
                   placeholder="Search users..."
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
-                  className="pl-10 pr-4 py-2.5 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent w-64 bg-white shadow-sm"
+                  className="pl-10 pr-4 py-2.5 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent w-64 bg-white shadow-sm"
                 />
               </div>
-              <button onClick={fetchUsers} className="p-2.5 text-gray-600 hover:text-gray-800 bg-green-500 hover:bg-green-600 text-white rounded-xl transition-all duration-200 shadow-sm">
+              <button onClick={fetchUsers} className="p-2.5 text-gray-600 hover:text-gray-800 bg-blue-500 hover:bg-blue-600 text-white rounded-xl transition-all duration-200 shadow-sm">
                 <RefreshCw className="w-4 h-4" />
               </button>
-              <button className="p-2.5 text-gray-600 hover:text-gray-800 bg-green-500 hover:bg-green-600 text-white rounded-xl transition-all duration-200 shadow-sm">
+              <button className="p-2.5 text-gray-600 hover:text-gray-800 bg-blue-500 hover:bg-blue-600 text-white rounded-xl transition-all duration-200 shadow-sm">
                 <Grid3X3 className="w-4 h-4" />
               </button>
             </div>
@@ -407,7 +407,7 @@ const ModernUserManagement = () => {
           <div className="hidden lg:flex items-center justify-between bg-white rounded-lg shadow-sm p-4 border border-gray-200">
             <button 
               onClick={handleShowCreate}
-              className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg text-sm flex items-center space-x-2 transition-colors shadow-sm"
+              className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm flex items-center space-x-2 transition-colors shadow-sm"
             >
               <UserPlus className="w-4 h-4" />
               <span>Create User</span>
@@ -420,17 +420,17 @@ const ModernUserManagement = () => {
                   placeholder="Search users..."
                   value={searchTerm}
                   onChange={e => setSearchTerm(e.target.value)}
-                  className="bg-gray-50 text-gray-700 placeholder-gray-500 pl-10 pr-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500 w-64"
+                  className="bg-gray-50 text-gray-700 placeholder-gray-500 pl-10 pr-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 w-64"
                 />
               </div>
-              <button onClick={fetchUsers} className="bg-green-600 hover:bg-green-700 text-white p-2 rounded-lg shadow-sm transition-colors" title="Refresh">
+              <button onClick={fetchUsers} className="bg-blue-600 hover:bg-blue-700 text-white p-2 rounded-lg shadow-sm transition-colors" title="Refresh">
                 <RefreshCw className="w-4 h-4" />
               </button>
-              <button onClick={() => setViewMode(viewMode === 'table' ? 'cards' : 'table')} className="bg-green-600 hover:bg-green-700 text-white p-2 rounded-lg shadow-sm transition-colors" title={viewMode === 'table' ? 'Card View' : 'Table View'}>
+              <button onClick={() => setViewMode(viewMode === 'table' ? 'cards' : 'table')} className="bg-blue-600 hover:bg-blue-700 text-white p-2 rounded-lg shadow-sm transition-colors" title={viewMode === 'table' ? 'Card View' : 'Table View'}>
                 <List className="w-4 h-4" />
               </button>
               <div className="relative column-toggle-container">
-                <button onClick={() => setShowColumnToggle(!showColumnToggle)} className="bg-green-600 hover:bg-green-700 text-white p-2 rounded-lg shadow-sm transition-colors" title="Column Visibility">
+                <button onClick={() => setShowColumnToggle(!showColumnToggle)} className="bg-blue-600 hover:bg-blue-700 text-white p-2 rounded-lg shadow-sm transition-colors" title="Column Visibility">
                   <Grid3X3 className="w-4 h-4" />
                 </button>
                 {showColumnToggle && (
@@ -441,7 +441,7 @@ const ModernUserManagement = () => {
                           type="checkbox"
                           checked={visibleColumns[column.key]}
                           onChange={() => toggleColumn(column.key)}
-                          className="w-4 h-4 text-green-600 bg-gray-100 border-gray-300 rounded focus:ring-green-500"
+                          className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500"
                         />
                         <span className="text-sm">{column.label}</span>
                       </label>
@@ -456,13 +456,13 @@ const ModernUserManagement = () => {
             <div className="flex items-center justify-between mb-3">
               <button 
                 onClick={handleShowCreate}
-                className="bg-green-600 hover:bg-green-700 text-white px-3 py-2 rounded-lg text-sm flex items-center space-x-2 transition-colors"
+                className="bg-blue-600 hover:bg-blue-700 text-white px-3 py-2 rounded-lg text-sm flex items-center space-x-2 transition-colors"
               >
                 <UserPlus className="w-4 h-4" />
                 <span className="hidden sm:inline">Create User</span>
                 <span className="sm:hidden">Create</span>
               </button>
-              <button onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)} className="bg-green-600 hover:bg-green-700 text-white p-2 rounded-lg">
+              <button onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)} className="bg-blue-600 hover:bg-blue-700 text-white p-2 rounded-lg">
                 {isMobileMenuOpen ? <X className="w-4 h-4" /> : <Menu className="w-4 h-4" />}
               </button>
             </div>
@@ -473,21 +473,21 @@ const ModernUserManagement = () => {
                 placeholder="Search users..."
                 value={searchTerm}
                 onChange={e => setSearchTerm(e.target.value)}
-                className="w-full bg-gray-50 text-gray-700 placeholder-gray-500 pl-10 pr-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500"
+                className="w-full bg-gray-50 text-gray-700 placeholder-gray-500 pl-10 pr-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
               />
             </div>
             {isMobileMenuOpen && (
               <div className="mt-3 mobile-menu-container bg-gray-50 rounded-lg p-3 space-y-3 border border-gray-200">
                 <div className="flex flex-wrap gap-2">
-                  <button onClick={fetchUsers} className="flex items-center space-x-2 bg-green-600 hover:bg-green-700 text-white px-3 py-2 rounded text-sm transition-colors">
+                  <button onClick={fetchUsers} className="flex items-center space-x-2 bg-blue-600 hover:bg-blue-700 text-white px-3 py-2 rounded text-sm transition-colors">
                     <RefreshCw className="w-4 h-4" />
                     <span>Refresh</span>
                   </button>
-                  <button onClick={() => setViewMode(viewMode === 'table' ? 'cards' : 'table')} className="flex items-center space-x-2 bg-green-600 hover:bg-green-700 text-white px-3 py-2 rounded text-sm transition-colors">
+                  <button onClick={() => setViewMode(viewMode === 'table' ? 'cards' : 'table')} className="flex items-center space-x-2 bg-blue-600 hover:bg-blue-700 text-white px-3 py-2 rounded text-sm transition-colors">
                     <List className="w-4 h-4" />
                     <span>{viewMode === 'table' ? 'Cards' : 'Table'}</span>
                   </button>
-                  <button onClick={() => setShowColumnToggle(!showColumnToggle)} className="flex items-center space-x-2 bg-green-600 hover:bg-green-700 text-white px-3 py-2 rounded text-sm transition-colors">
+                  <button onClick={() => setShowColumnToggle(!showColumnToggle)} className="flex items-center space-x-2 bg-blue-600 hover:bg-blue-700 text-white px-3 py-2 rounded text-sm transition-colors">
                     <Grid3X3 className="w-4 h-4" />
                     <span>Columns</span>
                   </button>
@@ -502,7 +502,7 @@ const ModernUserManagement = () => {
                             type="checkbox"
                             checked={visibleColumns[column.key]}
                             onChange={() => toggleColumn(column.key)}
-                            className="w-4 h-4 text-green-600 bg-gray-100 border-gray-300 rounded focus:ring-green-500"
+                            className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500"
                           />
                           <span>{column.label}</span>
                         </label>
@@ -539,7 +539,7 @@ const ModernUserManagement = () => {
               <p className="text-gray-500">Try searching with different keywords or clear the search to see all users.</p>
 <button 
                 onClick={() => setSearchTerm('')}
-                className="mt-4 bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-lg transition-colors"
+                className="mt-4 bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg transition-colors"
               >
                 Clear Search
               </button>
@@ -622,7 +622,7 @@ const ModernUserManagement = () => {
                         {visibleColumns.name && (
                           <td className="px-6 py-4 whitespace-nowrap">
                             <div className="flex items-center space-x-3">
-                              <div className="w-8 h-8 bg-gradient-to-r from-green-500 to-green-600 rounded-full flex items-center justify-center shadow-sm">
+                              <div className="w-8 h-8 bg-gradient-to-r from-blue-500 to-blue-600 rounded-full flex items-center justify-center shadow-sm">
                                 <User className="w-4 h-4 text-white" />
                               </div>
                               <div>
@@ -669,7 +669,7 @@ const ModernUserManagement = () => {
                             <div className="flex items-center space-x-2">
                               <button
                                 onClick={() => handleShowEdit(user)}
-                                className="bg-green-500 hover:bg-green-600 text-white p-2 rounded-lg transition-colors shadow-sm"
+                                className="bg-blue-500 hover:bg-blue-600 text-white p-2 rounded-lg transition-colors shadow-sm"
                                 title="Edit User"
                               >
                                 <Edit className="w-4 h-4" />
