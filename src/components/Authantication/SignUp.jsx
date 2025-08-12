@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Eye, EyeOff, Mail, Shield, Lock, AlertCircle, CheckCircle, RefreshCw, User, Phone, ChevronDown } from 'lucide-react';
+import { Eye, EyeOff, Mail, Shield, Lock, AlertCircle, CheckCircle, RefreshCw, User, Phone, ChevronDown, Briefcase } from 'lucide-react';
 import { countries } from '../constant/countries';
 
 const SignUp = () => {
@@ -11,6 +11,7 @@ const SignUp = () => {
     confirmPassword: '',
     userRole: '',
     gender: '',
+    field: '',
     telephone: ''
   });
   
@@ -25,6 +26,7 @@ const SignUp = () => {
   const [showCountryDropdown, setShowCountryDropdown] = useState(false);
   const [showUserRoleDropdown, setShowUserRoleDropdown] = useState(false);
   const [showGenderDropdown, setShowGenderDropdown] = useState(false);
+  const [showFieldDropdown, setShowFieldDropdown] = useState(false);
 
   // Load countries data
   useEffect(() => {
@@ -46,13 +48,16 @@ const SignUp = () => {
       if (showGenderDropdown && !event.target.closest('.gender-dropdown-container')) {
         setShowGenderDropdown(false);
       }
+      if (showFieldDropdown && !event.target.closest('.field-dropdown-container')) {
+        setShowFieldDropdown(false);
+      }
     };
 
     document.addEventListener('mousedown', handleClickOutside);
     return () => {
       document.removeEventListener('mousedown', handleClickOutside);
     };
-  }, [showCountryDropdown, showUserRoleDropdown, showGenderDropdown]);
+  }, [showCountryDropdown, showUserRoleDropdown, showGenderDropdown, showFieldDropdown]);
 
   // Client-side validation function
   const validateFormData = () => {
@@ -101,6 +106,11 @@ const SignUp = () => {
     // Gender validation
     if (!formData.gender) {
       newErrors.gender = 'Please select your gender';
+    }
+
+    // Field validation
+    if (!formData.field) {
+      newErrors.field = 'Please select your field';
     }
 
     // Telephone validation
@@ -189,6 +199,23 @@ const SignUp = () => {
     }
   };
 
+  // Handle field selection
+  const handleFieldSelect = (field) => {
+    setFormData(prev => ({
+      ...prev,
+      field: field
+    }));
+    setShowFieldDropdown(false);
+    
+    // Clear error when field changes
+    if (errors.field) {
+      setErrors(prev => ({
+        ...prev,
+        field: ''
+      }));
+    }
+  };
+
   // Handle form submission
 const handleSubmit = async (e) => {
   e.preventDefault();
@@ -217,6 +244,7 @@ const handleSubmit = async (e) => {
       confirmPassword: formData.confirmPassword, 
       userRole: formData.userRole,
       gender: formData.gender,
+      field: formData.field,
       telephone: selectedCountry.dial_code + formData.telephone.trim()
     };
     
@@ -253,6 +281,7 @@ const handleSubmit = async (e) => {
           confirmPassword: '',
           userRole: '',
           gender: '',
+          field: '',
           telephone: ''
         });
         setSelectedCountry(countries.find(country => country.code === "RW")); // Reset to Rwanda
@@ -310,6 +339,26 @@ const handleSubmit = async (e) => {
     { value: 'female', label: 'Female' },
     { value: 'other', label: 'Other' },
     { value: 'prefer_not_to_say', label: 'Prefer not to say' }
+  ];
+
+  // Field options
+  const fields = [
+    { value: 'technology', label: 'Technology' },
+    { value: 'business', label: 'Business' },
+    { value: 'healthcare', label: 'Healthcare' },
+    { value: 'education', label: 'Education' },
+    { value: 'engineering', label: 'Engineering' },
+    { value: 'finance', label: 'Finance' },
+    { value: 'marketing', label: 'Marketing' },
+    { value: 'design', label: 'Design' },
+    { value: 'science', label: 'Science' },
+    { value: 'arts', label: 'Arts' },
+    { value: 'law', label: 'Law' },
+    { value: 'media', label: 'Media' },
+    { value: 'agriculture', label: 'Agriculture' },
+    { value: 'manufacturing', label: 'Manufacturing' },
+    { value: 'consulting', label: 'Consulting' },
+    { value: 'other', label: 'Other' }
   ];
 
   return (
@@ -403,7 +452,7 @@ const handleSubmit = async (e) => {
             </div>
           </div>
 
-          {/* Email Input */}
+          {/* Email */}
           <div>
             <label htmlFor="email" className="flex items-center text-xs sm:text-sm font-medium text-gray-700 mb-1 sm:mb-2">
               <Mail className="w-3 h-3 sm:w-4 sm:h-4 mr-1" />
@@ -418,7 +467,7 @@ const handleSubmit = async (e) => {
               className={`w-full px-3 sm:px-4 py-2 sm:py-2 text-sm sm:text-base border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors ${
                 errors.email ? 'border-red-500 bg-red-50' : 'border-gray-300'
               }`}
-              placeholder="Enter your Email Adress"
+              placeholder="Enter your email"
               disabled={isSubmitting}
             />
             {errors.email && (
@@ -429,112 +478,110 @@ const handleSubmit = async (e) => {
             )}
           </div>
 
-          {/* Password Input */}
-          <div>
-            <label htmlFor="password" className="flex items-center text-xs sm:text-sm font-medium text-gray-700 mb-1 sm:mb-2">
-              <Lock className="w-3 h-3 sm:w-4 sm:h-4 mr-1" />
-              Password <span className="text-red-500 ml-1">*</span>
-            </label>
-            <div className="relative">
-              <input
-                type={showPassword ? 'text' : 'password'}
-                id="password"
-                name="password"
-                value={formData.password}
-                onChange={handleChange}
-                className={`w-full px-3 sm:px-4 py-2 sm:py-2 pr-10 sm:pr-12 text-sm sm:text-base border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors ${
-                  errors.password ? 'border-red-500 bg-red-50' : 'border-gray-300'
-                }`}
-                placeholder="Enter Password"
-                disabled={isSubmitting}
-              />
-              <button
-                type="button"
-                onClick={() => setShowPassword(!showPassword)}
-                className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
-                disabled={isSubmitting}
-              >
-                {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-              </button>
-            </div>
-            {errors.password && (
-              <div className="flex items-center mt-1 text-red-600 text-xs">
-                <AlertCircle className="w-3 h-3 mr-1 flex-shrink-0" />
-                {errors.password}
+          {/* Password & Confirm Password */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
+            <div>
+              <label htmlFor="password" className="flex items-center text-xs sm:text-sm font-medium text-gray-700 mb-1 sm:mb-2">
+                <Lock className="w-3 h-3 sm:w-4 sm:h-4 mr-1" />
+                Password <span className="text-red-500 ml-1">*</span>
+              </label>
+              <div className="relative">
+                <input
+                  type={showPassword ? "text" : "password"}
+                  id="password"
+                  name="password"
+                  value={formData.password}
+                  onChange={handleChange}
+                  className={`w-full px-3 sm:px-4 py-2 sm:py-2 text-sm sm:text-base border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors pr-10 ${
+                    errors.password ? 'border-red-500 bg-red-50' : 'border-gray-300'
+                  }`}
+                  placeholder="Enter password"
+                  disabled={isSubmitting}
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600 focus:outline-none"
+                  disabled={isSubmitting}
+                >
+                  {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                </button>
               </div>
-            )}
-          </div>
+              {errors.password && (
+                <div className="flex items-center mt-1 text-red-600 text-xs">
+                  <AlertCircle className="w-3 h-3 mr-1 flex-shrink-0" />
+                  {errors.password}
+                </div>
+              )}
+            </div>
 
-          {/* Confirm Password Input */}
-          <div>
-            <label htmlFor="confirmPassword" className="flex items-center text-xs sm:text-sm font-medium text-gray-700 mb-1 sm:mb-2">
-              <Lock className="w-3 h-3 sm:w-4 sm:h-4 mr-1" />
-              Confirm Password <span className="text-red-500 ml-1">*</span>
-            </label>
-            <div className="relative">
-              <input
-                type={showConfirmPassword ? 'text' : 'password'}
-                id="confirmPassword"
-                name="confirmPassword"
-                value={formData.confirmPassword}
-                onChange={handleChange}
-                className={`w-full px-3 sm:px-4 py-2 sm:py-2 pr-10 sm:pr-12 text-sm sm:text-base border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors ${
-                  errors.confirmPassword ? 'border-red-500 bg-red-50' : 'border-gray-300'
-                }`}
-                placeholder="Enter Confirm password"
-                disabled={isSubmitting}
-              />
-              <button
-                type="button"
-                onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
-                disabled={isSubmitting}
-              >
-                {showConfirmPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-              </button>
-            </div>
-            {errors.confirmPassword && (
-              <div className="flex items-center mt-1 text-red-600 text-xs">
-                <AlertCircle className="w-3 h-3 mr-1 flex-shrink-0" />
-                {errors.confirmPassword}
+            <div>
+              <label htmlFor="confirmPassword" className="flex items-center text-xs sm:text-sm font-medium text-gray-700 mb-1 sm:mb-2">
+                <Shield className="w-3 h-3 sm:w-4 sm:h-4 mr-1" />
+                Confirm Password <span className="text-red-500 ml-1">*</span>
+              </label>
+              <div className="relative">
+                <input
+                  type={showConfirmPassword ? "text" : "password"}
+                  id="confirmPassword"
+                  name="confirmPassword"
+                  value={formData.confirmPassword}
+                  onChange={handleChange}
+                  className={`w-full px-3 sm:px-4 py-2 sm:py-2 text-sm sm:text-base border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors pr-10 ${
+                    errors.confirmPassword ? 'border-red-500 bg-red-50' : 'border-gray-300'
+                  }`}
+                  placeholder="Confirm password"
+                  disabled={isSubmitting}
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                  className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600 focus:outline-none"
+                  disabled={isSubmitting}
+                >
+                  {showConfirmPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                </button>
               </div>
-            )}
+              {errors.confirmPassword && (
+                <div className="flex items-center mt-1 text-red-600 text-xs">
+                  <AlertCircle className="w-3 h-3 mr-1 flex-shrink-0" />
+                  {errors.confirmPassword}
+                </div>
+              )}
+            </div>
           </div>
 
           {/* User Role & Gender */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
             {/* User Role Dropdown */}
-            <div className="user-role-dropdown-container relative">
+            <div className="user-role-dropdown-container">
               <label className="flex items-center text-xs sm:text-sm font-medium text-gray-700 mb-1 sm:mb-2">
-                <Shield className="w-3 h-3 sm:w-4 sm:h-4 mr-1" />
+                <User className="w-3 h-3 sm:w-4 sm:h-4 mr-1" />
                 User Role <span className="text-red-500 ml-1">*</span>
               </label>
               <div className="relative">
                 <button
                   type="button"
                   onClick={() => setShowUserRoleDropdown(!showUserRoleDropdown)}
-                  className={`w-full px-3 sm:px-4 py-2 sm:py-2 text-sm sm:text-base border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors text-left flex items-center justify-between ${
+                  className={`w-full px-3 sm:px-4 py-2 sm:py-2 text-sm sm:text-base border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors flex items-center justify-between ${
                     errors.userRole ? 'border-red-500 bg-red-50' : 'border-gray-300'
-                  }`}
+                  } ${isSubmitting ? 'opacity-50 cursor-not-allowed' : 'hover:border-gray-400'}`}
                   disabled={isSubmitting}
                 >
                   <span className={formData.userRole ? 'text-gray-900' : 'text-gray-500'}>
-                    {formData.userRole 
-                      ? userRoles.find(r => r.value === formData.userRole)?.label
-                      : 'Select role'
-                    }
+                    {formData.userRole ? userRoles.find(role => role.value === formData.userRole)?.label : 'Select user role'}
                   </span>
-                  <ChevronDown className="w-4 h-4 text-gray-400" />
+                  <ChevronDown className={`w-4 h-4 text-gray-400 transition-transform ${showUserRoleDropdown ? 'rotate-180' : ''}`} />
                 </button>
                 
                 {showUserRoleDropdown && (
-                  <div className="absolute z-50 mt-1 w-full bg-white border border-gray-300 rounded-lg shadow-lg max-h-48 overflow-y-auto">
+                  <div className="absolute top-full left-0 right-0 mt-1 bg-white border border-gray-300 rounded-lg shadow-lg z-10 max-h-48 overflow-y-auto">
                     {userRoles.map((role) => (
                       <button
                         key={role.value}
                         type="button"
                         onClick={() => handleUserRoleSelect(role.value)}
-                        className="w-full px-3 sm:px-4 py-2 sm:py-2 text-left hover:bg-gray-50 transition-colors text-sm sm:text-base"
+                        className="w-full px-3 sm:px-4 py-2 text-left text-sm sm:text-base hover:bg-blue-50 hover:text-blue-700 transition-colors flex items-center"
                       >
                         {role.label}
                       </button>
@@ -551,7 +598,7 @@ const handleSubmit = async (e) => {
             </div>
 
             {/* Gender Dropdown */}
-            <div className="gender-dropdown-container relative">
+            <div className="gender-dropdown-container">
               <label className="flex items-center text-xs sm:text-sm font-medium text-gray-700 mb-1 sm:mb-2">
                 <User className="w-3 h-3 sm:w-4 sm:h-4 mr-1" />
                 Gender <span className="text-red-500 ml-1">*</span>
@@ -560,28 +607,25 @@ const handleSubmit = async (e) => {
                 <button
                   type="button"
                   onClick={() => setShowGenderDropdown(!showGenderDropdown)}
-                  className={`w-full px-3 sm:px-4 py-2 sm:py-2 text-sm sm:text-base border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors text-left flex items-center justify-between ${
+                  className={`w-full px-3 sm:px-4 py-2 sm:py-2 text-sm sm:text-base border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors flex items-center justify-between ${
                     errors.gender ? 'border-red-500 bg-red-50' : 'border-gray-300'
-                  }`}
+                  } ${isSubmitting ? 'opacity-50 cursor-not-allowed' : 'hover:border-gray-400'}`}
                   disabled={isSubmitting}
                 >
                   <span className={formData.gender ? 'text-gray-900' : 'text-gray-500'}>
-                    {formData.gender 
-                      ? genders.find(g => g.value === formData.gender)?.label
-                      : 'Select gender'
-                    }
+                    {formData.gender ? genders.find(gender => gender.value === formData.gender)?.label : 'Select gender'}
                   </span>
-                  <ChevronDown className="w-4 h-4 text-gray-400" />
+                  <ChevronDown className={`w-4 h-4 text-gray-400 transition-transform ${showGenderDropdown ? 'rotate-180' : ''}`} />
                 </button>
                 
                 {showGenderDropdown && (
-                  <div className="absolute z-50 mt-1 w-full bg-white border border-gray-300 rounded-lg shadow-lg max-h-48 overflow-y-auto">
+                  <div className="absolute top-full left-0 right-0 mt-1 bg-white border border-gray-300 rounded-lg shadow-lg z-10 max-h-48 overflow-y-auto">
                     {genders.map((gender) => (
                       <button
                         key={gender.value}
                         type="button"
                         onClick={() => handleGenderSelect(gender.value)}
-                        className="w-full px-3 sm:px-4 py-2 sm:py-2 text-left hover:bg-gray-50 transition-colors text-sm sm:text-base"
+                        className="w-full px-3 sm:px-4 py-2 text-left text-sm sm:text-base hover:bg-blue-50 hover:text-blue-700 transition-colors flex items-center"
                       >
                         {gender.label}
                       </button>
@@ -598,39 +642,83 @@ const handleSubmit = async (e) => {
             </div>
           </div>
 
-          {/* Telephone Input */}
-          <div className="country-dropdown-container relative">
-            <label htmlFor="telephone" className="flex items-center text-xs sm:text-sm font-medium text-gray-700 mb-1 sm:mb-2">
-              <Phone className="w-3 h-3 sm:w-4 sm:h-4 mr-1" />
-              Telephone <span className="text-red-500 ml-1">*</span>
+          {/* Field Selection */}
+          <div className="field-dropdown-container">
+            <label className="flex items-center text-xs sm:text-sm font-medium text-gray-700 mb-1 sm:mb-2">
+              <Briefcase className="w-3 h-3 sm:w-4 sm:h-4 mr-1" />
+              Field of Interest <span className="text-red-500 ml-1">*</span>
             </label>
-            <div className="flex gap-2">
+            <div className="relative">
+              <button
+                type="button"
+                onClick={() => setShowFieldDropdown(!showFieldDropdown)}
+                className={`w-full px-3 sm:px-4 py-2 sm:py-2 text-sm sm:text-base border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors flex items-center justify-between ${
+                  errors.field ? 'border-red-500 bg-red-50' : 'border-gray-300'
+                } ${isSubmitting ? 'opacity-50 cursor-not-allowed' : 'hover:border-gray-400'}`}
+                disabled={isSubmitting}
+              >
+                <span className={formData.field ? 'text-gray-900' : 'text-gray-500'}>
+                  {formData.field ? fields.find(field => field.value === formData.field)?.label : 'Select your field'}
+                </span>
+                <ChevronDown className={`w-4 h-4 text-gray-400 transition-transform ${showFieldDropdown ? 'rotate-180' : ''}`} />
+              </button>
+              
+              {showFieldDropdown && (
+                <div className="absolute top-full left-0 right-0 mt-1 bg-white border border-gray-300 rounded-lg shadow-lg z-10 max-h-48 overflow-y-auto">
+                  {fields.map((field) => (<button
+                      key={field.value}
+                      type="button"
+                      onClick={() => handleFieldSelect(field.value)}
+                      className="w-full px-3 sm:px-4 py-2 text-left text-sm sm:text-base hover:bg-blue-50 hover:text-blue-700 transition-colors flex items-center"
+                    >
+                      {field.label}
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
+            {errors.field && (
+              <div className="flex items-center mt-1 text-red-600 text-xs">
+                <AlertCircle className="w-3 h-3 mr-1 flex-shrink-0" />
+                {errors.field}
+              </div>
+            )}
+          </div>
+
+          {/* Telephone with Country Code */}
+          <div>
+            <label className="flex items-center text-xs sm:text-sm font-medium text-gray-700 mb-1 sm:mb-2">
+              <Phone className="w-3 h-3 sm:w-4 sm:h-4 mr-1" />
+              Telephone Number <span className="text-red-500 ml-1">*</span>
+            </label>
+            <div className="flex">
               {/* Country Code Dropdown */}
-              <div className="relative">
+              <div className="country-dropdown-container relative">
                 <button
                   type="button"
                   onClick={() => setShowCountryDropdown(!showCountryDropdown)}
-                  className="flex items-center px-2 sm:px-3 py-2 sm:py-2 border border-gray-300 rounded-l-lg bg-gray-50 hover:bg-gray-100 transition-colors min-w-[100px] sm:min-w-[120px]"
+                  className={`px-3 py-2 sm:py-2 text-sm sm:text-base border border-r-0 rounded-l-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors flex items-center ${
+                    errors.telephone ? 'border-red-500 bg-red-50' : 'border-gray-300'
+                  } ${isSubmitting ? 'opacity-50 cursor-not-allowed' : 'hover:border-gray-400'}`}
                   disabled={isSubmitting}
                 >
-                  <span className="mr-1 sm:mr-2 text-sm">{selectedCountry?.flag}</span>
-                  <span className="text-xs sm:text-sm text-gray-700 hidden sm:inline">{selectedCountry?.dial_code}</span>
-                  <span className="text-xs sm:text-sm text-gray-700 sm:hidden">{selectedCountry?.dial_code}</span>
-                  <ChevronDown className="w-3 h-3 sm:w-4 sm:h-4 ml-1 sm:ml-2 text-gray-400" />
+                  <span className="mr-1">{selectedCountry?.flag}</span>
+                  <span className="text-xs sm:text-sm">{selectedCountry?.dial_code}</span>
+                  <ChevronDown className={`w-3 h-3 ml-1 text-gray-400 transition-transform ${showCountryDropdown ? 'rotate-180' : ''}`} />
                 </button>
                 
                 {showCountryDropdown && (
-                  <div className="absolute z-50 mt-1 w-48 sm:w-64 bg-white border border-gray-300 rounded-lg shadow-lg max-h-48 sm:max-h-60 overflow-y-auto">
-                    {countries.map((country) => (
+                  <div className="absolute top-full left-0 mt-1 bg-white border border-gray-300 rounded-lg shadow-lg z-20 w-64 max-h-48 overflow-y-auto">
+                    {countriesData.map((country) => (
                       <button
                         key={country.code}
                         type="button"
                         onClick={() => handleCountrySelect(country)}
-                        className="w-full flex items-center px-3 sm:px-4 py-2 sm:py-2 text-left hover:bg-gray-50 transition-colors"
+                        className="w-full px-3 py-2 text-left text-sm hover:bg-blue-50 hover:text-blue-700 transition-colors flex items-center"
                       >
-                        <span className="mr-2 sm:mr-3 text-sm">{country.flag}</span>
-                        <span className="flex-1 text-xs sm:text-sm text-gray-700 truncate">{country.name}</span>
-                        <span className="text-xs sm:text-sm text-gray-500 ml-2">{country.dial_code}</span>
+                        <span className="mr-2">{country.flag}</span>
+                        <span className="mr-2">{country.name}</span>
+                        <span className="text-gray-500">({country.dial_code})</span>
                       </button>
                     ))}
                   </div>
@@ -647,13 +735,10 @@ const handleSubmit = async (e) => {
                 className={`flex-1 px-3 sm:px-4 py-2 sm:py-2 text-sm sm:text-base border rounded-r-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors ${
                   errors.telephone ? 'border-red-500 bg-red-50' : 'border-gray-300'
                 }`}
-                placeholder="788123456"
+                placeholder="Enter phone number"
                 disabled={isSubmitting}
               />
             </div>
-            <p className="text-xs text-gray-500 mt-1">
-              Selected: {selectedCountry?.flag} {selectedCountry?.name}
-            </p>
             {errors.telephone && (
               <div className="flex items-center mt-1 text-red-600 text-xs">
                 <AlertCircle className="w-3 h-3 mr-1 flex-shrink-0" />
@@ -666,103 +751,101 @@ const handleSubmit = async (e) => {
           <button
             type="submit"
             disabled={isSubmitting}
-            className={`w-full py-2.5 sm:py-2 px-4 rounded-lg text-white font-medium transition-all duration-200 flex items-center justify-center space-x-2 text-sm sm:text-base ${
-              isSubmitting 
-                ? 'bg-gray-400 cursor-not-allowed' 
-                : 'bg-blue-600 hover:bg-blue-700 active:bg-blue-800'
+            className={`w-full py-2 sm:py-3 px-4 rounded-lg font-medium text-sm sm:text-base transition-all duration-200 flex items-center justify-center ${
+              isSubmitting
+                ? 'bg-gray-400 text-white cursor-not-allowed'
+                : 'bg-blue-600 hover:bg-blue-700 text-white hover:shadow-lg active:transform active:scale-95'
             }`}
           >
             {isSubmitting ? (
               <>
-                <RefreshCw className="w-4 h-4 animate-spin" />
-                <span>Creating Account...</span>
+                <RefreshCw className="animate-spin w-4 h-4 mr-2" />
+                Creating Account...
               </>
             ) : (
-              <span>Create Account</span>
+              'Create Account'
             )}
           </button>
         </form>
 
         {/* Sign In Link */}
         <div className="mt-4 sm:mt-6 text-center">
-          <p className="text-gray-600 text-xs sm:text-sm">
+          <p className="text-xs sm:text-sm text-gray-600">
             Already have an account?{' '}
-            <a href="/login" className="text-blue-600 hover:text-blue-500 font-medium">
-              Sign in
+            <a href="/login" className="text-blue-600 hover:text-blue-700 font-medium hover:underline">
+              Sign in here
             </a>
           </p>
         </div>
       </div>
     </div>
-    
-    {/* Right Side - Illustration - Reduced height for mobile */}
-    {/* <div className="w-full lg:w-1/2 bg-gradient-to-br from-blue-600 via-blue-700 to-blue-800 flex items-center justify-center p-4 sm:p-6 lg:p-8 min-h-[250px] lg:min-h-auto"> */}
-        <div className="w-full lg:w-1/2 bg-gradient-to-br from-blue-600 via-blue-700 to-blue-800 flex items-center justify-center p-4 sm:p-6 lg:p-8 min-h-[250px] lg:min-h-auto rounded-t-lg lg:rounded-t-none lg:rounded-r-lg">
-      <div className="text-center text-white max-w-md w-full">
-        <div className="mb-4 sm:mb-6 lg:mb-8">
-          <div className="relative">
-            <div className="bg-white/10 backdrop-blur-sm rounded-xl lg:rounded-2xl p-4 sm:p-6 lg:p-8 mx-auto w-full max-w-xs sm:max-w-sm lg:w-72 h-28 sm:h-32 lg:h-72 flex items-center justify-center">
-              <div className="space-y-2 sm:space-y-3 lg:space-y-6">
-                {/* Welcome illustration */}
-                <div className="flex justify-center">
-                  <div className="w-8 h-8 sm:w-12 sm:h-12 lg:w-20 lg:h-20 bg-white rounded-full flex items-center justify-center shadow-xl">
-                    <User className="w-4 h-4 sm:w-6 sm:h-6 lg:w-10 lg:h-10 text-blue-600" />
-                  </div>
-                </div>
+
+  {/* Right Side - Welcome Content */}
+ <div className="w-full lg:w-1/2 bg-gradient-to-br from-blue-600 via-blue-700 to-blue-800 flex items-center justify-center p-4 sm:p-6 lg:p-8 min-h-[250px] lg:min-h-auto rounded-t-lg sm:rounded-t-2xl lg:rounded-t-none lg:rounded-r-lg lg:rounded-tr-2xl lg:rounded-br-2xl">      
+       <div className="text-center text-white max-w-md w-full">
+         <div className="mb-4 sm:mb-6 lg:mb-8">
+           <div className="relative">
+             <div className="bg-white/10 backdrop-blur-sm rounded-xl lg:rounded-2xl p-4 sm:p-6 lg:p-8 mx-auto w-full max-w-xs sm:max-w-sm lg:w-72 h-28 sm:h-32 lg:h-72 flex items-center justify-center">
+               <div className="space-y-2 sm:space-y-3 lg:space-y-6">
+                 {/* Welcome illustration */}
+                 <div className="flex justify-center">
+                   <div className="w-8 h-8 sm:w-12 sm:h-12 lg:w-20 lg:h-20 bg-white rounded-full flex items-center justify-center shadow-xl">
+                     <User className="w-4 h-4 sm:w-6 sm:h-6 lg:w-10 lg:h-10 text-blue-600" />
+                   </div>
+                 </div>
                 
-                {/* Form fields mockup */}
-                <div className="space-y-1 sm:space-y-2 lg:space-y-3">
-                  <div className="bg-white/20 rounded-lg p-1 sm:p-2 lg:p-3">
-                    <div className="h-1 sm:h-1.5 lg:h-2 bg-white/30 rounded w-3/4 mb-0.5 sm:mb-1 lg:mb-2"></div>
-                    <div className="h-1 sm:h-1.5 lg:h-2 bg-white/30 rounded w-1/2"></div>
-                  </div>
-                  <div className="bg-white/20 rounded-lg p-1 sm:p-2 lg:p-3">
-                    <div className="h-1 sm:h-1.5 lg:h-2 bg-white/30 rounded w-2/3 mb-0.5 sm:mb-1 lg:mb-2"></div>
-                    <div className="h-1 sm:h-1.5 lg:h-2 bg-white/30 rounded w-3/4"></div>
-                  </div>
-                  <div className="bg-white/20 rounded-lg p-1 sm:p-2 lg:p-3">
-                    <div className="h-1 sm:h-1.5 lg:h-2 bg-white/30 rounded w-1/2"></div>
-                  </div>
-                </div>
+                 {/* Form fields mockup */}
+                 <div className="space-y-1 sm:space-y-2 lg:space-y-3">
+                   <div className="bg-white/20 rounded-lg p-1 sm:p-2 lg:p-3">
+                     <div className="h-1 sm:h-1.5 lg:h-2 bg-white/30 rounded w-3/4 mb-0.5 sm:mb-1 lg:mb-2"></div>
+                     <div className="h-1 sm:h-1.5 lg:h-2 bg-white/30 rounded w-1/2"></div>
+                   </div>
+                   <div className="bg-white/20 rounded-lg p-1 sm:p-2 lg:p-3">
+                     <div className="h-1 sm:h-1.5 lg:h-2 bg-white/30 rounded w-2/3 mb-0.5 sm:mb-1 lg:mb-2"></div>
+                     <div className="h-1 sm:h-1.5 lg:h-2 bg-white/30 rounded w-3/4"></div>
+                   </div>
+                   <div className="bg-white/20 rounded-lg p-1 sm:p-2 lg:p-3">
+                     <div className="h-1 sm:h-1.5 lg:h-2 bg-white/30 rounded w-1/2"></div>
+                   </div>
+                 </div>
                 
-                {/* Success checkmark */}
-                <div className="flex justify-center">
-                  <div className="w-6 h-6 sm:w-8 sm:h-8 lg:w-12 lg:h-12 bg-white/20 rounded-full flex items-center justify-center">
-                    <CheckCircle className="w-3 h-3 sm:w-4 sm:h-4 lg:w-6 lg:h-6 text-white" />
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
+                 {/* Success checkmark */}
+                 <div className="flex justify-center">
+                   <div className="w-6 h-6 sm:w-8 sm:h-8 lg:w-12 lg:h-12 bg-white/20 rounded-full flex items-center justify-center">
+                     <CheckCircle className="w-3 h-3 sm:w-4 sm:h-4 lg:w-6 lg:h-6 text-white" />
+                   </div>
+                 </div>
+               </div>
+             </div>
+           </div>
+         </div>
         
-        <h2 className="text-base sm:text-lg lg:text-2xl font-bold mb-2 sm:mb-3 lg:mb-4">Join our GELP community today!</h2>
-        <p className="text-blue-100 mb-3 sm:mb-4 lg:mb-8 text-xs sm:text-sm lg:text-base">Create your account and start connecting with mentors and mentees.</p>
+         <h2 className="text-base sm:text-lg lg:text-2xl font-bold mb-2 sm:mb-3 lg:mb-4">Join our GELP community today!</h2>
+         <p className="text-blue-100 mb-3 sm:mb-4 lg:mb-8 text-xs sm:text-sm lg:text-base">Create your account and start connecting with mentors and mentees.</p>
         
-        {/* Features list */}
-        <div className="space-y-1 sm:space-y-2 lg:space-y-3">
-          <div className="flex items-center text-blue-100 text-xs sm:text-sm lg:text-base">
-            <CheckCircle className="w-3 h-3 sm:w-4 sm:h-4 lg:w-5 lg:h-5 mr-2 text-blue-300 flex-shrink-0" />
-            <span>Connect with experienced mentors</span>
-          </div>
-          <div className="flex items-center text-blue-100 text-xs sm:text-sm lg:text-base">
-            <CheckCircle className="w-3 h-3 sm:w-4 sm:h-4 lg:w-5 lg:h-5 mr-2 text-blue-300 flex-shrink-0" />
-            <span>Share knowledge and grow together</span>
-          </div>
-          <div className="flex items-center text-blue-100 text-xs sm:text-sm lg:text-base">
-            <CheckCircle className="w-3 h-3 sm:w-4 sm:h-4 lg:w-5 lg:h-5 mr-2 text-blue-300 flex-shrink-0" />
-            <span>Build lasting professional relationships</span>
-          </div>
-        </div>
-      </div>
-    </div>
+         {/* Features list */}
+         <div className="space-y-1 sm:space-y-2 lg:space-y-3">
+           <div className="flex items-center text-blue-100 text-xs sm:text-sm lg:text-base">
+             <CheckCircle className="w-3 h-3 sm:w-4 sm:h-4 lg:w-5 lg:h-5 mr-2 text-blue-300 flex-shrink-0" />
+             <span>Connect with experienced mentors</span>
+           </div>
+           <div className="flex items-center text-blue-100 text-xs sm:text-sm lg:text-base">
+             <CheckCircle className="w-3 h-3 sm:w-4 sm:h-4 lg:w-5 lg:h-5 mr-2 text-blue-300 flex-shrink-0" />
+             <span>Share knowledge and grow together</span>
+           </div>
+           <div className="flex items-center text-blue-100 text-xs sm:text-sm lg:text-base">
+             <CheckCircle className="w-3 h-3 sm:w-4 sm:h-4 lg:w-5 lg:h-5 mr-2 text-blue-300 flex-shrink-0" />
+             <span>Build lasting professional relationships</span>
+           </div>
+         </div>
+       </div>
+     </div>
+
+  {/* </div> */}
+
   </div>
 </div>
   );
 };
 
 export default SignUp;
-
-
-
-
