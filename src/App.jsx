@@ -1,3 +1,4 @@
+
 // import React, { Component, useEffect } from 'react';
 // import { createBrowserRouter, RouterProvider } from "react-router-dom";
 
@@ -29,6 +30,9 @@
 // import JobApplicationsPage from './components/JobBoardOpportunites/JobApplicationsPage'
 // import GELEPDashboard from './components/UserDashboard/GELEPDashboard'
 // import { EventsCalendar } from './components/ProfessionalNetworking/EventsCalendar.jsx'
+// import UserReportDownloader from './components/Report/UserReportssDashboard';
+// import MentorshipProgram from './components/MatchingAlgorithim/MentorshipProgram';
+// import { MentorRequests } from './components/MatchingAlgorithim/MentorRequests';
 
 
 // // Dashboard Page Components
@@ -198,6 +202,13 @@
 //     }, []);
 
 //     const router = createBrowserRouter([
+//         // Root route - Login page as startup
+//         {
+//             path: "/",
+//             element: <Login />,
+//             errorElement: <ServerErrorPage />,
+//         },
+        
 //         // Dashboard Routes with Layout
 //         {
 //             path: "/dashboard",
@@ -231,32 +242,13 @@
 //                 },
 //                 {
 //                     path: "reports",
-//                     element: <DashboardReportsPage />,
+//                     element: <UserReportDownloader/>
+//                     // element: <DashboardReportsPage />,
+
 //                 },
 //                 {
 //                     path: "settings",
 //                     element: <DashboardSettingsPage />,
-//                 },
-//             ],
-//         },
-        
-//         // Root route - redirect to dashboard
-//         {
-//             path: "/",
-//             element: <GELEPAdminDashboard />,
-//             errorElement: <ServerErrorPage />,
-//             children: [
-//                 {
-//                     index: true,
-//                     element: <GELEPAdminDashboard />,
-//                 },
-//                 {
-//                     path: "inventory",
-//                     element: <div className="p-6"><h1 className="text-2xl font-bold">Inventory Management</h1></div>,
-//                 },
-//                 {
-//                     path: "settings",
-//                     element: <div className="p-6"><h1 className="text-2xl font-bold">Settings</h1></div>,
 //                 },
 //             ],
 //         },
@@ -298,6 +290,10 @@
 //             path: "/training-courses",
 //             element: <ModernTrainingCourseManagement />,
 //         },
+//         {
+//             path: "/one",
+//             element: <MentorshipProgram/>
+//         },
         
 //         // Authentication Routes
 //         {
@@ -307,6 +303,10 @@
 //         {
 //             path: "/JobBoard",
 //             element: <JobBoard/>
+//         },
+//         {
+//             path: "/testrequest",
+//             element: <MentorRequests    />
 //         },
 //         {
 //             path: "/applicationstatus",
@@ -329,14 +329,14 @@
 //             element: <UpdatePassword />,
 //         },
 //         {
-//     path: "/forum/:forumId",
-//     element: <ForumDetail />,
-// },
+//             path: "/forum/:forumId",
+//             element: <ForumDetail />,
+//         },
 //         {
 //             path: "/leadershipTraining",
 //             element: <LeadershipTrainingDevelopment/>
 //         },
-//                 {
+//         {
 //             path: "/testTraining",
 //             element: <OnlineCourse/>
 //         },
@@ -353,15 +353,18 @@
 //             element: <EventsCalendar/>
 //         },
 //         {
-//                 path: "/GELEPPlatform",
-//                 element: <GELEPPlatform/>
+//             path: "/GELEPPlatform",
+//             element: <GELEPPlatform/>
 //         },
-
+//         {
+//             path:"/report",
+//             element: <UserReportDownloader/>
+//         }
+//         ,
 //         {
 //             path : "/exam",
 //             element: <LeadershipExam/>
 //         },
-
 //         {
 //             path: "/user",
 //             element: <GELEPAdminDashboard />,
@@ -392,6 +395,9 @@
 
 import React, { Component, useEffect } from 'react';
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
+
+// Import your proper ThemeProvider
+import { ThemeProvider } from './components/Dashboard/theme-context';
 
 import GELEPAdminDashboard from "@/components/User/GELEPAdminDashboard";
 import Login from "@/components/Authantication/Login";
@@ -424,7 +430,6 @@ import { EventsCalendar } from './components/ProfessionalNetworking/EventsCalend
 import UserReportDownloader from './components/Report/UserReportssDashboard';
 import MentorshipProgram from './components/MatchingAlgorithim/MentorshipProgram';
 import { MentorRequests } from './components/MatchingAlgorithim/MentorRequests';
-
 
 // Dashboard Page Components
 const DashboardUsersPage = () => (
@@ -493,10 +498,6 @@ const NotFoundPage = () => (
         </div>
     </div>
 );
-
-const ThemeProvider = ({ children, storageKey }) => {
-    return <div data-theme={storageKey}>{children}</div>;
-};
 
 class ErrorBoundary extends Component {
     constructor(props) {
@@ -774,7 +775,10 @@ function App() {
 
     return (
         <ErrorBoundary>
-            <ThemeProvider storageKey="agroforest-theme">
+            <ThemeProvider 
+                defaultTheme="light" 
+                storageKey="gelep-app-theme"
+            >
                 <RouterProvider router={router} />
             </ThemeProvider>
         </ErrorBoundary>
