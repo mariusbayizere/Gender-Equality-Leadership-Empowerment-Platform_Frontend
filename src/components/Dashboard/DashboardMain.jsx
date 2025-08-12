@@ -6,6 +6,7 @@ import {
   Briefcase, GraduationCap, HandHeart, MessageCircle, Award
 } from 'lucide-react';
 import UserGrowthAnalytics from './UserGrowthAnalytics';
+import GELEPUserGrowthChart from './GELEPUserGrowthChart';
 
 const DashboardMain = () => {
   const [showAllActivities, setShowAllActivities] = useState(false);
@@ -289,7 +290,8 @@ const DashboardMain = () => {
     { 
       title: 'Total Users', 
       value: loading ? 'Loading...' : (userCount || 0).toLocaleString(), 
-      change: '+12%', 
+      // change: '+12%',
+      change: `+${(userCount || 0).toLocaleString()}%`, 
       icon: Users,
       color: 'bg-white',
       iconColor: 'bg-gradient-to-br from-blue-500 to-blue-600',
@@ -298,7 +300,8 @@ const DashboardMain = () => {
     { 
       title: 'Active Events', 
       value: loading ? 'Loading...' : (eventCount || 0).toLocaleString(), 
-      change: '+8%', 
+      // change: '+8%',
+      change: `+${(eventCount || 0).toLocaleString()}%`,
       icon: Calendar, 
       color: 'bg-white',
       iconColor: 'bg-gradient-to-br from-emerald-500 to-emerald-600',
@@ -307,7 +310,8 @@ const DashboardMain = () => {
     { 
       title: 'Mentorship Pairs', 
       value: loading ? 'Loading...' : (mentorshipCount || 0).toLocaleString(), 
-      change: '+23%', 
+      // change: '+23%', 
+      change: `+${(mentorshipCount || 0).toLocaleString()}%`, 
       icon: UserCheck, 
       color: 'bg-white',
       iconColor: 'bg-gradient-to-br from-violet-500 to-violet-600',
@@ -316,7 +320,7 @@ const DashboardMain = () => {
     { 
       title: 'Forum Posts', 
       value: loading ? 'Loading...' : (forumCount || 0).toLocaleString(), 
-      change: '+15%', 
+      change: `+${(forumCount || 0).toLocaleString()}%`, 
       icon: MessageSquare, 
       color: 'bg-white',
       iconColor: 'bg-gradient-to-br from-amber-500 to-amber-600',
@@ -659,7 +663,9 @@ const DashboardMain = () => {
           </div>
         )} */}
 
-        <UserGrowthAnalytics/>
+        {/* <UserGrowthAnalytics/> */}
+
+        <GELEPUserGrowthChart/>
 
         {/* Last Updated Timestamp */}
         {healthData && healthData.details && (

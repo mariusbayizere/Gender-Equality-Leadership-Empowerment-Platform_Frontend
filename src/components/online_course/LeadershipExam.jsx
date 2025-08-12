@@ -56,7 +56,7 @@ const QRCodeGenerator = ({ value, size = 120 }) => {
   );
 };
 
-const LeadershipExam = ({ onClose, studentName = "Bayizere Marius", courseName = "Leadership Training Online Courses" }) => {
+const LeadershipExam = ({ onClose, studentName = "Abijuru Raissa", courseName = "Leadership Training Online Courses" }) => {
   const [currentQuestion, setCurrentQuestion] = useState(0);
   const [answers, setAnswers] = useState({});
   const [timeLeft, setTimeLeft] = useState(1800); // 30 minutes
@@ -247,370 +247,379 @@ const LeadershipExam = ({ onClose, studentName = "Bayizere Marius", courseName =
   };
 
   // Certificate Component - Clean certificate without buttons
-  const Certificate = () => {
-    const certificateData = generateCertificateData();
-    
-    return (
-      <div>
-        {/* Certificate content only - no buttons inside */}
-        <div className="bg-white max-w-4xl mx-auto relative overflow-hidden shadow-2xl" id="certificate-content">
-          {/* Blue gradient background at bottom - reduced height */}
-          <div className="absolute bottom-0 left-0 right-0 h-24 bg-gradient-to-t from-blue-600 via-blue-400 to-transparent"></div>
-          
-          {/* Certificate content - reduced padding and spacing */}
-          <div className="relative z-10 p-8 min-h-[400px]">
-            {/* Header with MIGEPROF logo - reduced margin */}
-            <div className="text-center mb-6">
-              <div className="flex items-center justify-center mb-4">
-                <div className="w-10 h-10 bg-blue-600 rounded-full flex items-center justify-center mr-3 border-2 border-blue-700">
-                  <Award className="w-5 h-5 text-white" />
-                </div>
-                <span className="text-xl font-bold text-gray-800 tracking-wide">GELEP</span>
-              </div>
-            </div>
-            
-            {/* Certificate title - reduced size and margin */}
-            <div className="text-center mb-8">
-              <h1 className="text-4xl font-black text-gray-800 mb-2 tracking-wider">CERTIFICATE</h1>
-              <h2 className="text-lg font-medium text-gray-700">OF COMPLETION</h2>
-            </div>
-            
-            {/* Main content - reduced spacing */}
-            <div className="text-center space-y-4 mb-8">
-              <p className="text-base text-gray-600">This Certificate is Proudly Awarded to,</p>
-              
-              <h3 className="text-3xl font-bold text-gray-800 py-2">
-                {studentName}
-              </h3>
-              
-              <p className="text-base text-gray-600">For Successfully Completing the</p>
-              
-              <h4 className="text-xl font-semibold text-gray-800 mb-4">{courseName}</h4>
-              
-              <p className="text-sm text-gray-600">Score: {score}%</p>
-            </div>
-            
-            {/* QR Code and signature - moved above gradient in white area */}
-            <div className="flex justify-between items-center relative z-20 mb-6">
-              <div className="text-left">
-                <p className="text-xs text-gray-600">Date: {new Date().toLocaleDateString()}</p>
-              </div>
-              
-              <div className="text-center">
-                {/* QR Code - now in white area above gradient */}
-                <div className="mb-2 bg-white p-2 rounded-lg border border-gray-200">
-                  <QRCodeGenerator 
-                    value={certificateData} 
-                    size={120}
-                  />
-                </div>
-                
-                {/* MIGEPROF signature below QR code */}
-                <div>
-                  <p className="text-xs text-gray-700 font-bold">(Founder, MIGEPROF)</p>
-                </div>
-              </div>
-            </div>
-            
-            {/* Certificate ID at bottom - now in gradient area */}
-            <div className="text-center relative z-20 mt-8">
-              <p className="text-xs text-gray-200">
-                Certificate ID: MGPRF-{Date.now().toString().slice(-8)}-{Math.random().toString(36).substr(2, 4).toUpperCase()}
-              </p>
-            </div>
-          </div>
-        </div>
+
+// Certificate Component - Clean certificate without buttons
+const Certificate = () => {
+  const certificateData = generateCertificateData();
+  
+  return (
+    <div>
+      {/* Certificate content only - no buttons inside */}
+      <div className="bg-white dark:bg-gray-800 max-w-4xl mx-auto relative overflow-hidden shadow-2xl" id="certificate-content">
+        {/* Blue gradient background at bottom - reduced height */}
+        <div className="absolute bottom-0 left-0 right-0 h-16 sm:h-20 md:h-24 bg-gradient-to-t from-blue-600 via-blue-400 to-transparent"></div>
         
-        {/* Action buttons completely outside and below certificate */}
-        <div className="flex justify-center space-x-4 p-6 bg-gray-100 mt-6 rounded-lg max-w-4xl mx-auto">
-          <button 
-            onClick={downloadCertificate}
-            className="flex items-center space-x-2 bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition-colors shadow-lg"
-          >
-            <Download className="w-5 h-5" />
-            <span>Download Certificate</span>
-          </button>
-          <button 
-            onClick={() => window.print()}
-            className="flex items-center space-x-2 bg-gray-600 text-white px-6 py-3 rounded-lg hover:bg-gray-700 transition-colors shadow-lg"
-          >
-            <Download className="w-5 h-5" />
-            <span>Print Certificate</span>
-          </button>
-          <button 
-            className="flex items-center space-x-2 bg-green-600 text-white px-6 py-3 rounded-lg hover:bg-green-700 transition-colors shadow-lg"
-            onClick={() => {
-              if (navigator.share) {
-                navigator.share({
-                  title: 'Leadership Certificate Achievement',
-                  text: `${studentName} has successfully completed the ${courseName} with a score of ${score}%!`,
-                  url: window.location.href
-                });
-              } else {
-                // Fallback for browsers that don't support Web Share API
-                const shareText = `🎓 I just earned my Leadership Certificate from MIGEPROF! Score: ${score}% 🏆`;
-                navigator.clipboard.writeText(shareText).then(() => {
-                  alert('Achievement text copied to clipboard!');
-                });
-              }
-            }}
-          >
-            <Share2 className="w-5 h-5" />
-            <span>Share Achievement</span>
-          </button>
-        </div>
-      </div>
-    );
-  };
-
-  // Start screen
-  if (!examStarted) {
-    return (
-      <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[9999] p-4">
-        <div className="bg-white rounded-2xl p-8 max-w-2xl w-full">
-          <div className="text-center">
-            <BookOpen className="w-16 h-16 text-blue-600 mx-auto mb-4" />
-            <h2 className="text-3xl font-bold text-gray-800 mb-4">Leadership Assessment</h2>
-            <p className="text-gray-600 mb-6">
-              Complete this comprehensive exam to earn your Leadership Certificate. 
-              You need to score 85% or higher to pass.
+        {/* Certificate content - responsive padding and spacing */}
+        <div className="relative z-10 p-4 sm:p-6 md:p-8 min-h-[350px] sm:min-h-[400px]">
+          {/* Header with MIGEPROF logo - responsive sizing */}
+          <div className="text-center mb-4 sm:mb-6">
+            <div className="flex items-center justify-center mb-3 sm:mb-4">
+              <div className="w-8 h-8 sm:w-10 sm:h-10 bg-blue-600 rounded-full flex items-center justify-center mr-2 sm:mr-3 border-2 border-blue-700">
+                <Award className="w-4 h-4 sm:w-5 sm:h-5 text-white" />
+              </div>
+              <span className="text-lg sm:text-xl font-bold text-gray-800 dark:text-white tracking-wide">GELEP</span>
+            </div>
+          </div>
+          
+          {/* Certificate title - responsive sizes */}
+          <div className="text-center mb-6 sm:mb-8">
+            <h1 className="text-2xl sm:text-3xl md:text-4xl font-black text-gray-800 dark:text-white mb-1 sm:mb-2 tracking-wider">CERTIFICATE</h1>
+            <h2 className="text-sm sm:text-base md:text-lg font-medium text-gray-700 dark:text-gray-300">OF COMPLETION</h2>
+          </div>
+          
+          {/* Main content - responsive spacing */}
+          <div className="text-center space-y-3 sm:space-y-4 mb-6 sm:mb-8">
+            <p className="text-sm sm:text-base text-gray-600 dark:text-gray-400">This Certificate is Proudly Awarded to,</p>
+            
+            <h3 className="text-xl sm:text-2xl md:text-3xl font-bold text-gray-800 dark:text-white py-1 sm:py-2 px-2">
+              {studentName}
+            </h3>
+            
+            <p className="text-sm sm:text-base text-gray-600 dark:text-gray-400">For Successfully Completing the</p>
+            
+            <h4 className="text-lg sm:text-xl font-semibold text-gray-800 dark:text-white mb-2 sm:mb-4 px-2">{courseName}</h4>
+            
+            <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-400">Score: {score}%</p>
+          </div>
+          
+          {/* QR Code and signature - responsive layout */}
+          <div className="flex flex-col sm:flex-row justify-between items-center relative z-20 mb-4 sm:mb-6 space-y-4 sm:space-y-0">
+            <div className="text-center sm:text-left order-2 sm:order-1">
+              <p className="text-xs text-gray-600 dark:text-gray-400">Date: {new Date().toLocaleDateString()}</p>
+            </div>
+            
+            <div className="text-center order-1 sm:order-2">
+              {/* QR Code - responsive sizing */}
+              <div className="mb-2 bg-white p-1.5 sm:p-2 rounded-lg border border-gray-200 inline-block">
+                <QRCodeGenerator 
+                  value={certificateData} 
+                  size={80} // Smaller for mobile, will be styled responsively
+                  className="w-20 h-20 sm:w-24 sm:h-24 md:w-30 md:h-30"
+                />
+              </div>
+              
+              {/* MIGEPROF signature below QR code */}
+              <div>
+                <p className="text-xs text-gray-700 dark:text-gray-300 font-bold">(Founder, MIGEPROF)</p>
+              </div>
+            </div>
+          </div>
+          
+          {/* Certificate ID at bottom - responsive text */}
+          <div className="text-center relative z-20 mt-6 sm:mt-8">
+            <p className="text-xs text-gray-200 dark:text-gray-400 break-all">
+              Certificate ID: MGPRF-{Date.now().toString().slice(-8)}-{Math.random().toString(36).substr(2, 4).toUpperCase()}
             </p>
-            
-            <div className="bg-gray-50 rounded-lg p-6 mb-6">
-              <h3 className="font-semibold text-gray-800 mb-4">Exam Details:</h3>
-              <div className="grid grid-cols-2 gap-4 text-sm">
-                <div className="flex items-center">
-                  <Clock className="w-4 h-4 mr-2 text-blue-600" />
-                  <span>Duration: 30 minutes</span>
-                </div>
-                <div className="flex items-center">
-                  <BookOpen className="w-4 h-4 mr-2 text-blue-600" />
-                  <span>Questions: {examQuestions.length}</span>
-                </div>
-                <div className="flex items-center">
-                  <CheckCircle className="w-4 h-4 mr-2 text-green-600" />
-                  <span>Passing Score: 85%</span>
-                </div>
-                <div className="flex items-center">
-                  <Award className="w-4 h-4 mr-2 text-yellow-600" />
-                  <span>Certificate: Yes</span>
-                </div>
-              </div>
-            </div>
-            
-            <div className="flex justify-center space-x-4">
-              <button 
-                onClick={onClose}
-                className="px-6 py-3 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
-              >
-                Cancel
-              </button>
-              <button 
-                onClick={handleStartExam}
-                className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
-              >
-                Start Exam
-              </button>
-            </div>
           </div>
         </div>
       </div>
-    );
-  }
-
-  // Certificate view
-  if (showCertificate) {
-    return (
-      <div className="fixed inset-0 bg-gray-100 flex items-center justify-center z-[9999] p-4 overflow-auto">
-        <div className="w-full max-w-5xl">
-          <div className="mb-4 text-center">
-            <button 
-              onClick={() => setShowCertificate(false)}
-              className="bg-gray-200 text-gray-800 px-4 py-2 rounded-lg hover:bg-gray-300 transition-colors"
-            >
-              Back to Results
-            </button>
-          </div>
-          <Certificate />
-        </div>
+      
+      {/* Action buttons - responsive layout */}
+      <div className="flex flex-col sm:flex-row justify-center space-y-3 sm:space-y-0 sm:space-x-4 p-4 sm:p-6 bg-gray-100 dark:bg-gray-700 mt-4 sm:mt-6 rounded-lg max-w-4xl mx-auto">
+        <button 
+          onClick={downloadCertificate}
+          className="flex items-center justify-center space-x-2 bg-blue-600 text-white px-4 sm:px-6 py-2.5 sm:py-3 rounded-lg hover:bg-blue-700 transition-colors shadow-lg text-sm sm:text-base"
+        >
+          <Download className="w-4 h-4 sm:w-5 sm:h-5" />
+          <span>Download Certificate</span>
+        </button>
+        <button 
+          onClick={() => window.print()}
+          className="flex items-center justify-center space-x-2 bg-gray-600 text-white px-4 sm:px-6 py-2.5 sm:py-3 rounded-lg hover:bg-gray-700 transition-colors shadow-lg text-sm sm:text-base"
+        >
+          <Download className="w-4 h-4 sm:w-5 sm:h-5" />
+          <span>Print Certificate</span>
+        </button>
+        <button 
+          className="flex items-center justify-center space-x-2 bg-green-600 text-white px-4 sm:px-6 py-2.5 sm:py-3 rounded-lg hover:bg-green-700 transition-colors shadow-lg text-sm sm:text-base"
+          onClick={() => {
+            if (navigator.share) {
+              navigator.share({
+                title: 'Leadership Certificate Achievement',
+                text: `${studentName} has successfully completed the ${courseName} with a score of ${score}%!`,
+                url: window.location.href
+              });
+            } else {
+              const shareText = `🎓 I just earned my Leadership Certificate from MIGEPROF! Score: ${score}% 🏆`;
+              navigator.clipboard.writeText(shareText).then(() => {
+                alert('Achievement text copied to clipboard!');
+              });
+            }
+          }}
+        >
+          <Share2 className="w-4 h-4 sm:w-5 sm:h-5" />
+          <span>Share Achievement</span>
+        </button>
       </div>
-    );
-  }
+    </div>
+  );
+};
 
-  // Results screen
-  if (showResults) {
-    const incorrectCount = examQuestions.length - correctCount;
-    
-    return (
-      <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[9999] p-4">
-        <div className="bg-white rounded-2xl p-8 max-w-2xl w-full max-h-screen overflow-auto">
-          <div className="text-center mb-6">
-            {isPassed ? (
-              <div>
-                <Trophy className="w-16 h-16 text-yellow-500 mx-auto mb-4" />
-                <h2 className="text-3xl font-bold text-green-600 mb-2">Congratulations!</h2>
-                <p className="text-gray-600">You have passed the Leadership Assessment!</p>
-              </div>
-            ) : (
-              <div>
-                <XCircle className="w-16 h-16 text-red-500 mx-auto mb-4" />
-                <h2 className="text-3xl font-bold text-red-600 mb-2">Try Again</h2>
-                <p className="text-gray-600">You need 85% to pass. Review the course and retake the exam.</p>
-              </div>
-            )}
-          </div>
+// Start screen - responsive and dark mode
+if (!examStarted) {
+  return (
+    <div className="fixed inset-0 bg-black bg-opacity-50 dark:bg-black dark:bg-opacity-70 flex items-center justify-center z-[9999] p-4">
+      <div className="bg-white dark:bg-gray-800 rounded-2xl p-4 sm:p-6 md:p-8 max-w-2xl w-full max-h-screen overflow-auto">
+        <div className="text-center">
+          <BookOpen className="w-12 h-12 sm:w-16 sm:h-16 text-blue-600 mx-auto mb-3 sm:mb-4" />
+          <h2 className="text-2xl sm:text-3xl font-bold text-gray-800 dark:text-white mb-3 sm:mb-4">Leadership Assessment</h2>
+          <p className="text-gray-600 dark:text-gray-300 mb-4 sm:mb-6 text-sm sm:text-base">
+            Complete this comprehensive exam to earn your Leadership Certificate. 
+            You need to score 85% or higher to pass.
+          </p>
           
-          <div className="bg-gray-50 rounded-lg p-6 mb-6">
-            <div className="grid grid-cols-3 gap-4 text-center">
-              <div>
-                <p className="text-2xl font-bold text-blue-600">{score}%</p>
-                <p className="text-sm text-gray-600">Your Score</p>
+          <div className="bg-gray-50 dark:bg-gray-700 rounded-lg p-4 sm:p-6 mb-4 sm:mb-6">
+            <h3 className="font-semibold text-gray-800 dark:text-white mb-3 sm:mb-4 text-sm sm:text-base">Exam Details:</h3>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 text-xs sm:text-sm">
+              <div className="flex items-center justify-center sm:justify-start">
+                <Clock className="w-3 h-3 sm:w-4 sm:h-4 mr-2 text-blue-600" />
+                <span>Duration: 30 minutes</span>
               </div>
-              <div>
-                <p className="text-2xl font-bold text-green-600">{correctCount}</p>
-                <p className="text-sm text-gray-600">Correct</p>
+              <div className="flex items-center justify-center sm:justify-start">
+                <BookOpen className="w-3 h-3 sm:w-4 sm:h-4 mr-2 text-blue-600" />
+                <span>Questions: {examQuestions.length}</span>
               </div>
-              <div>
-                <p className="text-2xl font-bold text-red-600">{incorrectCount}</p>
-                <p className="text-sm text-gray-600">Incorrect</p>
+              <div className="flex items-center justify-center sm:justify-start">
+                <CheckCircle className="w-3 h-3 sm:w-4 sm:h-4 mr-2 text-green-600" />
+                <span>Passing Score: 85%</span>
+              </div>
+              <div className="flex items-center justify-center sm:justify-start">
+                <Award className="w-3 h-3 sm:w-4 sm:h-4 mr-2 text-yellow-600" />
+                <span>Certificate: Yes</span>
               </div>
             </div>
           </div>
           
-          <div className="flex justify-center space-x-4">
-            {isPassed && (
-              <button 
-                onClick={() => setShowCertificate(true)}
-                className="flex items-center space-x-2 bg-yellow-500 text-white px-6 py-3 rounded-lg hover:bg-yellow-600 transition-colors"
-              >
-                <Award className="w-5 h-5" />
-                <span>View Certificate</span>
-              </button>
-            )}
+          <div className="flex flex-col sm:flex-row justify-center space-y-3 sm:space-y-0 sm:space-x-4">
             <button 
               onClick={onClose}
-              className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+              className="px-4 sm:px-6 py-2.5 sm:py-3 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors text-sm sm:text-base"
             >
-              {isPassed ? 'Continue' : 'Back to Course'}
+              Cancel
             </button>
-          </div>
-        </div>
-      </div>
-    );
-  }
-
-  // Main exam interface
-  const currentQ = examQuestions[currentQuestion];
-
-  return (
-    <div className="fixed inset-0 bg-white z-[9999] flex flex-col">
-      {/* Header */}
-      <div className="bg-blue-600 text-white p-4 flex items-center justify-between">
-        <div>
-          <h1 className="text-xl font-bold">Leadership Assessment</h1>
-          <p className="text-blue-100 text-sm">Question {currentQuestion + 1} of {examQuestions.length}</p>
-        </div>
-        <div className="flex items-center space-x-4">
-          <div className="flex items-center space-x-2">
-            <Clock className="w-5 h-5" />
-            <span className="font-mono text-lg">{formatTime(timeLeft)}</span>
-          </div>
-          <div className="text-sm">
-            <span className="font-semibold">{getAnsweredCount()}</span>/{examQuestions.length} answered
-          </div>
-        </div>
-      </div>
-      
-      {/* Progress bar */}
-      <div className="w-full bg-gray-200 h-2">
-        <div 
-          className="bg-blue-600 h-2 transition-all duration-300" 
-          style={{ width: `${((currentQuestion + 1) / examQuestions.length) * 100}%` }}
-        ></div>
-      </div>
-      
-      {/* Question content */}
-      <div className="flex-1 p-8 max-w-4xl mx-auto w-full">
-        <div className="mb-8">
-          <h2 className="text-2xl font-semibold text-gray-800 mb-6">{currentQ.question}</h2>
-          
-          <div className="space-y-3">
-            {currentQ.options.map((option, index) => (
-              <button
-                key={index}
-                onClick={(e) => {
-                  e.preventDefault();
-                  e.stopPropagation();
-                  handleAnswerSelect(currentQuestion, index);
-                }}
-                className={`w-full p-4 text-left rounded-lg border-2 transition-colors ${
-                  answers[currentQuestion] === index
-                    ? 'border-blue-600 bg-blue-50 text-blue-700'
-                    : 'border-gray-200 hover:border-gray-400 hover:bg-gray-50'
-                }`}
-              >
-                <div className="flex items-center">
-                  <div className={`w-6 h-6 rounded-full border-2 mr-3 flex items-center justify-center ${
-                    answers[currentQuestion] === index
-                      ? 'border-blue-600 bg-blue-600'
-                      : 'border-gray-400'
-                  }`}>
-                    {answers[currentQuestion] === index && (
-                      <div className="w-3 h-3 bg-white rounded-full"></div>
-                    )}
-                  </div>
-                  <span className="mr-2 text-gray-500">({String.fromCharCode(65 + index)})</span>
-                  <span>{option}</span>
-                </div>
-              </button>
-            ))}
-          </div>
-        </div>
-      </div>
-      
-      {/* Navigation */}
-      <div className="border-t bg-gray-50 p-6">
-        <div className="max-w-4xl mx-auto flex justify-between items-center">
-          <button
-            onClick={prevQuestion}
-            disabled={currentQuestion === 0}
-            className={`flex items-center space-x-2 px-4 py-2 rounded-lg ${
-              currentQuestion === 0
-                ? 'text-gray-400 cursor-not-allowed'
-                : 'text-blue-600 hover:bg-blue-50'
-            }`}
-          >
-            <ChevronLeft className="w-5 h-5" />
-            <span>Previous</span>
-          </button>
-          
-          <div className="flex space-x-4">
-            {currentQuestion === examQuestions.length - 1 ? (
-              <button
-                onClick={handleSubmitExam}
-                disabled={getAnsweredCount() < examQuestions.length}
-                className={`px-6 py-2 rounded-lg font-semibold ${
-                  getAnsweredCount() < examQuestions.length
-                    ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
-                    : 'bg-green-600 text-white hover:bg-green-700'
-                }`}
-              >
-                Submit Exam ({getAnsweredCount()}/{examQuestions.length})
-              </button>
-            ) : (
-              <button
-                onClick={nextQuestion}
-                className="flex items-center space-x-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
-              >
-                <span>Next</span>
-                <ChevronRight className="w-5 h-5" />
-              </button>
-            )}
+            <button 
+              onClick={handleStartExam}
+              className="px-4 sm:px-6 py-2.5 sm:py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm sm:text-base"
+            >
+              Start Exam
+            </button>
           </div>
         </div>
       </div>
     </div>
   );
-};
+}
+
+// Certificate view - responsive
+if (showCertificate) {
+  return (
+    <div className="fixed inset-0 bg-gray-100 dark:bg-gray-900 flex items-center justify-center z-[9999] p-2 sm:p-4 overflow-auto">
+      <div className="w-full max-w-5xl">
+        <div className="mb-3 sm:mb-4 text-center">
+          <button 
+            onClick={() => setShowCertificate(false)}
+            className="bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-200 px-3 sm:px-4 py-2 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors text-sm sm:text-base"
+          >
+            Back to Results
+          </button>
+        </div>
+        <Certificate />
+      </div>
+    </div>
+  );
+}
+
+// Results screen - responsive and dark mode
+if (showResults) {
+  const incorrectCount = examQuestions.length - correctCount;
+  
+  return (
+    <div className="fixed inset-0 bg-black bg-opacity-50 dark:bg-black dark:bg-opacity-70 flex items-center justify-center z-[9999] p-4">
+      <div className="bg-white dark:bg-gray-800 rounded-2xl p-4 sm:p-6 md:p-8 max-w-2xl w-full max-h-screen overflow-auto">
+        <div className="text-center mb-4 sm:mb-6">
+          {isPassed ? (
+            <div>
+              <Trophy className="w-12 h-12 sm:w-16 sm:h-16 text-yellow-500 mx-auto mb-3 sm:mb-4" />
+              <h2 className="text-2xl sm:text-3xl font-bold text-green-600 mb-2">Congratulations!</h2>
+              <p className="text-gray-600 dark:text-gray-300 text-sm sm:text-base">You have passed the Leadership Assessment!</p>
+            </div>
+          ) : (
+            <div>
+              <XCircle className="w-12 h-12 sm:w-16 sm:h-16 text-red-500 mx-auto mb-3 sm:mb-4" />
+              <h2 className="text-2xl sm:text-3xl font-bold text-red-600 mb-2">Try Again</h2>
+              <p className="text-gray-600 dark:text-gray-300 text-sm sm:text-base">You need 85% to pass. Review the course and retake the exam.</p>
+            </div>
+          )}
+        </div>
+        
+        <div className="bg-gray-50 dark:bg-gray-700 rounded-lg p-4 sm:p-6 mb-4 sm:mb-6">
+          <div className="grid grid-cols-3 gap-3 sm:gap-4 text-center">
+            <div>
+              <p className="text-xl sm:text-2xl font-bold text-blue-600">{score}%</p>
+              <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-400">Your Score</p>
+            </div>
+            <div>
+              <p className="text-xl sm:text-2xl font-bold text-green-600">{correctCount}</p>
+              <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-400">Correct</p>
+            </div>
+            <div>
+              <p className="text-xl sm:text-2xl font-bold text-red-600">{incorrectCount}</p>
+              <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-400">Incorrect</p>
+            </div>
+          </div>
+        </div>
+        
+        <div className="flex flex-col sm:flex-row justify-center space-y-3 sm:space-y-0 sm:space-x-4">
+          {isPassed && (
+            <button 
+              onClick={() => setShowCertificate(true)}
+              className="flex items-center justify-center space-x-2 bg-yellow-500 text-white px-4 sm:px-6 py-2.5 sm:py-3 rounded-lg hover:bg-yellow-600 transition-colors text-sm sm:text-base"
+            >
+              <Award className="w-4 h-4 sm:w-5 sm:h-5" />
+              <span>View Certificate</span>
+            </button>
+          )}
+          <button 
+            onClick={onClose}
+            className="px-4 sm:px-6 py-2.5 sm:py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm sm:text-base"
+          >
+            {isPassed ? 'Continue' : 'Back to Course'}
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// Main exam interface - fully responsive
+const currentQ = examQuestions[currentQuestion];
+
+return (
+  <div className="fixed inset-0 bg-white dark:bg-gray-900 z-[9999] flex flex-col">
+    {/* Header - responsive */}
+    <div className="bg-blue-600 text-white p-3 sm:p-4 flex flex-col sm:flex-row items-start sm:items-center justify-between space-y-2 sm:space-y-0">
+      <div className="flex-1">
+        <h1 className="text-lg sm:text-xl font-bold">Leadership Assessment</h1>
+        <p className="text-blue-100 text-xs sm:text-sm">Question {currentQuestion + 1} of {examQuestions.length}</p>
+      </div>
+      <div className="flex flex-col sm:flex-row items-start sm:items-center space-y-2 sm:space-y-0 sm:space-x-4 w-full sm:w-auto">
+        <div className="flex items-center space-x-2">
+          <Clock className="w-4 h-4 sm:w-5 sm:h-5" />
+          <span className="font-mono text-base sm:text-lg">{formatTime(timeLeft)}</span>
+        </div>
+        <div className="text-xs sm:text-sm">
+          <span className="font-semibold">{getAnsweredCount()}</span>/{examQuestions.length} answered
+        </div>
+      </div>
+    </div>
+    
+    {/* Progress bar */}
+    <div className="w-full bg-gray-200 dark:bg-gray-700 h-1.5 sm:h-2">
+      <div 
+        className="bg-blue-600 h-1.5 sm:h-2 transition-all duration-300" 
+        style={{ width: `${((currentQuestion + 1) / examQuestions.length) * 100}%` }}
+      ></div>
+    </div>
+    
+    {/* Question content - responsive padding and typography */}
+    <div className="flex-1 p-4 sm:p-6 md:p-8 max-w-4xl mx-auto w-full overflow-auto">
+      <div className="mb-6 sm:mb-8">
+        <h2 className="text-lg sm:text-xl md:text-2xl font-semibold text-gray-800 dark:text-white mb-4 sm:mb-6 leading-relaxed">
+          {currentQ.question}
+        </h2>
+        
+        <div className="space-y-2 sm:space-y-3">
+          {currentQ.options.map((option, index) => (
+            <button
+              key={index}
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                handleAnswerSelect(currentQuestion, index);
+              }}
+              className={`w-full p-3 sm:p-4 text-left rounded-lg border-2 transition-colors ${
+                answers[currentQuestion] === index
+                  ? 'border-blue-600 bg-blue-50 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300'
+                  : 'border-gray-200 dark:border-gray-600 hover:border-gray-400 dark:hover:border-gray-500 hover:bg-gray-50 dark:hover:bg-gray-700 dark:bg-gray-800'
+              }`}
+            >
+              <div className="flex items-start sm:items-center">
+                <div className={`w-5 h-5 sm:w-6 sm:h-6 rounded-full border-2 mr-2 sm:mr-3 flex items-center justify-center flex-shrink-0 mt-0.5 sm:mt-0 ${
+                  answers[currentQuestion] === index
+                    ? 'border-blue-600 bg-blue-600'
+                    : 'border-gray-400 dark:border-gray-500'
+                }`}>
+                  {answers[currentQuestion] === index && (
+                    <div className="w-2.5 h-2.5 sm:w-3 sm:h-3 bg-white rounded-full"></div>
+                  )}
+                </div>
+                <span className="mr-2 text-gray-500 dark:text-gray-400 text-sm sm:text-base flex-shrink-0">
+                  ({String.fromCharCode(65 + index)})
+                </span>
+                <span className="text-sm sm:text-base text-gray-800 dark:text-gray-200 leading-relaxed">
+                  {option}
+                </span>
+              </div>
+            </button>
+          ))}
+        </div>
+      </div>
+    </div>
+    
+    {/* Navigation - responsive */}
+    <div className="border-t dark:border-gray-700 bg-gray-50 dark:bg-gray-800 p-3 sm:p-4 md:p-6">
+      <div className="max-w-4xl mx-auto flex flex-col sm:flex-row justify-between items-center space-y-3 sm:space-y-0">
+        <button
+          onClick={prevQuestion}
+          disabled={currentQuestion === 0}
+          className={`flex items-center justify-center space-x-2 px-3 sm:px-4 py-2 rounded-lg text-sm sm:text-base w-full sm:w-auto ${
+            currentQuestion === 0
+              ? 'text-gray-400 dark:text-gray-600 cursor-not-allowed'
+              : 'text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/30'
+          }`}
+        >
+          <ChevronLeft className="w-4 h-4 sm:w-5 sm:h-5" />
+          <span>Previous</span>
+        </button>
+        
+        <div className="flex space-x-3 sm:space-x-4 w-full sm:w-auto">
+          {currentQuestion === examQuestions.length - 1 ? (
+            <button
+              onClick={handleSubmitExam}
+              disabled={getAnsweredCount() < examQuestions.length}
+              className={`px-4 sm:px-6 py-2 rounded-lg font-semibold text-sm sm:text-base w-full sm:w-auto ${
+                getAnsweredCount() < examQuestions.length
+                  ? 'bg-gray-300 dark:bg-gray-600 text-gray-500 dark:text-gray-400 cursor-not-allowed'
+                  : 'bg-green-600 text-white hover:bg-green-700'
+              }`}
+            >
+              <span className="hidden sm:inline">Submit Exam ({getAnsweredCount()}/{examQuestions.length})</span>
+              <span className="sm:hidden">Submit ({getAnsweredCount()}/{examQuestions.length})</span>
+            </button>
+          ) : (
+            <button
+              onClick={nextQuestion}
+              className="flex items-center justify-center space-x-2 px-3 sm:px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 text-sm sm:text-base w-full sm:w-auto"
+            >
+              <span>Next</span>
+              <ChevronRight className="w-4 h-4 sm:w-5 sm:h-5" />
+            </button>
+          )}
+        </div>
+      </div>
+    </div>
+  </div>
+);
+}
 
 export default LeadershipExam;

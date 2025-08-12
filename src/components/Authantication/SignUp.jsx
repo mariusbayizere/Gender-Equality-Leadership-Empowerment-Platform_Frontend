@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Eye, EyeOff, Mail, Shield, Lock, AlertCircle, CheckCircle, RefreshCw, User, Phone, ChevronDown, Briefcase } from 'lucide-react';
 import { countries } from '../constant/countries';
+import {fields} from './field'
 
 const SignUp = () => {
   const [formData, setFormData] = useState({
@@ -341,25 +342,25 @@ const handleSubmit = async (e) => {
     { value: 'prefer_not_to_say', label: 'Prefer not to say' }
   ];
 
-  // Field options
-  const fields = [
-    { value: 'technology', label: 'Technology' },
-    { value: 'business', label: 'Business' },
-    { value: 'healthcare', label: 'Healthcare' },
-    { value: 'education', label: 'Education' },
-    { value: 'engineering', label: 'Engineering' },
-    { value: 'finance', label: 'Finance' },
-    { value: 'marketing', label: 'Marketing' },
-    { value: 'design', label: 'Design' },
-    { value: 'science', label: 'Science' },
-    { value: 'arts', label: 'Arts' },
-    { value: 'law', label: 'Law' },
-    { value: 'media', label: 'Media' },
-    { value: 'agriculture', label: 'Agriculture' },
-    { value: 'manufacturing', label: 'Manufacturing' },
-    { value: 'consulting', label: 'Consulting' },
-    { value: 'other', label: 'Other' }
-  ];
+  // // Field options
+  // const fields = [
+  //   { value: 'technology', label: 'Technology' },
+  //   { value: 'business', label: 'Business' },
+  //   { value: 'healthcare', label: 'Healthcare' },
+  //   { value: 'education', label: 'Education' },
+  //   { value: 'engineering', label: 'Engineering' },
+  //   { value: 'finance', label: 'Finance' },
+  //   { value: 'marketing', label: 'Marketing' },
+  //   { value: 'design', label: 'Design' },
+  //   { value: 'science', label: 'Science' },
+  //   { value: 'arts', label: 'Arts' },
+  //   { value: 'law', label: 'Law' },
+  //   { value: 'media', label: 'Media' },
+  //   { value: 'agriculture', label: 'Agriculture' },
+  //   { value: 'manufacturing', label: 'Manufacturing' },
+  //   { value: 'consulting', label: 'Consulting' },
+  //   { value: 'other', label: 'Other' }
+  // ];
 
   return (
 <div className="min-h-screen bg-gray-50 flex items-center justify-center p-2 sm:p-4">

@@ -422,7 +422,8 @@ import JobApplicationsPage from './components/JobBoardOpportunites/JobApplicatio
 import GELEPDashboard from './components/UserDashboard/GELEPDashboard'
 import { EventsCalendar } from './components/ProfessionalNetworking/EventsCalendar.jsx'
 import UserReportDownloader from './components/Report/UserReportssDashboard';
-import MentorshipProgram from './components/User/MentorshipProgram';
+import MentorshipProgram from './components/MatchingAlgorithim/MentorshipProgram';
+import { MentorRequests } from './components/MatchingAlgorithim/MentorRequests';
 
 
 // Dashboard Page Components
@@ -693,6 +694,10 @@ function App() {
         {
             path: "/JobBoard",
             element: <JobBoard/>
+        },
+        {
+            path: "/testrequest",
+            element: <MentorRequests    />
         },
         {
             path: "/applicationstatus",

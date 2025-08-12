@@ -1,3 +1,144 @@
+// // Mock data
+// const mentors = [
+//   {
+//     id: 1,
+//     name: "Jeanne d'Arc Mujawamariya",
+//     title: "Chief Executive Officer",
+//     company: "Rwanda Development Board",
+//     location: "Kigali, Rwanda",
+//     expertise: ["Strategic Leadership", "Public Policy", "Economic Development", "International Relations"],
+//     experience: 15,
+//     rating: 4.9,
+//     sessions: 127
+//   },
+//   {
+//     id: 2,
+//     name: "Dr. Diane Karusisi",
+//     title: "Chief Executive Officer",
+//     company: "Bank of Kigali",
+//     location: "Kigali, Rwanda",
+//     expertise: ["Financial Leadership", "Banking", "Corporate Strategy", "Digital Transformation"],
+//     experience: 18,
+//     rating: 4.8,
+//     sessions: 98
+//   },
+//   {
+//     id: 3,
+//     name: "Clarisse Iribagiza",
+//     title: "Chief Executive Officer",
+//     company: "HeHe Limited",
+//     location: "Kigali, Rwanda",
+//     expertise: ["Technology Innovation", "Startup Leadership", "Product Development", "Market Expansion"],
+//     experience: 12,
+//     rating: 4.7,
+//     sessions: 156
+//   }
+// ];
+
+// const mentees = [
+//   {
+//     id: 1,
+//     name: "Aline Uwimana",
+//     currentRole: "Senior Policy Analyst",
+//     company: "Ministry of Finance",
+//     location: "Kigali, Rwanda",
+//     goals: ["Strategic Leadership", "Policy Development", "Team Management"],
+//     interests: ["Public Administration", "Economic Policy", "Leadership Development"],
+//     experience: 5
+//   },
+//   {
+//     id: 2,
+//     name: "Grace Mutesi",
+//     currentRole: "Operations Manager",
+//     company: "Equity Bank Rwanda",
+//     location: "Kigali, Rwanda",
+//     goals: ["Executive Leadership", "Financial Management", "Digital Banking"],
+//     interests: ["Financial Services", "Technology", "Customer Experience"],
+//     experience: 7
+//   },
+//   {
+//     id: 3,
+//     name: "Immaculée Ingabire",
+//     currentRole: "Product Manager",
+//     company: "Andela Rwanda",
+//     location: "Kigali, Rwanda",
+//     goals: ["Technology Leadership", "Product Strategy", "Innovation Management"],
+//     interests: ["Software Development", "AI/ML", "Tech Entrepreneurship"],
+//     experience: 4
+//   }
+// ];
+
+// const sessionData = [
+//   {
+//     id: 1,
+//     mentorId: 1,
+//     menteeId: 1,
+//     title: "Strategic Leadership Development",
+//     date: "2025-08-05",
+//     time: "14:00",
+//     duration: 60,
+//     status: "scheduled",
+//     type: "video",
+//     agenda: "Leadership frameworks and decision-making processes"
+//   },
+//   {
+//     id: 2,
+//     mentorId: 2,
+//     menteeId: 2,
+//     title: "Financial Management Excellence",
+//     date: "2025-08-06",
+//     time: "10:00",
+//     duration: 45,
+//     status: "scheduled",
+//     type: "video",
+//     agenda: "Financial planning and risk management strategies"
+//   },
+//   {
+//     id: 3,
+//     mentorId: 3,
+//     menteeId: 3,
+//     title: "Innovation Leadership",
+//     date: "2025-07-28",
+//     time: "16:00",
+//     duration: 60,
+//     status: "completed",
+//     type: "video",
+//     agenda: "Product innovation and market strategies"
+//   }
+// ];
+
+// const progressData = [
+//   {
+//     menteeId: 1,
+//     mentorId: 1,
+//     sessionsCompleted: 8,
+//     totalSessions: 12,
+//     skillsProgress: {
+//       "Strategic Thinking": 75,
+//       "Policy Development": 85,
+//       "Team Leadership": 70,
+//       "Public Speaking": 60
+//     },
+//     feedback: "Excellent progress in policy analysis and strategic thinking. Ready for more complex leadership challenges.",
+//     nextMilestone: "Lead cross-departmental policy initiative"
+//   },
+//   {
+//     menteeId: 2,
+//     mentorId: 2,
+//     sessionsCompleted: 6,
+//     totalSessions: 10,
+//     skillsProgress: {
+//       "Financial Analysis": 80,
+//       "Digital Banking": 65,
+//       "Team Management": 75,
+//       "Customer Relations": 85
+//     },
+//     feedback: "Strong analytical skills developing. Focus needed on digital transformation leadership.",
+//     nextMilestone: "Present digital strategy to executive team"
+//   }
+// ];
+
+
 
 
 
@@ -65,61 +206,60 @@
     }
   ];
 
-  // Hardcoded data for mentees - Rwandan context with diverse career goals
-  export const mentees = [
+export const mentees = [
     {
       id: 1,
-      name: "Uwimana Vestine",
-      currentRole: "Assistant Director",
-      company: "Ministry of Health",
-      goals: ["Public Leadership", "Policy Development", "Health System Management"],
-      experience: 6,
-      interests: ["Healthcare", "Public Policy", "Community Health"],
-      bio: "Healthcare administrator aspiring to lead Rwanda's health system transformation",
+      name: "Abijuru Raissa",
+      currentRole: "Nurse",
+      company: "Kigali University Hospital",
+      goals: ["Career Development", "Healthcare Skills", "Patient Care Excellence"],
+      experience: 3,
+      interests: ["Healthcare", "Patient Care", "Medical Training"],
+      bio: "Dedicated nurse looking to advance career and improve patient care skills",
       location: "Kigali"
     },
     {
       id: 2,
       name: "Mukamana Claudine",
-      currentRole: "Program Manager",
+      currentRole: "Administrative Assistant",
       company: "Pro-Femmes Twese Hamwe",
-      goals: ["Non-profit Leadership", "Women's Rights", "Advocacy"],
-      experience: 8,
-      interests: ["Gender Equality", "Women's Empowerment", "Social Justice"],
-      bio: "Women's rights advocate seeking to expand impact in gender equality initiatives",
+      goals: ["Professional Growth", "Project Coordination", "Communication Skills"],
+      experience: 2,
+      interests: ["Administration", "Community Work", "Women's Rights"],
+      bio: "Administrative professional seeking to develop project management and leadership skills",
       location: "Kigali"
     },
     {
       id: 3,
       name: "Nyirahabimana Alice",
-      currentRole: "Senior Lecturer",
+      currentRole: "Teaching Assistant",
       company: "University of Rwanda",
-      goals: ["Academic Leadership", "Research Excellence", "Higher Education Reform"],
-      experience: 9,
-      interests: ["Education", "Research", "Student Development"],
-      bio: "Academic professional aiming for university leadership and educational innovation",
+      goals: ["Teaching Excellence", "Research Skills", "Academic Growth"],
+      experience: 4,
+      interests: ["Education", "Student Mentoring", "Academic Research"],
+      bio: "Teaching assistant working towards becoming a qualified lecturer and researcher",
       location: "Butare"
     },
     {
       id: 4,
       name: "Uwizeyimana Solange",
-      currentRole: "Business Development Manager",
+      currentRole: "Bank Teller",
       company: "Bank of Kigali",
-      goals: ["Financial Leadership", "Banking Innovation", "Economic Development"],
-      experience: 7,
-      interests: ["Finance", "Banking", "Economic Growth"],
-      bio: "Banking professional seeking executive leadership in Rwanda's financial sector",
+      goals: ["Financial Knowledge", "Customer Service", "Career Advancement"],
+      experience: 2,
+      interests: ["Finance", "Customer Relations", "Banking Operations"],
+      bio: "Bank teller eager to learn more about financial services and advance within banking",
       location: "Kigali"
     },
     {
       id: 5,
       name: "Mukarugwiza Esperance",
-      currentRole: "Cooperative Manager",
+      currentRole: "Farm Worker",
       company: "Abahizi Women's Cooperative",
-      goals: ["Cooperative Leadership", "Rural Development", "Agricultural Innovation"],
-      experience: 5,
-      interests: ["Agriculture", "Rural Development", "Women's Cooperatives"],
-      bio: "Cooperative leader working to empower rural women through agricultural initiatives",
+      goals: ["Agricultural Skills", "Cooperative Management", "Sustainable Farming"],
+      experience: 3,
+      interests: ["Farming", "Rural Development", "Women's Empowerment"],
+      bio: "Farm worker passionate about learning modern agricultural techniques and cooperative principles",
       location: "Musanze"
     }
   ];
