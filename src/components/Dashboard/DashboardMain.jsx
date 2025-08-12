@@ -387,7 +387,7 @@ const DashboardMain = () => {
         </div>
 
         {/* Quick Actions */}
-        {/* <div className="mb-4 sm:mb-6 lg:mb-8">
+        <div className="mb-4 sm:mb-6 lg:mb-8">
           <h3 className="text-sm sm:text-base lg:text-lg font-semibold text-gray-800 mb-3 sm:mb-4">Quick Actions</h3>
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-2 sm:gap-3 lg:gap-4">
             {quickActions.map((action, index) => (
@@ -400,7 +400,7 @@ const DashboardMain = () => {
               </button>
             ))}
           </div>
-        </div> */}
+        </div>
 
         {/* Recent Activity and System Health */}
         <div className="grid grid-cols-1 xl:grid-cols-3 gap-4 sm:gap-6">
@@ -568,6 +568,34 @@ const DashboardMain = () => {
           </div>
         </div>
 
+        <GELEPUserGrowthChart/>
+      </div>
+
+      {/* Footer */}
+      <footer className="bg-gray-50 border-t border-gray-200 mt-8">
+        <div className="max-w-full mx-auto px-3 sm:px-4 lg:px-6 py-4">
+          <div className="flex flex-col sm:flex-row items-center justify-between text-center sm:text-left">
+            <div className="mb-2 sm:mb-0">
+              <p className="text-sm text-gray-600">
+                © 2025 <span className="font-semibold text-purple-600">GELEP</span> - Gender Equality Leadership Empowerment Platform
+              </p>
+            </div>
+            <div className="flex items-center space-x-4 text-xs text-gray-500">
+              <span>Made with ❤️ for gender equality</span>
+              <span>•</span>
+              <span>v1.0.0</span>
+            </div>
+          </div>
+        </div>
+      </footer>
+    </div>
+  );
+};
+
+export default DashboardMain;
+
+
+
         {/* Detailed System Metrics */}
         {/* Server Metrics */}
         {/* {healthData && healthData.details && (
@@ -664,21 +692,3 @@ const DashboardMain = () => {
         )} */}
 
         {/* <UserGrowthAnalytics/> */}
-
-        <GELEPUserGrowthChart/>
-
-        {/* Last Updated Timestamp */}
-        {healthData && healthData.details && (
-          <div className="mt-4 sm:mt-6 text-center">
-            <div className="flex items-center justify-center text-xs sm:text-sm text-gray-500">
-              <Clock size={12} className="mr-1 flex-shrink-0 sm:w-3.5 sm:h-3.5" />
-              Last updated: {new Date(healthData.details.timestamp).toLocaleString()}
-            </div>
-          </div>
-        )}
-      </div>
-    </div>
-  );
-};
-
-export default DashboardMain;
