@@ -300,26 +300,122 @@ const MentorshipDashboard = () => {
   const uniqueFields = [...new Set(mentors.map(mentor => mentor.field))];
 
   // Components
-  const MentorCard = ({ mentor, isMatched = false, matchData = null }) => {
-    const [showRequestForm, setShowRequestForm] = useState(false);
-    const [requestMessage, setRequestMessage] = useState('');
-    return (
-      <div className="bg-white rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 border border-gray-100">
-        <div className="p-6">
-          <div className="flex items-start justify-between">
+  // const MentorCard = ({ mentor, isMatched = false, matchData = null }) => {
+  //   const [showRequestForm, setShowRequestForm] = useState(false);
+  //   const [requestMessage, setRequestMessage] = useState('');
+  //   return (
+  //     <div className="bg-white rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 border border-gray-100">
+  //       <div className="p-6">
+  //         <div className="flex items-start justify-between">
+  //           <div className="flex-1">
+  //             <div className="flex items-center space-x-3 mb-3">
+  //               <div className="w-12 h-12 bg-gradient-to-br from-purple-500 to-pink-500 rounded-full flex items-center justify-center text-white font-semibold">
+  //                 {mentor.firstName?.[0]}{mentor.lastName?.[0]}
+  //               </div>
+  //               <div>
+  //                 <h3 className="text-lg font-semibold text-gray-900">
+  //                   {mentor.firstName} {mentor.lastName}
+  //                 </h3>
+  //                 {/* <p className="text-sm text-gray-600">{mentor.company}</p> */}
+  //                 <p className="text-sm text-gray-600">{mentor.userRole}</p>
+  //               </div>
+  //             </div>
+  //             <div className="space-y-2 mb-4">
+  //               <div className="flex items-center text-sm text-gray-600">
+  //                 <BookOpen className="w-4 h-4 mr-2 text-purple-500" />
+  //                 {mentor.field}
+  //               </div>
+  //               <div className="flex items-center text-sm text-gray-600">
+  //                 <Award className="w-4 h-4 mr-2 text-purple-500" />
+  //                 {mentor.yearsOfExperience} years experience
+  //               </div>
+  //               <div className="flex items-center text-sm text-gray-600">
+  //                 <Star className="w-4 h-4 mr-2 text-purple-500" />
+  //                 {mentor.specialization}
+  //               </div>
+  //             </div>
+  //             {isMatched && matchData && (
+  //               <div className="bg-green-50 border border-green-200 rounded-lg p-3 mb-4">
+  //                 <div className="flex items-center justify-between mb-2">
+  //                   <span className="text-sm font-medium text-green-800">
+  //                     {matchData.compatibility} Match
+  //                   </span>
+  //                   <span className="text-sm text-green-600">
+  //                     {matchData.matchScore}% compatibility
+  //                   </span>
+  //                 </div>
+  //                 <p className="text-xs text-green-700">
+  //                   {matchData.matchReasons?.join(', ')}
+  //                 </p>
+  //               </div>
+  //             )}
+  //           </div>
+  //         </div>
+  //         {!showRequestForm ? (
+  //           <button
+  //             onClick={() => setShowRequestForm(true)}
+  //             className="w-full bg-gradient-to-r from-purple-600 to-pink-600 text-white py-2 px-4 rounded-lg hover:from-purple-700 hover:to-pink-700 transition-all duration-200 flex items-center justify-center space-x-2"
+  //           >
+  //             <UserPlus className="w-4 h-4" />
+  //             <span>Request Mentorship</span>
+  //           </button>
+  //         ) : (
+  //           <div className="space-y-3">
+  //             <textarea
+  //               placeholder="Write a message to introduce yourself and explain why you'd like this mentor..."
+  //               value={requestMessage}
+  //               onChange={(e) => setRequestMessage(e.target.value)}
+  //               className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent resize-none"
+  //               rows={3}
+  //             />
+  //             <div className="flex space-x-2">
+  //               <button
+  //                 onClick={() => {
+  //                   handleSelectMentor(mentor.id, requestMessage);
+  //                   setShowRequestForm(false);
+  //                   setRequestMessage('');
+  //                 }}
+  //                 disabled={loading || !requestMessage.trim()}
+  //                 className="flex-1 bg-purple-600 text-white py-2 px-4 rounded-lg hover:bg-purple-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+  //               >
+  //                 Send Request
+  //               </button>
+  //               <button
+  //                 onClick={() => {
+  //                   setShowRequestForm(false);
+  //                   setRequestMessage('');
+  //                 }}
+  //                 className="px-4 py-2 text-gray-600 hover:text-gray-800 transition-colors"
+  //               >
+  //                 Cancel
+  //               </button>
+  //             </div>
+  //           </div>
+  //         )}
+  //       </div>
+  //     </div>
+  //   );
+  // };
+
+// Components
+const MentorCard = ({ mentor, isMatched = false, matchData = null }) => {
+  const [showRequestForm, setShowRequestForm] = useState(false);
+  const [requestMessage, setRequestMessage] = useState('');
+  return (
+    <div className="bg-white rounded-2xl shadow-sm border border-gray-100 hover:shadow-md transition-all duration-300">
+      <div className="p-6">
+        <div className="flex items-start justify-between">
+          <div className="flex items-start space-x-3">
+            <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-blue-600 rounded-full flex items-center justify-center text-white font-semibold flex-shrink-0">
+              {mentor.firstName?.[0]}{mentor.lastName?.[0]}
+            </div>
             <div className="flex-1">
-              <div className="flex items-center space-x-3 mb-3">
-                <div className="w-12 h-12 bg-gradient-to-br from-purple-500 to-pink-500 rounded-full flex items-center justify-center text-white font-semibold">
-                  {mentor.firstName?.[0]}{mentor.lastName?.[0]}
-                </div>
-                <div>
-                  <h3 className="text-lg font-semibold text-gray-900">
-                    {mentor.firstName} {mentor.lastName}
-                  </h3>
-                  <p className="text-sm text-gray-600">{mentor.company}</p>
-                </div>
-              </div>
-              <div className="space-y-2 mb-4">
+              <h3 className="text-lg font-semibold text-gray-900">
+                {mentor.firstName} {mentor.lastName}
+              </h3>
+              <p className="text-sm text-gray-600 mb-2">{mentor.userRole}</p>
+              
+              <div className="space-y-1">
                 <div className="flex items-center text-sm text-gray-600">
                   <BookOpen className="w-4 h-4 mr-2 text-purple-500" />
                   {mentor.field}
@@ -333,68 +429,73 @@ const MentorshipDashboard = () => {
                   {mentor.specialization}
                 </div>
               </div>
-              {isMatched && matchData && (
-                <div className="bg-green-50 border border-green-200 rounded-lg p-3 mb-4">
-                  <div className="flex items-center justify-between mb-2">
-                    <span className="text-sm font-medium text-green-800">
-                      {matchData.compatibility} Match
-                    </span>
-                    <span className="text-sm text-green-600">
-                      {matchData.matchScore}% compatibility
-                    </span>
-                  </div>
-                  <p className="text-xs text-green-700">
-                    {matchData.matchReasons?.join(', ')}
-                  </p>
-                </div>
-              )}
             </div>
           </div>
-          {!showRequestForm ? (
+          {!showRequestForm && (
             <button
               onClick={() => setShowRequestForm(true)}
-              className="w-full bg-gradient-to-r from-purple-600 to-pink-600 text-white py-2 px-4 rounded-lg hover:from-purple-700 hover:to-pink-700 transition-all duration-200 flex items-center justify-center space-x-2"
+              className="bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 transition-all duration-200 flex items-center space-x-2 text-sm font-medium flex-shrink-0"
             >
               <UserPlus className="w-4 h-4" />
               <span>Request Mentorship</span>
             </button>
-          ) : (
-            <div className="space-y-3">
-              <textarea
-                placeholder="Write a message to introduce yourself and explain why you'd like this mentor..."
-                value={requestMessage}
-                onChange={(e) => setRequestMessage(e.target.value)}
-                className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent resize-none"
-                rows={3}
-              />
-              <div className="flex space-x-2">
-                <button
-                  onClick={() => {
-                    handleSelectMentor(mentor.id, requestMessage);
-                    setShowRequestForm(false);
-                    setRequestMessage('');
-                  }}
-                  disabled={loading || !requestMessage.trim()}
-                  className="flex-1 bg-purple-600 text-white py-2 px-4 rounded-lg hover:bg-purple-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                >
-                  Send Request
-                </button>
-                <button
-                  onClick={() => {
-                    setShowRequestForm(false);
-                    setRequestMessage('');
-                  }}
-                  className="px-4 py-2 text-gray-600 hover:text-gray-800 transition-colors"
-                >
-                  Cancel
-                </button>
-              </div>
-            </div>
           )}
         </div>
+
+        {isMatched && matchData && (
+          <div className="bg-green-50 border border-green-200 rounded-lg p-3 mb-4 mt-4">
+            <div className="flex items-center justify-between mb-2">
+              <span className="text-sm font-medium text-green-800">
+                {matchData.compatibility} Match
+              </span>
+              <span className="text-sm text-green-600">
+                {matchData.matchScore}% compatibility
+              </span>
+            </div>
+            <p className="text-xs text-green-700">
+              {matchData.matchReasons?.join(', ')}
+            </p>
+          </div>
+        )}
+
+        {showRequestForm && (
+          <div className="space-y-3 mt-4">
+            <textarea
+              placeholder="Write a message to introduce yourself and explain why you'd like this mentor..."
+              value={requestMessage}
+              onChange={(e) => setRequestMessage(e.target.value)}
+              className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent resize-none"
+              rows={3}
+            />
+            <div className="flex space-x-2">
+              <button
+                onClick={() => {
+                  handleSelectMentor(mentor.id, requestMessage);
+                  setShowRequestForm(false);
+                  setRequestMessage('');
+                }}
+                disabled={loading || !requestMessage.trim()}
+                className="flex-1 bg-purple-600 text-white py-2 px-4 rounded-lg hover:bg-purple-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                Send Request
+              </button>
+              <button
+                onClick={() => {
+                  setShowRequestForm(false);
+                  setRequestMessage('');
+                }}
+                className="px-4 py-2 text-gray-600 hover:text-gray-800 transition-colors"
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
+        )}
       </div>
-    );
-  };
+    </div>
+  );
+};
+
 
   const MentorshipCard = ({ mentorship }) => {
     const formatDate = (dateString) => {
@@ -792,74 +893,6 @@ const MentorshipDashboard = () => {
       </div>
     );
   };
-
-  const AnalyticsPanel = () => {
-    return (
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-        <div className="bg-white rounded-xl shadow-lg p-6 border border-gray-100">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm font-medium text-gray-600">
-                {currentUser.userRole === 'mentor' ? 'Active Mentees' : 'Active Mentorships'}
-              </p>
-              <p className="text-2xl font-bold text-gray-900">
-                {analytics.activeMentorships || 0}
-              </p>
-            </div>
-            <div className="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center">
-              <Users className="w-6 h-6 text-purple-600" />
-            </div>
-          </div>
-          <div className="mt-4">
-            <div className="flex items-center text-sm text-green-600">
-              <TrendingUp className="w-4 h-4 mr-1" />
-              <span>+{analytics.growthRate || 0}% this month</span>
-            </div>
-          </div>
-        </div>
-        <div className="bg-white rounded-xl shadow-lg p-6 border border-gray-100">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm font-medium text-gray-600">Messages Sent</p>
-              <p className="text-2xl font-bold text-gray-900">
-                {analytics.messagesSent || 0}
-              </p>
-            </div>
-            <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
-              <MessageSquare className="w-6 h-6 text-blue-600" />
-            </div>
-          </div>
-        </div>
-        <div className="bg-white rounded-xl shadow-lg p-6 border border-gray-100">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm font-medium text-gray-600">Goals Completed</p>
-              <p className="text-2xl font-bold text-gray-900">
-                {analytics.goalsCompleted || 0}
-              </p>
-            </div>
-            <div className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center">
-              <Target className="w-6 h-6 text-green-600" />
-            </div>
-          </div>
-        </div>
-        <div className="bg-white rounded-xl shadow-lg p-6 border border-gray-100">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm font-medium text-gray-600">Success Rate</p>
-              <p className="text-2xl font-bold text-gray-900">
-                {analytics.successRate || 0}%
-              </p>
-            </div>
-            <div className="w-12 h-12 bg-yellow-100 rounded-lg flex items-center justify-center">
-              <Award className="w-6 h-6 text-yellow-600" />
-            </div>
-          </div>
-        </div>
-      </div>
-    );
-  };
-
   const LoadingSpinner = () => (
     <div className="flex items-center justify-center py-12">
       <RefreshCw className="w-8 h-8 text-purple-600 animate-spin" />
@@ -911,7 +944,7 @@ const MentorshipDashboard = () => {
           </p>
         </div>
         {/* Analytics Panel */}
-        <AnalyticsPanel />
+        {/* <AnalyticsPanel /> */}
         {/* Error Alert */}
         <ErrorAlert />
         {/* Navigation Tabs */}
@@ -1035,7 +1068,8 @@ const MentorshipDashboard = () => {
                   </div>
                 </div>
                 {/* Mentors Grid */}
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {/* <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"> */}
+                <div className="space-y-4">
                   {filteredMentors.length > 0 ? (
                     filteredMentors.map(mentor => (
                       <MentorCard key={mentor.id} mentor={mentor} />
@@ -1058,7 +1092,8 @@ const MentorshipDashboard = () => {
                   <h2 className="text-2xl font-bold text-gray-900 mb-2">Mentors Matched for You</h2>
                   <p className="text-gray-600">Based on your profile and preferences, here are your top mentor matches.</p>
                 </div>
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {/* <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"> */}
+                <div className="space-y-4">
                   {matchedMentors.length > 0 ? (
                     matchedMentors.map(match => (
                       <MentorCard
