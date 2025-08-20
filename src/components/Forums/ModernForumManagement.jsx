@@ -4,6 +4,8 @@ import {
 } from 'lucide-react';
 import ForumForm from './ForumForm'; 
 import { formatDate} from './formatDate';
+import ForumHeader from './ForumHeader';
+
 
 // Column definitions
 const columnsList = [
@@ -206,7 +208,7 @@ const EditModal = ({
 
 const ModernForumManagement = () => {
 
-    const [showForumModal, setShowForumModal] = useState(false);
+  const [showForumModal, setShowForumModal] = useState(false);
 
   const [forums, setForums] = useState([]);
   const [visibleColumns, setVisibleColumns] = useState({
@@ -227,31 +229,61 @@ const ModernForumManagement = () => {
   const [usersData, setUsersData] = useState([]);
 
   const handleCreateForum = () => {
-  setShowForumModal(true);
-};
+    setShowForumModal(true);
+  };
 
-const handleForumCreated = (newForum) => {
-  console.log('New forum created:', newForum);
-  // Add the new forum to the list
-  setForums(prev => [newForum, ...prev]);
-};
+  // FIXED: Update the handleForumCreated function
+  const handleForumCreated = async (newForum) => {
+    console.log('New forum created:', newForum);
+    
+    // Close the modal first
+    setShowForumModal(false);
+    
+    // Add the new forum to the list immediately for better UX
+    if (newForum) {
+      setForums(prev => [newForum, ...prev]);
+    }
+    
+    // Then refresh the data to ensure consistency
+    try {
+      await fetchForums();
+    } catch (error) {
+      console.error('Error refreshing forums after creation:', error);
+      // If refresh fails, at least we have the optimistic update above
+    }
+  };
 
-
-
-
+  // FIXED: Get auth token function
+  const getAuthToken = () => {
+    if (typeof window !== 'undefined') {
+      const tokenKeys = ['token', 'authToken', 'accessToken', 'jwt', 'bearerToken'];
+      for (const key of tokenKeys) {
+        const storedToken = localStorage.getItem(key);
+        if (storedToken) {
+          console.log(`Found token with key: ${key}`);
+          return storedToken;
+        }
+      }
+    }
+    console.warn('No auth token found in localStorage');
+    return null;
+  };
 
   const fetchUsersByIds = async (userIds) => {
     try {
-      const token = localStorage.getItem('token') || localStorage.getItem('authToken') || localStorage.getItem('accessToken');
+      const token = getAuthToken();
+      
+      if (!token) {
+        console.warn('No auth token available for fetching users');
+        return [];
+      }
       
       // Method 1: Try bulk fetch if your API supports it
-    //   const bulkResponse = await fetch('http://localhost:3000/api/v1/users/bulk', {
       const bulkResponse = await fetch('http://localhost:3000/api/v1/users', {
-
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          ...(token && { Authorization: `Bearer ${token}` })
+          'Authorization': `Bearer ${token}`
         },
         body: JSON.stringify({ userIds })
       });
@@ -268,7 +300,7 @@ const handleForumCreated = (newForum) => {
           const response = await fetch(`http://localhost:3000/api/v1/users/${userId}`, {
             headers: {
               'Content-Type': 'application/json',
-              ...(token && { Authorization: `Bearer ${token}` })
+              'Authorization': `Bearer ${token}`
             }
           });
           
@@ -291,11 +323,13 @@ const handleForumCreated = (newForum) => {
       
       // Method 3: Try alternative endpoint structure
       try {
-        const token = localStorage.getItem('token') || localStorage.getItem('authToken') || localStorage.getItem('accessToken');
+        const token = getAuthToken();
+        if (!token) return [];
+        
         const response = await fetch('http://localhost:3000/api/v1/users', {
           headers: {
             'Content-Type': 'application/json',
-            ...(token && { Authorization: `Bearer ${token}` })
+            'Authorization': `Bearer ${token}`
           }
         });
 
@@ -313,25 +347,50 @@ const handleForumCreated = (newForum) => {
     }
   };
 
-
-
-// Replace your existing fetchForums function with this:
+  // FIXED: Improved fetchForums function
   const fetchForums = async () => {
     setLoading(true);
     setError('');
+    
     try {
-      const token = localStorage.getItem('token') || localStorage.getItem('authToken') || localStorage.getItem('accessToken');
-      const res = await fetch('http://localhost:3000/api/v1/forums', {
+      const token = getAuthToken();
+      
+      if (!token) {
+        throw new Error('No authentication token found. Please log in.');
+      }
+
+      const response = await fetch('http://localhost:3000/api/v1/forums', {
+        method: 'GET',
         headers: { 
           'Content-Type': 'application/json', 
-          ...(token && { Authorization: `Bearer ${token}` }) 
+          'Authorization': `Bearer ${token}`
         }
       });
       
-      if (!res.ok) throw new Error('Failed to fetch forum posts');
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.message || `Failed to fetch forums: ${response.status} ${response.statusText}`);
+      }
       
-      const data = await res.json();
-      const forumsArray = Array.isArray(data) ? data : (data.forums || data.data || []);
+      const data = await response.json();
+      console.log('Raw API response:', data);
+      
+      // Handle different response formats
+      let forumsArray = [];
+      if (Array.isArray(data)) {
+        forumsArray = data;
+      } else if (data && typeof data === 'object') {
+        forumsArray = data.forums || data.data || data.results || [];
+      }
+      
+      console.log('Processed forums array:', forumsArray);
+      
+      // Ensure we have an array
+      if (!Array.isArray(forumsArray)) {
+        console.warn('Forums data is not an array:', forumsArray);
+        forumsArray = [];
+      }
+      
       setForums(forumsArray);
       
       // Extract unique user IDs from forums
@@ -373,9 +432,14 @@ const handleForumCreated = (newForum) => {
         console.warn('No user IDs found in forums data');
         setUsersData([]);
       }
+      
+      setError(''); // Clear any previous errors
+      
     } catch (err) {
       console.error('Error fetching forums:', err);
-      setError(err.message || 'Failed to load forum posts');
+      const errorMessage = err.message || 'Failed to load forum posts';
+      setError(errorMessage);
+      setForums([]); // Set empty array on error
     } finally {
       setLoading(false);
     }
@@ -455,22 +519,28 @@ const handleForumCreated = (newForum) => {
   // Delete forum post
   const handleDelete = async (forumId) => {
     try {
-      const token = localStorage.getItem('token') || localStorage.getItem('authToken') || localStorage.getItem('accessToken');
+      const token = getAuthToken();
+      
+      if (!token) {
+        throw new Error('No authentication token found');
+      }
+
       const res = await fetch(`http://localhost:3000/api/v1/forums/${forumId}`, {
         method: 'DELETE',
         headers: { 
           'Content-Type': 'application/json', 
-          ...(token && { Authorization: `Bearer ${token}` }) 
+          'Authorization': `Bearer ${token}`
         }
       });
       
       if (!res.ok) {
-        const errorData = await res.json();
-        throw new Error(errorData.message || 'Failed to delete forum post');
+        const errorData = await res.json().catch(() => ({}));
+        throw new Error(errorData.message || `Failed to delete forum post: ${res.status} ${res.statusText}`);
       }
       
       setForums(forums.filter(f => f.id !== forumId));
     } catch (err) {
+      console.error('Delete error:', err);
       alert(err.message || 'Failed to delete forum post');
     }
   };
@@ -478,25 +548,31 @@ const handleForumCreated = (newForum) => {
   // Update forum post
   const handleUpdate = async (forumId, formData) => {
     try {
-      const token = localStorage.getItem('token') || localStorage.getItem('authToken') || localStorage.getItem('accessToken');
+      const token = getAuthToken();
+      
+      if (!token) {
+        throw new Error('No authentication token found');
+      }
+
       const res = await fetch(`http://localhost:3000/api/v1/forums/${forumId}`, {
         method: 'PUT',
         headers: { 
           'Content-Type': 'application/json', 
-          ...(token && { Authorization: `Bearer ${token}` }) 
+          'Authorization': `Bearer ${token}`
         },
         body: JSON.stringify(formData)
       });
       
       if (!res.ok) {
-        const errorData = await res.json();
-        throw new Error(errorData.message || 'Failed to update forum post');
+        const errorData = await res.json().catch(() => ({}));
+        throw new Error(errorData.message || `Failed to update forum post: ${res.status} ${res.statusText}`);
       }
       
       const updatedForum = await res.json();
       setForums(forums.map(f => f.id === forumId ? updatedForum : f));
       setEditModal({ isOpen: false, forumToEdit: null });
     } catch (err) {
+      console.error('Update error:', err);
       alert(err.message || 'Failed to update forum post');
     }
   };
@@ -517,11 +593,6 @@ const handleForumCreated = (newForum) => {
   const handleEditClick = (forum) => setEditModal({ isOpen: true, forumToEdit: forum });
   const handleEditSave = (forumId, formData) => handleUpdate(forumId, formData);
   const handleEditCancel = () => setEditModal({ isOpen: false, forumToEdit: null });
-
-
-
-
-
 
   // Truncate content
   const truncateContent = (content, maxLength = 100) => {
@@ -595,8 +666,6 @@ const handleForumCreated = (newForum) => {
                   <User className="w-4 h-4 text-green-600" />
                 </div>
                 <span className="text-gray-700 text-sm">{getUserName(forum?.user_id)}</span>
-
-                {/* <span className="text-gray-700 text-sm">{forum?.user_id || 'Unknown'}</span> */}
               </div>
             )}
             {visibleColumns.created_at && (
@@ -604,9 +673,7 @@ const handleForumCreated = (newForum) => {
                 <div className="w-8 h-8 bg-yellow-100 rounded-full flex items-center justify-center">
                   <Clock className="w-4 h-4 text-yellow-600" />
                 </div>
-                {/* <span className="text-gray-700 text-sm">{formatDate(forum?.created_at)}</span> */}
                 <span className="text-gray-700 text-sm">{formatDate(forum?.createdAt) || 'N/A'}</span>
-
               </div>
             )}
             {visibleColumns.actions && (
@@ -659,353 +726,168 @@ const handleForumCreated = (newForum) => {
             </button>
           );
         })}
-        {totalPages > 5 && (
-          <>
-            <span className="text-gray-600 px-2">...</span>
-            <button
-              onClick={() => setCurrentPage(totalPages)}
-              className={`px-4 py-2 text-sm rounded-lg border transition-colors ${
-                currentPage === totalPages
-                  ? 'bg-blue-500 text-white border-blue-500 shadow-lg'
-                  : 'text-gray-600 hover:text-gray-800 hover:bg-white border-gray-200 bg-white'
-              }`}
-            >
-              {totalPages}
-            </button>
-          </>
-        )}
-        <button onClick={() => setCurrentPage(Math.min(totalPages, currentPage + 1))} disabled={currentPage === totalPages} className="px-4 py-2 text-sm text-gray-600 hover:text-gray-800 disabled:opacity-50 disabled:cursor-not-allowed bg-white rounded-lg border border-gray-200 hover:bg-gray-50 transition-colors">›</button>
+        <button 
+          onClick={() => setCurrentPage(Math.min(totalPages, currentPage + 1))} 
+          disabled={currentPage === totalPages} 
+          className="px-4 py-2 text-sm text-gray-600 hover:text-gray-800 disabled:opacity-50 disabled:cursor-not-allowed bg-white rounded-lg border border-gray-200 hover:bg-gray-50 transition-colors"
+        >
+          ›
+        </button>
       </div>
     </div>
   );
 
-  if (loading) {
-    return (
-      <div className="flex items-center justify-center h-64 px-4">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500"></div>
-        <span className="ml-2 text-gray-600 text-sm sm:text-base">Loading forum posts...</span>
-      </div>
-    );
-  }
-
-  if (!paginatedForums || paginatedForums.length === 0) {
-    return (
-      <div className="min-h-screen bg-gray-50 p-6">
-        <div className="max-w-7xl mx-auto">
-          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-6 gap-4 bg-white rounded-xl p-4 shadow-sm">
-            <div className="flex items-center gap-4">
-              <button className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2.5 rounded-xl flex items-center gap-2 transition-all duration-200 shadow-sm hover:shadow-md font-medium">
-                <Plus className="w-4 h-4" />
-                Create Post
-              </button>
-            </div>
-            <div className="flex items-center gap-3">
-              <div className="relative">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
-                <input
-                  type="text"
-                  placeholder="Search forums..."
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  className="pl-10 pr-4 py-2.5 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent w-64 bg-white shadow-sm"
-                />
-              </div>
-            </div>
-          </div>
-          <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
-            <div className="p-12 text-center">
-              <MessageSquare className="w-16 h-16 text-gray-300 mx-auto mb-4" />
-              <p className="text-gray-800 text-xl font-semibold mb-2">No forum posts found</p>
-              <p className="text-gray-500">Try adjusting your search criteria or create a new post.</p>
-            </div>
-            <PaginationControls />
-          </div>
-        </div>
-      </div>
-    );
-  }
-
   return (
-    <div className="min-h-screen bg-gray-50 p-6">
-      <div className="max-w-7xl mx-auto">
-        <div className="flex flex-col space-y-4 mb-4 sm:mb-6">
-          <div className="hidden lg:flex items-center justify-between bg-white rounded-lg shadow-sm p-4 border border-gray-200">
-            <button onClick={handleCreateForum} className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm flex items-center space-x-2 transition-colors shadow-sm">
-              <Plus className="w-4 h-4" />
-              <span>Create Post</span>
-            </button>
-            <div className="flex items-center space-x-3">
-              <div className="relative">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500 w-4 h-4" />
-                <input
-                  type="text"
-                  placeholder="Search forums..."
-                  value={searchTerm}
-                  onChange={e => setSearchTerm(e.target.value)}
-                  className="bg-gray-50 text-gray-700 placeholder-gray-500 pl-10 pr-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 w-64"
-                />
-              </div>
-              <button onClick={fetchForums} className="bg-blue-600 hover:bg-blue-700 text-white p-2 rounded-lg shadow-sm transition-colors" title="Refresh">
-                <RefreshCw className="w-4 h-4" />
-              </button>
-              <button onClick={() => setViewMode(viewMode === 'table' ? 'cards' : 'table')} className="bg-blue-600 hover:bg-blue-700 text-white p-2 rounded-lg shadow-sm transition-colors" title={viewMode === 'table' ? 'Card View' : 'Table View'}>
-                <MessageSquare className="w-4 h-4" />
-              </button>
-              <div className="relative column-toggle-container">
-                <button onClick={() => setShowColumnToggle(!showColumnToggle)} className="bg-blue-600 hover:bg-blue-700 text-white p-2 rounded-lg shadow-sm transition-colors" title="Column Visibility">
-                  <Grid3X3 className="w-4 h-4" />
-                </button>
-                {showColumnToggle && (
-                  <div className="absolute right-0 top-full mt-2 bg-white rounded-lg shadow-lg border border-gray-200 py-2 px-3 z-50 min-w-[150px]">
-                    {columnsList.map(column => (
-                      <label key={column.key} className="flex items-center space-x-2 py-1 cursor-pointer text-gray-700 hover:bg-gray-50 rounded px-2">
-                        <input
-                          type="checkbox"
-                          checked={visibleColumns[column.key]}
-                          onChange={() => toggleColumn(column.key)}
-                          className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500"
-                        />
-                        <span className="text-sm">{column.label}</span>
-                      </label>
-                    ))}
-                  </div>
-                )}
+    <div className="min-h-screen bg-gray-50 p-4 lg:p-6">
+      <div className="mx-auto max-w-7xl">
+        {/* Header */}
+
+        <ForumHeader
+          handleCreateForum={handleCreateForum}
+          fetchForums={fetchForums}
+          loading={loading}
+          searchTerm={searchTerm}
+          setSearchTerm={setSearchTerm}
+          showColumnToggle={showColumnToggle}
+          setShowColumnToggle={setShowColumnToggle}
+          visibleColumns={visibleColumns}
+          toggleColumn={toggleColumn}
+          viewMode={viewMode}
+          setViewMode={setViewMode}
+          indexOfFirstItem={actualStartIndex}
+          indexOfLastItem={Math.min(actualStartIndex + itemsPerPage, filteredForums.length)}
+          totalItems={filteredForums.length}
+        />
+
+        {/* Main Content */}
+        <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+          {loading ? (
+            <div className="flex items-center justify-center py-12">
+              <div className="flex flex-col items-center space-y-4">
+                <RefreshCw className="w-8 h-8 text-blue-500 animate-spin" />
+                <p className="text-gray-600 font-medium">Loading forum posts...</p>
               </div>
             </div>
-          </div>
-          
-          {/* Mobile Header */}
-          <div className="lg:hidden bg-white rounded-lg shadow-sm p-4 border border-gray-200">
-            <div className="flex items-center justify-between mb-3">
-              <button onClick={handleCreateForum} className="bg-blue-600 hover:bg-blue-700 text-white px-3 py-2 rounded-lg text-sm flex items-center space-x-2 transition-colors">
-                <Plus className="w-4 h-4" />
-                <span className="hidden sm:inline">Create Post</span>
-                <span className="sm:hidden">Create</span>
-              </button>
-              <button onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)} className="bg-blue-600 hover:bg-blue-700 text-white p-2 rounded-lg">
-                {isMobileMenuOpen ? <X className="w-4 h-4" /> : <Menu className="w-4 h-4" />}
-              </button>
-            </div>
-            <div className="relative mb-3">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500 w-4 h-4" />
-              <input
-                type="text"
-                placeholder="Search forums"value={searchTerm}
-              onChange={e => setSearchTerm(e.target.value)}
-              className="bg-gray-50 text-gray-700 placeholder-gray-500 pl-10 pr-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 w-full"
-            />
-          </div>
-          {isMobileMenuOpen && (
-            <div className="flex flex-wrap gap-2 pt-2 border-t border-gray-200">
-              <button onClick={fetchForums} className="bg-blue-600 hover:bg-blue-700 text-white px-3 py-2 rounded-lg text-sm flex items-center space-x-2 transition-colors">
-                <RefreshCw className="w-4 h-4" />
-                <span>Refresh</span>
-              </button>
-              <button onClick={() => setViewMode(viewMode === 'table' ? 'cards' : 'table')} className="bg-blue-600 hover:bg-blue-700 text-white px-3 py-2 rounded-lg text-sm flex items-center space-x-2 transition-colors">
-                <MessageSquare className="w-4 h-4" />
-                <span>{viewMode === 'table' ? 'Cards' : 'Table'}</span>
-              </button>
-              <div className="relative">
-                <button onClick={() => setShowColumnToggle(!showColumnToggle)} className="bg-blue-600 hover:bg-blue-700 text-white px-3 py-2 rounded-lg text-sm flex items-center space-x-2 transition-colors">
-                  <Grid3X3 className="w-4 h-4" />
-                  <span>Columns</span>
+          ) : error ? (
+            <div className="flex items-center justify-center py-12">
+              <div className="flex flex-col items-center space-y-4 text-center">
+                <AlertCircle className="w-8 h-8 text-red-500" />
+                <div>
+                  <p className="text-red-600 font-medium">Error loading forums</p>
+                  <p className="text-gray-600 text-sm mt-1">{error}</p>
+                </div>
+                <button
+                  onClick={fetchForums}
+                  className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm transition-colors"
+                >
+                  Try Again
                 </button>
-                {showColumnToggle && (
-                  <div className="absolute left-0 top-full mt-2 bg-white rounded-lg shadow-lg border border-gray-200 py-2 px-3 z-50 min-w-[150px]">
-                    {columnsList.map(column => (
-                      <label key={column.key} className="flex items-center space-x-2 py-1 cursor-pointer text-gray-700 hover:bg-gray-50 rounded px-2">
-                        <input
-                          type="checkbox"
-                          checked={visibleColumns[column.key]}
-                          onChange={() => toggleColumn(column.key)}
-                          className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500"
-                        />
-                        <span className="text-sm">{column.label}</span>
-                      </label>
-                    ))}
-                  </div>
-                )}
               </div>
+            </div>
+          ) : filteredForums.length === 0 ? (
+            <div className="flex items-center justify-center py-12">
+              <div className="flex flex-col items-center space-y-4 text-center">
+                <MessageSquare className="w-8 h-8 text-gray-400" />
+                <div>
+                  <p className="text-gray-600 font-medium">No forum posts found</p>
+                  <p className="text-gray-500 text-sm mt-1">
+                    {searchTerm ? 'Try adjusting your search terms' : 'Create your first forum post'}
+                  </p>
+                </div>
+              </div>
+            </div>
+          ) : viewMode === 'cards' ? (
+            <div className="p-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+                {paginatedForums.map((forum, index) => (
+                  <MobileCard key={forum?.id || index} forum={forum} index={index} />
+                ))}
+              </div>
+              <PaginationControls />
+            </div>
+          ) : (
+            <div className="overflow-x-auto">
+              <table className="w-full">
+                <thead className="bg-gray-50 border-b border-gray-200">
+                  <tr>
+                    {visibleColumns.id && <th className="px-6 py-4 text-left text-sm font-semibold text-gray-900">ID</th>}
+                    {visibleColumns.title && <th className="px-6 py-4 text-left text-sm font-semibold text-gray-900">Title</th>}
+                    {visibleColumns.content && <th className="px-6 py-4 text-left text-sm font-semibold text-gray-900">Content</th>}
+                    {visibleColumns.category && <th className="px-6 py-4 text-left text-sm font-semibold text-gray-900">Category</th>}
+                    {visibleColumns.author && <th className="px-6 py-4 text-left text-sm font-semibold text-gray-900">Author</th>}
+                    {visibleColumns.created_at && <th className="px-6 py-4 text-left text-sm font-semibold text-gray-900">Created At</th>}
+                    {visibleColumns.actions && <th className="px-6 py-4 text-left text-sm font-semibold text-gray-900">Actions</th>}
+                  </tr>
+                </thead>
+                <tbody className="bg-white divide-y divide-gray-200">
+                  {paginatedForums.map((forum, index) => (
+                    <tr key={forum?.id || index} className="hover:bg-gray-50 transition-colors">
+                      {visibleColumns.id && <td className="px-6 py-4 text-sm text-gray-900">{actualStartIndex + index + 1}</td>}
+                      {visibleColumns.title && <td className="px-6 py-4 text-sm font-medium text-gray-900">{forum?.title || 'Untitled'}</td>}
+                      {visibleColumns.content && <td className="px-6 py-4 text-sm text-gray-700">{truncateContent(forum?.content)}</td>}
+                      {visibleColumns.category && (
+                        <td className="px-6 py-4 text-sm">
+                          <span className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium ${getCategoryColor(forum?.category)}`}>
+                            {getCategoryIcon(forum?.category)}
+                            <span className="ml-2">{forum?.category || 'N/A'}</span>
+                          </span>
+                        </td>
+                      )}
+                      {visibleColumns.author && <td className="px-6 py-4 text-sm text-gray-700">{getUserName(forum?.user_id)}</td>}
+                      {visibleColumns.created_at && <td className="px-6 py-4 text-sm text-gray-500">{formatDate(forum?.createdAt) || 'N/A'}</td>}
+                      {visibleColumns.actions && (
+                        <td className="px-6 py-4 text-sm">
+                          <div className="flex items-center space-x-2">
+                            <button
+                              onClick={() => handleEditClick(forum)}
+                              className="text-blue-600 hover:text-blue-800 p-2 rounded-lg hover:bg-blue-50 transition-colors"
+                              title="Edit"
+                            >
+                              <Edit className="w-4 h-4" />
+                            </button>
+                            <button
+                              onClick={() => handleDeleteClick(forum)}
+                              className="text-red-600 hover:text-red-800 p-2 rounded-lg hover:bg-red-50 transition-colors"
+                              title="Delete"
+                            >
+                              <Trash2 className="w-4 h-4" />
+                            </button>
+                          </div>
+                        </td>
+                      )}
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+              <PaginationControls />
             </div>
           )}
         </div>
       </div>
 
-      {error && (
-        <div className="mb-6 bg-red-50 border border-red-200 rounded-lg p-4">
-          <div className="flex items-center">
-            <AlertCircle className="w-5 h-5 text-red-500 mr-2" />
-            <span className="text-red-700">{error}</span>
-          </div>
-        </div>
-      )}
+      {/* Modals */}
+      <DeleteConfirmation
+        isOpen={deleteModal.isOpen}
+        forumToDelete={deleteModal.forumToDelete}
+        onConfirm={handleDeleteConfirm}
+        onCancel={handleDeleteCancel}
+      />
 
-      {/* Main Content */}
-      <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
-        {viewMode === 'table' ? (
-          <div className="overflow-x-auto">
-            <table className="w-full">
-              <thead className="bg-gray-50 border-b border-gray-200">
-                <tr>
-                  {visibleColumns.id && (
-                    <th className="text-left py-4 px-6 text-sm font-semibold text-gray-700 uppercase tracking-wider">
-                      <div className="flex items-center space-x-2">
-                        <Hash className="w-4 h-4 text-gray-500" />
-                        <span>ID</span>
-                      </div>
-                    </th>
-                  )}
-                  {visibleColumns.title && (
-                    <th className="text-left py-4 px-6 text-sm font-semibold text-gray-700 uppercase tracking-wider">
-                      <div className="flex items-center space-x-2">
-                        <MessageSquare className="w-4 h-4 text-gray-500" />
-                        <span>Title</span>
-                      </div>
-                    </th>
-                  )}
-                  {visibleColumns.content && (
-                    <th className="text-left py-4 px-6 text-sm font-semibold text-gray-700 uppercase tracking-wider">
-                      <div className="flex items-center space-x-2">
-                        <MessageSquare className="w-4 h-4 text-gray-500" />
-                        <span>Content</span>
-                      </div>
-                    </th>
-                  )}
-                  {visibleColumns.category && (
-                    <th className="text-left py-4 px-6 text-sm font-semibold text-gray-700 uppercase tracking-wider">
-                      <div className="flex items-center space-x-2">
-                        <Tag className="w-4 h-4 text-gray-500" />
-                        <span>Category</span>
-                      </div>
-                    </th>
-                  )}
-                  {visibleColumns.author && (
-                    <th className="text-left py-4 px-6 text-sm font-semibold text-gray-700 uppercase tracking-wider">
-                      <div className="flex items-center space-x-2">
-                        <User className="w-4 h-4 text-gray-500" />
-                        <span>Author</span>
-                      </div>
-                    </th>
-                  )}
-                  {visibleColumns.created_at && (
-                    <th className="text-left py-4 px-6 text-sm font-semibold text-gray-700 uppercase tracking-wider">
-                      <div className="flex items-center space-x-2">
-                        <Calendar className="w-4 h-4 text-gray-500" />
-                        <span>Created At</span>
-                      </div>
-                    </th>
-                  )}
-                  {visibleColumns.actions && (
-                    <th className="text-left py-4 px-6 text-sm font-semibold text-gray-700 uppercase tracking-wider">
-                      Actions
-                    </th>
-                  )}
-                </tr>
-              </thead>
-              <tbody className="bg-white divide-y divide-gray-200">
-                {paginatedForums.map((forum, index) => (
-                  <tr key={forum?.id || index} className="hover:bg-gray-50 transition-colors">
-                    {visibleColumns.id && (
-                      <td className="py-4 px-6 text-sm text-gray-900">
-                        {actualStartIndex + index + 1}
-                      </td>
-                    )}
-                    {visibleColumns.title && (
-                      <td className="py-4 px-6 text-sm">
-                        <div className="font-medium text-gray-900 line-clamp-2">
-                          {forum?.title || 'Untitled'}
-                        </div>
-                      </td>
-                    )}
-                    {visibleColumns.content && (
-                      <td className="py-4 px-6 text-sm text-gray-700 max-w-xs">
-                        <div className="line-clamp-3">
-                          {truncateContent(forum?.content)}
-                        </div>
-                      </td>
-                    )}
-                    {visibleColumns.category && (
-                      <td className="py-4 px-6 text-sm">
-                        <div className="flex items-center space-x-2">
-                          {getCategoryIcon(forum?.category)}
-                          <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${getCategoryColor(forum?.category)}`}>
-                            {forum?.category || 'N/A'}
-                          </span>
-                        </div>
-                      </td>
-                    )}
-                    {visibleColumns.author && (
-                    <td className="py-4 px-6 text-sm text-gray-700">
-                        {getUserName(forum?.user_id)}
-                    </td>
-                    )}
-                    {visibleColumns.created_at && (
-                      <td className="py-4 px-6 text-sm text-gray-700">
-                        {formatDate(forum?.createdAt) || 'N/A'}
-                         {/* {formatDate(entry?.completion_date)} */}
-
-                      </td>
-                    )}
-                    {visibleColumns.actions && (
-                      <td className="py-4 px-6 text-sm">
-                        <div className="flex items-center space-x-2">
-                          <button
-                            onClick={() => handleEditClick(forum)}
-                            className="text-blue-600 hover:text-blue-800 p-1 rounded-full hover:bg-blue-50 transition-colors"
-                            title="Edit"
-                          >
-                            <Edit className="w-4 h-4" />
-                          </button>
-                          <button
-                            onClick={() => handleDeleteClick(forum)}
-                            className="text-red-600 hover:text-red-800 p-1 rounded-full hover:bg-red-50 transition-colors"
-                            title="Delete"
-                          >
-                            <Trash2 className="w-4 h-4" />
-                          </button>
-                        </div>
-                      </td>
-                    )}
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        ) : (
-          <div className="p-6">
-            <div className="grid gap-4">
-              {paginatedForums.map((forum, index) => (
-                <MobileCard key={forum?.id || index} forum={forum} index={index} />
-              ))}
-            </div>
-          </div>
-        )}
-        
-        <PaginationControls />
-      </div>
+      <EditModal
+        isOpen={editModal.isOpen}
+        forum={editModal.forumToEdit}
+        onSave={handleEditSave}
+        onCancel={handleEditCancel}
+      />
+      {showForumModal && (
+  <ForumForm
+    showModal={showForumModal}                    // ✅ Changed from 'isOpen' to 'showModal'
+    setShowModal={setShowForumModal}              // ✅ Changed from 'onClose' to 'setShowModal'
+    onForumCreated={handleForumCreated}
+  />
+)}
     </div>
-    <ForumForm 
-  showModal={showForumModal}
-  setShowModal={setShowForumModal}
-  onForumCreated={handleForumCreated}
-/>
-
-    {/* Modals */}
-    <DeleteConfirmation
-      isOpen={deleteModal.isOpen}
-      forumToDelete={deleteModal.forumToDelete}
-      onConfirm={handleDeleteConfirm}
-      onCancel={handleDeleteCancel}
-    />
-    
-    <EditModal
-      isOpen={editModal.isOpen}
-      forum={editModal.forumToEdit}
-      onSave={handleEditSave}
-      onCancel={handleEditCancel}
-    />
-  </div>
-);
+  );
 };
 
 export default ModernForumManagement;

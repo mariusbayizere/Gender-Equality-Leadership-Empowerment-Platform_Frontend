@@ -340,6 +340,7 @@ const ModernCourseModulesManagement = () => {
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [moduleToEdit, setModuleToEdit] = useState(null);
   const [isEditMode, setIsEditMode] = useState(false);
+  const [courseMap, setCourseMap] = useState({});
 
   const [courses, setCourses] = useState([]);
 
@@ -374,7 +375,6 @@ const ModernCourseModulesManagement = () => {
     setModuleToEdit(null);
     setIsEditMode(false);
   };
-
   // Fetch modules from API
   const fetchModules = async () => {
     setLoading(true);
@@ -411,10 +411,37 @@ const ModernCourseModulesManagement = () => {
     }
   };
 
-  // Column toggle
-  const toggleColumn = (key) => {
-    setVisibleColumns(prev => ({ ...prev, [key]: !prev[key] }));
-  };
+  const fetchCourses = async () => {
+  try {
+    const token = localStorage.getItem('token') || localStorage.getItem('authToken') || localStorage.getItem('accessToken');
+    const res = await fetch('http://localhost:3000/api/v1/training-courses', {
+      headers: { 'Content-Type': 'application/json', ...(token && { Authorization: `Bearer ${token}` }) }
+    });
+    if (!res.ok) throw new Error('Failed to fetch courses');
+    const data = await res.json();
+    const coursesArray = Array.isArray(data) ? data : [];
+    setCourses(coursesArray);
+    
+    // Create a map for quick lookups - THIS IS THE KEY PART
+    const map = {};
+    coursesArray.forEach(course => {
+      map[course.id] = course.title;  // Assuming your course object has 'id' and 'title'
+    });
+    setCourseMap(map);
+  } catch (err) {
+    console.error('Error fetching courses:', err);
+  }
+};
+
+// Update your useEffect to fetch both courses and modules
+useEffect(() => { 
+  fetchCourses().then(() => fetchModules()); 
+}, []);
+
+const getCourseName = (courseId) => {
+  return courseMap[courseId] || 'Unknown Course';
+};
+
 
   // Delete modal handlers
   const handleDeleteClick = (module) => setDeleteModal({ isOpen: true, moduleToDelete: module });
@@ -486,7 +513,8 @@ const ModernCourseModulesManagement = () => {
               <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
                 <Hash className="w-4 h-4 text-blue-600" />
               </div>
-              <span className="text-gray-700 text-sm">{module?.training_course_id || 'N/A'}</span>
+              {/* <span className="text-gray-700 text-sm">{module?.training_course_id || 'N/A'}</span> */}
+              <span className="text-gray-700 text-sm">{getCourseName(module?.training_course_id)}</span>
             </div>
           )}
           {visibleColumns.content && (

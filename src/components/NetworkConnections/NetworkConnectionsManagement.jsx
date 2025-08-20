@@ -1,8 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Edit, List, Trash2, Users, User, Clock, Hash, MoreVertical, AlertCircle, X, Plus, Search, RefreshCw, Grid3X3, Menu, Calendar, UserPlus, UserCheck, UserX, MessageSquare, CheckCircle, XCircle, Shield } from 'lucide-react';
 import ConnectionsForm from './ConnectionsForm';
-import {CONNECTION_STATUS, columns, formatDate, apiService} from './api_route'; // Import constants and functions from api_route
-// Connection Status Constants
+import {CONNECTION_STATUS, columns, formatDate, apiService} from './api_route';
 
 // Delete Confirmation Modal Component
 const DeleteConfirmation = ({ isOpen, connectionToDelete, onConfirm, onCancel }) => {
@@ -137,26 +136,6 @@ const getStatusBadge = (status) => {
   }
 };
 
-// FIXED: Updated getUserName function to match your working version
-const getUserName = (userId, usersData) => {
-  console.log("the User id is received", userId);
-  console.log("usersData:", usersData);
-  
-  // Make sure usersData is an array before using .find()
-  if (!Array.isArray(usersData)) {
-    console.error("usersData is not an array:", usersData);
-    return 'Unknown User';
-  }
-  
-  const user = usersData.find(user => user.id === userId);
-  console.log("the User is found", user);
-  
-  if (user) {
-    return `${user.firstName} ${user.lastName}`;
-  }
-  return 'Unknown User';
-};
-
 // Mobile Card Component - Fixed version
 const MobileCard = ({ 
   connection, 
@@ -166,7 +145,8 @@ const MobileCard = ({
   onExpand, 
   isExpanded, 
   startIndex,
-  usersData
+  usersData,
+  getUserName
 }) => {
   return (
     <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4 hover:shadow-md transition-shadow">
@@ -177,7 +157,7 @@ const MobileCard = ({
           </div>
           <div className="flex-1 min-w-0">
             <h3 className="font-semibold text-gray-900 text-sm truncate">
-              {getUserName(connection?.requester_id, usersData)} → {getUserName(connection?.recipient_id, usersData)}
+              {getUserName(connection?.requester_id)} → {getUserName(connection?.recipient_id)}
             </h3>
             <p className="text-xs text-gray-500">ID: {startIndex + index + 1}</p>
           </div>
@@ -203,14 +183,14 @@ const MobileCard = ({
             <div className="flex items-center space-x-2">
               <User className="w-4 h-4 text-gray-400 flex-shrink-0" />
               <span className="text-sm text-gray-600">
-                From: {getUserName(connection?.requester_id, usersData)}
+                From: {getUserName(connection?.requester_id)}
               </span>
             </div>
 
             <div className="flex items-center space-x-2">
               <User className="w-4 h-4 text-gray-400 flex-shrink-0" />
               <span className="text-sm text-gray-600">
-                To: {getUserName(connection?.recipient_id, usersData)}
+                To: {getUserName(connection?.recipient_id)}
               </span>
             </div>
 
@@ -258,65 +238,30 @@ const MobileCard = ({
 };
 
 const NetworkManagement = () => {
-
-  const [showConnectionModal, setShowConnectionModal] = useState(false);
-  const [showResponseModal, setShowResponseModal] = useState(false);
-  const [selectedConnection, setSelectedConnection] = useState(null);
-  const [isResponseMode, setIsResponseMode] = useState(false);
-
-  const [users, setUsers] = useState([]);
-
-  const [currentUser, setCurrentUser] = useState(null);
-
-  useEffect(() => {
-  const getCurrentUserId = () => {
-    // Try multiple sources for user ID
-    const possibleKeys = [
-      'currentUserId',
-      'userId', 
-      'user_id',
-      'loggedInUserId',
-      'authUserId'
-    ];
-    
-    for (const key of possibleKeys) {
-      const id = localStorage.getItem(key);
-      if (id) return id;
-    }
-    
-    // Try to get from user object
-    const userStr = localStorage.getItem('user') || localStorage.getItem('currentUser');
-    if (userStr) {
-      try {
-        const user = JSON.parse(userStr);
-        return user.id || user.userId || user.user_id;
-      } catch (e) {
-        console.error('Error parsing user:', e);
-      }
-    }
-    
-    return null;
-  };
-  
-  const userId = getCurrentUserId();
-  setCurrentUser(userId);
-  console.log('Current user ID:', userId);
-}, []);
-
   // State management
-
   const [connections, setConnections] = useState([]);
   const [filteredConnections, setFilteredConnections] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
-    const [usersData, setUsersData] = useState({}); 
+  const [usersData, setUsersData] = useState([]);
   const [itemsPerPage] = useState(8);
   const [sortConfig, setSortConfig] = useState({ key: null, direction: 'asc' });
   const [expandedCard, setExpandedCard] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  // Modal states - Fixed naming to match usage
+  const [isConnectionFormOpen, setIsConnectionFormOpen] = useState(false);
+  const [selectedConnection, setSelectedConnection] = useState(null);
+  const [isResponseMode, setIsResponseMode] = useState(false);
+
+  // Delete modal state
   const [deleteModal, setDeleteModal] = useState({
     isOpen: false,
     connectionToDelete: null
   });
+
+  // View configuration states
   const [visibleColumns, setVisibleColumns] = useState({
     id: true,
     requester_name: true,
@@ -329,8 +274,44 @@ const NetworkManagement = () => {
   const [viewMode, setViewMode] = useState('table');
   const [showColumnToggle, setShowColumnToggle] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+
+  // User management
+  const [users, setUsers] = useState([]);
+  const [currentUser, setCurrentUser] = useState(null);
+
+  // Get current user on mount
+  useEffect(() => {
+    const getCurrentUserId = () => {
+      const possibleKeys = [
+        'currentUserId',
+        'userId', 
+        'user_id',
+        'loggedInUserId',
+        'authUserId'
+      ];
+      
+      for (const key of possibleKeys) {
+        const id = localStorage.getItem(key);
+        if (id) return id;
+      }
+      
+      const userStr = localStorage.getItem('user') || localStorage.getItem('currentUser');
+      if (userStr) {
+        try {
+          const user = JSON.parse(userStr);
+          return user.id || user.userId || user.user_id;
+        } catch (e) {
+          console.error('Error parsing user:', e);
+        }
+      }
+      
+      return null;
+    };
+    
+    const userId = getCurrentUserId();
+    setCurrentUser(userId);
+    console.log('Current user ID:', userId);
+  }, []);
 
   // Fetch connections on component mount
   useEffect(() => {
@@ -344,17 +325,21 @@ const NetworkManagement = () => {
       return;
     }
 
-    const filtered = connections.filter(connection =>
-      connection.requester_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      connection.recipient_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      connection.message?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      connection.status?.toLowerCase().includes(searchTerm.toLowerCase())
-    );
+    const filtered = connections.filter(connection => {
+      const requesterName = getUserName(connection.requester_id);
+      const recipientName = getUserName(connection.recipient_id);
+      
+      return requesterName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        recipientName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        connection.message?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        connection.status?.toLowerCase().includes(searchTerm.toLowerCase());
+    });
+    
     setFilteredConnections(filtered);
     setCurrentPage(1);
-  }, [searchTerm, connections]);
+  }, [searchTerm, connections, usersData]);
 
-  // Responsive view mode - automatically switch to cards on mobile
+  // Responsive view mode
   useEffect(() => {
     const handleResize = () => {
       if (window.innerWidth < 768) {
@@ -367,49 +352,7 @@ const NetworkManagement = () => {
     return () => window.removeEventListener('resize', handleResize);
   }, []);
 
-
-  // Handle connection saved (refresh connections list)
-  const handleConnectionSaved = (newConnection) => {
-    console.log('Connection saved:', newConnection);
-    fetchConnections(); // Refresh the connections list
-  };
-
-  // Handle opening connection request modal
-  const handleOpenConnectionModal = () => {
-    setIsResponseMode(false);
-    setSelectedConnection(null);
-    setShowConnectionModal(true);
-  };
-
-  // Handle opening response modal
-  // const handleOpenResponseModal = (connection) => {
-  //   setSelectedConnection(connection);
-  //   setIsResponseMode(true);
-  //   setShowResponseModal(true);
-  // };
-
-const handleOpenResponseModal = (connection) => {
-  console.log('Opening response modal for connection:', connection);
-  console.log('Current user:', currentUser);
-  
-  // Check if user can respond to this connection
-  if (!currentUser) {
-    alert('Unable to identify current user. Please log in again.');
-    return;
-  }
-  
-  if (connection.recipient_id !== currentUser) {
-    alert(`You can only respond to connection requests sent to you. This request was sent to user ID: ${connection.recipient_id}, but you are logged in as: ${currentUser}`);
-    return;
-  }
-  
-  setConnectionToRespond(connection);
-  setIsResponseMode(true);
-  setShowModal(true);
-};
-
-  // new 
-  
+  // Fetch connections function
   const fetchConnections = async () => {
     try {
       setLoading(true);
@@ -427,7 +370,6 @@ const handleOpenResponseModal = (connection) => {
       // Fetch user data for all unique IDs
       if (userIds.length > 0) {
         const userData = await apiService.fetchUsersByIds(userIds);
-        // setUsersData(userData);
         const userArray = Object.values(userData);
         setUsersData(userArray); 
       }
@@ -439,21 +381,62 @@ const handleOpenResponseModal = (connection) => {
     }
   };
 
-const getUserName = (userId) => {
-  console.log("the User id is received", userId);
-  // Make sure usersData is an array before using .find()
-  if (!Array.isArray(usersData)) {
-    console.error("usersData is not an array:", usersData);
+  // Get user name helper function
+  const getUserName = (userId) => {
+    if (!Array.isArray(usersData)) {
+      return 'Unknown User';
+    }
+    
+    const user = usersData.find(user => user.id === userId);
+    if (user) {
+      return `${user.firstName} ${user.lastName}`;
+    }
     return 'Unknown User';
-  }
-  const user = usersData.find(user => user.id === userId);
-  console.log("the User is found", user);
-  if (user) {
-    return `${user.firstName} ${user.lastName}`;
-  }
-  return 'Unknown User';
-};
+  };
 
+  // FIXED: Handle create connection - this was the main issue
+  const handleCreateConnection = () => {
+    console.log('Opening create connection modal');
+    setSelectedConnection(null);
+    setIsResponseMode(false);
+    setIsConnectionFormOpen(true); // This was missing!
+  };
+
+  // Handle connection saved
+  const handleConnectionSaved = (newConnection) => {
+    console.log('Connection saved:', newConnection);
+    setIsConnectionFormOpen(false);
+    fetchConnections(); // Refresh the connections list
+  };
+
+  // Handle opening response modal
+  const handleOpenResponseModal = (connection) => {
+    console.log('Opening response modal for connection:', connection);
+    console.log('Current user:', currentUser);
+    
+    if (!currentUser) {
+      alert('Unable to identify current user. Please log in again.');
+      return;
+    }
+    
+    if (connection.recipient_id !== currentUser) {
+      alert(`You can only respond to connection requests sent to you. This request was sent to user ID: ${connection.recipient_id}, but you are logged in as: ${currentUser}`);
+      return;
+    }
+    
+    setSelectedConnection(connection);
+    setIsResponseMode(true);
+    setIsConnectionFormOpen(true);
+  };
+
+  // Handle form close
+  const handleFormClose = () => {
+    setIsConnectionFormOpen(false);
+    setSelectedConnection(null);
+    setIsResponseMode(false);
+  };
+
+  // Column toggle functionality
   const toggleColumn = (key) => {
     setVisibleColumns(prev => ({
       ...prev,
@@ -461,6 +444,7 @@ const getUserName = (userId) => {
     }));
   };
 
+  // Sorting functionality
   const handleSort = (key) => {
     let direction = 'asc';
     if (sortConfig.key === key && sortConfig.direction === 'asc') {
@@ -476,11 +460,7 @@ const getUserName = (userId) => {
     setFilteredConnections(sorted);
   };
 
-  // Calculate pagination
-  const totalPages = Math.ceil(filteredConnections.length / itemsPerPage);
-  const startIndex = (currentPage - 1) * itemsPerPage;
-  const paginatedConnections = filteredConnections.slice(startIndex, startIndex + itemsPerPage);
-
+  // Delete functionality
   const handleDelete = async (connectionId) => {
     try {
       await apiService.deleteConnection(connectionId);
@@ -514,14 +494,13 @@ const getUserName = (userId) => {
   };
 
   const handleEdit = (connection) => {
-    console.log('Edit connection:', connection);
-    // Implement edit functionality
+    handleOpenResponseModal(connection);
   };
 
-  const handleCreateConnection = () => {
-    console.log('Create new connection');
-    // Implement create functionality
-  };
+  // Calculate pagination
+  const totalPages = Math.ceil(filteredConnections.length / itemsPerPage);
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const paginatedConnections = filteredConnections.slice(startIndex, startIndex + itemsPerPage);
 
   // Pagination component
   const PaginationControls = () => (
@@ -605,7 +584,7 @@ const getUserName = (userId) => {
     );
   }
 
-  // Empty state
+  // Empty state - FIXED: Now properly calls handleCreateConnection
   if (!paginatedConnections || paginatedConnections.length === 0) {
     return (
       <div className="min-h-screen bg-gray-50 p-4 sm:p-6">
@@ -614,7 +593,7 @@ const getUserName = (userId) => {
             <div className="bg-white rounded-xl p-4 shadow-sm">
               <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
                 <button 
-                  onClick={handleCreateConnection}
+                  onClick={handleCreateConnection} // FIXED: This now opens the modal
                   className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2.5 rounded-xl flex items-center gap-2 transition-all duration-200 shadow-sm hover:shadow-md font-medium"
                 >
                   <UserPlus className="w-4 h-4" />
@@ -646,11 +625,28 @@ const getUserName = (userId) => {
             <div className="p-8 sm:p-12 text-center">
               <Users className="w-16 h-16 text-gray-300 mx-auto mb-4" />
               <p className="text-gray-800 text-xl font-semibold mb-2">No connections found</p>
-              <p className="text-gray-500">Try adjusting your search criteria or add some connections.</p>
+              <p className="text-gray-500 mb-4">Try adjusting your search criteria or add some connections.</p>
+              <button 
+                onClick={handleCreateConnection}
+                className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-xl flex items-center gap-2 mx-auto transition-all duration-200 font-medium"
+              >
+                <UserPlus className="w-5 h-5" />
+                Create Your First Connection
+              </button>
             </div>
             <PaginationControls />
           </div>
         </div>
+
+        {/* Connection Form Modal */}
+        <ConnectionsForm 
+          showModal={isConnectionFormOpen}
+          setShowModal={setIsConnectionFormOpen}
+          onConnectionSaved={handleConnectionSaved}
+          availableUsers={users}
+          isResponseMode={isResponseMode}
+          connectionToRespond={selectedConnection}
+        />
       </div>
     );
   }
@@ -662,7 +658,7 @@ const getUserName = (userId) => {
           {/* Desktop Header */}
           <div className="hidden lg:flex items-center justify-between bg-white rounded-lg shadow-sm p-4 border border-gray-200">
             <button 
-              onClick={handleOpenConnectionModal}
+              onClick={handleCreateConnection}
               className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm flex items-center space-x-2 transition-colors shadow-sm"
             >
               <UserPlus className="w-4 h-4" />
@@ -709,9 +705,9 @@ const getUserName = (userId) => {
                           type="checkbox"
                           checked={visibleColumns[column.key]}
                           onChange={() => toggleColumn(column.key)}
-                          className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500"
+                          className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
                         />
-                        <span className="text-sm">{column.label}</span>
+                        <span className="text-sm">{column.header}</span>
                       </label>
                     ))}
                   </div>
@@ -727,15 +723,14 @@ const getUserName = (userId) => {
                 onClick={handleCreateConnection}
                 className="bg-blue-600 hover:bg-blue-700 text-white px-3 py-2 rounded-lg text-sm flex items-center space-x-2 transition-colors"
               >
-                <UserPlus className="w-4 h-4" />
-                <span className="hidden sm:inline">Create Connection</span>
-                <span className="sm:hidden">Create</span>
+                <Plus className="w-4 h-4" />
+                <span>Create</span>
               </button>
               <button
                 onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-                className="bg-blue-600 hover:bg-blue-700 text-white p-2 rounded-lg"
+                className="bg-gray-100 hover:bg-gray-200 text-gray-700 p-2 rounded-lg transition-colors"
               >
-                {isMobileMenuOpen ? <X className="w-4 h-4" /> : <Menu className="w-4 h-4" />}
+                <Menu className="w-4 h-4" />
               </button>
             </div>
             <div className="relative">
@@ -749,17 +744,17 @@ const getUserName = (userId) => {
               />
             </div>
             {isMobileMenuOpen && (
-              <div className="mt-3 pt-3 border-t border-gray-200 flex flex-wrap gap-2">
+              <div className="mt-3 pt-3 border-t border-gray-200 flex space-x-2">
                 <button
                   onClick={fetchConnections}
-                  className="bg-blue-600 hover:bg-blue-700 text-white px-3 py-2 rounded-lg text-sm flex items-center space-x-2 transition-colors"
+                  className="flex-1 bg-blue-600 hover:bg-blue-700 text-white py-2 px-3 rounded-lg text-sm flex items-center justify-center space-x-1 transition-colors"
                 >
                   <RefreshCw className="w-4 h-4" />
                   <span>Refresh</span>
                 </button>
                 <button 
                   onClick={() => setViewMode(viewMode === 'table' ? 'cards' : 'table')}
-                  className="bg-blue-600 hover:bg-blue-700 text-white px-3 py-2 rounded-lg text-sm flex items-center space-x-2 transition-colors"
+                  className="flex-1 bg-blue-600 hover:bg-blue-700 text-white py-2 px-3 rounded-lg text-sm flex items-center justify-center space-x-1 transition-colors"
                 >
                   <List className="w-4 h-4" />
                   <span>{viewMode === 'table' ? 'Cards' : 'Table'}</span>
@@ -775,53 +770,62 @@ const getUserName = (userId) => {
             // Table View
             <div className="overflow-x-auto">
               <table className="w-full">
-                <thead className="bg-gray-50 border-b border-gray-200">
+                <thead className="bg-gray-50 border-b border-gray-100">
                   <tr>
-                    {columns.map(column => (
+                    {columns.map(column => 
                       visibleColumns[column.key] && (
-                        <th
-                          key={column.key}
-                          className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100 transition-colors"
-                          onClick={() => column.key !== 'actions' && handleSort(column.key)}
-                        >
-                          <div className="flex items-center space-x-1">
-                            {column.key === 'id' && <Hash className="w-4 h-4" />}
-                            {column.key === 'requester_name' && <User className="w-4 h-4" />}
-                            {column.key === 'recipient_name' && <User className="w-4 h-4" />}
-                            {column.key === 'status' && <CheckCircle className="w-4 h-4" />}
-                            {column.key === 'message' && <MessageSquare className="w-4 h-4" />}
-                            {column.key === 'created_date' && <Calendar className="w-4 h-4" />}
-                            {column.key === 'actions' && <Edit className="w-4 h-4" />}
-                            <span>{column.label}</span>
+                        <th key={column.key} className="px-6 py-4 text-left">
+                          <button
+                            onClick={() => handleSort(column.key)}
+                            className="flex items-center space-x-1 text-xs font-semibold text-gray-600 uppercase tracking-wider hover:text-gray-900 transition-colors"
+                          >
+                            <span>{column.header}</span>
                             {sortConfig.key === column.key && (
-                              <span className="ml-1">
+                              <span className="text-blue-500">
                                 {sortConfig.direction === 'asc' ? '↑' : '↓'}
                               </span>
                             )}
-                          </div>
+                          </button>
                         </th>
                       )
-                    ))}
+                    )}
                   </tr>
                 </thead>
-                <tbody className="bg-white divide-y divide-gray-200">
+                <tbody className="divide-y divide-gray-100">
                   {paginatedConnections.map((connection, index) => (
-                    <tr key={connection.id || index} className="hover:bg-gray-50 transition-colors">
+                    <tr key={connection.id} className="hover:bg-gray-50 transition-colors">
                       {visibleColumns.id && (
-                        <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                          {startIndex + index + 1}
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          <div className="flex items-center space-x-2">
+                            <Hash className="w-4 h-4 text-gray-400" />
+                            <span className="text-sm font-medium text-gray-900">
+                              {startIndex + index + 1}
+                            </span>
+                          </div>
                         </td>
                       )}
                       {visibleColumns.requester_name && (
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                          {/* {connection.requester_id || 'N/A'} */}
-                          From: {getUserName(connection?.requester_id) || 'N/A'}
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          <div className="flex items-center space-x-3">
+                            <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
+                              <User className="w-4 h-4 text-blue-600" />
+                            </div>
+                            <span className="text-sm font-medium text-gray-900">
+                              {getUserName(connection.requester_id)}
+                            </span>
+                          </div>
                         </td>
                       )}
                       {visibleColumns.recipient_name && (
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                          {/* {connection.recipient_id || 'N/A'} */}
-                          To: {getUserName(connection?.recipient_id) || 'N/A'}
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          <div className="flex items-center space-x-3">
+                            <div className="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center">
+                              <User className="w-4 h-4 text-green-600" />
+                            </div>
+                            <span className="text-sm font-medium text-gray-900">
+                              {getUserName(connection.recipient_id)}
+                            </span>
+                          </div>
                         </td>
                       )}
                       {visibleColumns.status && (
@@ -835,23 +839,27 @@ const getUserName = (userId) => {
                         </td>
                       )}
                       {visibleColumns.message && (
-                        <td className="px-6 py-4 text-sm text-gray-900 max-w-xs truncate">
-                          {connection.message || 'N/A'}
+                        <td className="px-6 py-4">
+                          <span className="text-sm text-gray-600 line-clamp-2">
+                            {connection.message || 'No message'}
+                          </span>
                         </td>
                       )}
                       {visibleColumns.created_date && (
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                          {/* {formatDate(connection.created_date)} */}
-                        {formatDate(connection.createdAt) || '7/1/2025'}
-
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          <div className="flex items-center space-x-2">
+                            <Clock className="w-4 h-4 text-gray-400" />
+                            <span className="text-sm text-gray-600">
+                              {formatDate(connection.createdAt) || formatDate(connection.created_date) || '7/1/2025'}
+                            </span>
+                          </div>
                         </td>
                       )}
                       {visibleColumns.actions && (
-                        <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                        <td className="px-6 py-4 whitespace-nowrap">
                           <div className="flex items-center space-x-2">
                             <button
-                              // onClick={() => handleEdit(connection)}
-                              onClick={() => handleOpenResponseModal(connection)}
+                              onClick={() => handleEdit(connection)}
                               className="text-blue-600 hover:text-blue-800 p-1 rounded transition-colors"
                               title="Edit"
                             >
@@ -870,17 +878,15 @@ const getUserName = (userId) => {
                     </tr>
                   ))}
                 </tbody>
-
-
               </table>
             </div>
           ) : (
             // Cards View
             <div className="p-4 sm:p-6">
-              <div className="grid gap-4">
+              <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
                 {paginatedConnections.map((connection, index) => (
                   <MobileCard
-                    key={connection.id || index}
+                    key={connection.id}
                     connection={connection}
                     index={index}
                     onEdit={handleEdit}
@@ -888,32 +894,26 @@ const getUserName = (userId) => {
                     onExpand={setExpandedCard}
                     isExpanded={expandedCard === connection.id}
                     startIndex={startIndex}
-                    usersData={usersData} 
+                    usersData={usersData}
+                    getUserName={getUserName}
                   />
                 ))}
               </div>
             </div>
           )}
-          
+
           <PaginationControls />
         </div>
       </div>
 
+      {/* Connection Form Modal */}
       <ConnectionsForm 
-        showModal={showConnectionModal}
-        setShowModal={setShowConnectionModal}
+        showModal={isConnectionFormOpen}
+        setShowModal={handleFormClose}
         onConnectionSaved={handleConnectionSaved}
         availableUsers={users}
-        isResponseMode={false}
-      />
-
-      <ConnectionsForm 
-        showModal={showResponseModal}
-        setShowModal={setShowResponseModal}
-        onConnectionSaved={handleConnectionSaved}
+        isResponseMode={isResponseMode}
         connectionToRespond={selectedConnection}
-        isResponseMode={true}
-        // currentUserId={currentUserId}
       />
 
       {/* Delete Confirmation Modal */}
@@ -923,14 +923,6 @@ const getUserName = (userId) => {
         onConfirm={handleDeleteConfirm}
         onCancel={handleDeleteCancel}
       />
-
-      {/* Click outside handler for column toggle */}
-      {showColumnToggle && (
-        <div 
-          className="fixed inset-0 z-40" 
-          onClick={() => setShowColumnToggle(false)}
-        />
-      )}
     </div>
   );
 };

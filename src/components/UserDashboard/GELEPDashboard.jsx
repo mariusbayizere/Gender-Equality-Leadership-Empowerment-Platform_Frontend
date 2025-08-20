@@ -12,10 +12,10 @@ import LeadershipExam from '../online_course/LeadershipExam';
 // Mock data for the dashboard (keeping stats and other data)
 const mockData = {
   stats: {
-    totalUsers: 28,
-    activeMentorships: 14,
-    upcomingEvents: 8,
-    jobOpportunities: 13,
+    totalUsers: 12,
+    activeMentorships: 8,
+    upcomingEvents: 4,
+    jobOpportunities: 6,
     completedTrainings: 9,
     forumPosts: 3
   },
@@ -27,20 +27,20 @@ const mockData = {
     { id: 5, type: 'training', title: 'Completed: Advanced Leadership Skills', time: '3 days ago', status: 'completed' }
   ],
   upcomingEvents: [
-    { id: 1, title: 'Women in Leadership Summit', date: '2025-08-15', type: 'networking', participants: 250 },
+    { id: 1, title: 'Women in Leadership Summit', date: '2025-08-15', type: 'networking', participants: 50 },
     { id: 2, title: 'Mentorship Skills Workshop', date: '2025-08-20', type: 'workshop', participants: 45 },
     { id: 3, title: 'Career Development Session', date: '2025-08-25', type: 'mentorship_session', participants: 30 }
   ],
   genderDistribution: {
-    female: 68,
-    male: 28,
+    female: 14,
+    male: 7,
     other: 3,
     prefer_not_to_say: 1
   },
   roleDistribution: {
     mentees: 1,
     mentors: 2,
-    admins: 342
+    admins: 8
   }
 };
 
@@ -445,7 +445,7 @@ const OverviewTab = ({ data, userData, isLoadingUser }) => {
           value={data.stats.jobOpportunities} 
           icon={Briefcase} 
           trend={true} 
-          trendValue="+5 new today"
+          trendValue="+1 new today"
           color="orange"
         />
         <StatsCard 
@@ -453,7 +453,7 @@ const OverviewTab = ({ data, userData, isLoadingUser }) => {
           value={data.stats.completedTrainings} 
           icon={GraduationCap} 
           trend={true} 
-          trendValue="+15 this month"
+          trendValue="+2 this month"
           color="blue"
         />
         <StatsCard 
@@ -461,7 +461,7 @@ const OverviewTab = ({ data, userData, isLoadingUser }) => {
           value={data.stats.forumPosts} 
           icon={MessageSquare} 
           trend={true} 
-          trendValue="+23 today"
+          trendValue="+2 today"
           color="indigo"
         />
       </div>

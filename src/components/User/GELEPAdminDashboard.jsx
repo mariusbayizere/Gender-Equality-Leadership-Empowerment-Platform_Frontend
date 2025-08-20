@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import {
   Edit, List, Trash2, User, Users, Mail, Phone, Shield, Hash, MoreVertical, AlertCircle, X, UserPlus, Search, RefreshCw, Grid3X3, Menu, Smile, HelpCircle } from 'lucide-react';
@@ -126,6 +127,8 @@ const ModernUserManagement = () => {
     setUserToEdit(null);
     setIsEditMode(false);
   };
+
+
 
   // After create/update, refresh users - FIXED: Clear all states
   const handleUserSaved = () => {
@@ -370,10 +373,12 @@ const ModernUserManagement = () => {
                   className="pl-10 pr-4 py-2.5 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent w-64 bg-white shadow-sm"
                 />
               </div>
-              <button onClick={fetchUsers} className="p-2.5 text-gray-600 hover:text-gray-800 bg-blue-500 hover:bg-blue-600 text-white rounded-xl transition-all duration-200 shadow-sm">
+              <button onClick={fetchUsers} className="p-2.5 text-gray-600 hover:text-gray-800 bg-blue-500 hover:bg-blue-60 rounded-xl transition-all duration-200 shadow-sm">
+              {/* <button onClick={fetchUsers} className="p-2.5 text-gray-600 hover:text-gray-800 bg-blue-500 hover:bg-blue-600 text-white rounded-xl transition-all duration-200 shadow-sm"> */}
                 <RefreshCw className="w-4 h-4" />
               </button>
-              <button className="p-2.5 text-gray-600 hover:text-gray-800 bg-blue-500 hover:bg-blue-600 text-white rounded-xl transition-all duration-200 shadow-sm">
+              <button className="p-2.5 text-gray-600 hover:text-gray-800 bg-blue-500 hover:bg-blue-600 rounded-xl transition-all duration-200 shadow-sm">
+              {/* <button className="p-2.5 text-gray-600 hover:text-gray-800 bg-blue-500 hover:bg-blue-600 text-white rounded-xl transition-all duration-200 shadow-sm"> */}
                 <Grid3X3 className="w-4 h-4" />
               </button>
             </div>
@@ -386,15 +391,6 @@ const ModernUserManagement = () => {
             </div>
             <PaginationControls />
           </div>
-          
-          {/* FIXED: Add UserForm here too */}
-          <UserForm
-            showModal={showCreateModal}
-            setShowModal={handleCloseUserForm}
-            onUserSaved={handleUserSaved}
-            userToEdit={userToEdit}
-            isEditMode={isEditMode}
-          />
         </div>
       </div>
     );
@@ -702,7 +698,17 @@ const ModernUserManagement = () => {
           </div>
         )}
 
-        {/* User Form Modal */}
+                  
+          {/* FIXED: Add UserForm here too */}
+          <UserForm
+            showModal={showCreateModal}
+            setShowModal={handleCloseUserForm}
+            onUserSaved={handleUserSaved}
+            userToEdit={userToEdit}
+            isEditMode={isEditMode}
+          />
+
+
         <UserForm
           showModal={showCreateModal}
           setShowModal={handleCloseUserForm}
@@ -710,6 +716,7 @@ const ModernUserManagement = () => {
           userToEdit={userToEdit}
           isEditMode={isEditMode}
         />
+
 
         {/* Delete Confirmation Modal */}
         <DeleteConfirmation
@@ -723,4 +730,5 @@ const ModernUserManagement = () => {
   );
 };
 
-export default ModernUserManagement;
+export default ModernUserManagement;  
+

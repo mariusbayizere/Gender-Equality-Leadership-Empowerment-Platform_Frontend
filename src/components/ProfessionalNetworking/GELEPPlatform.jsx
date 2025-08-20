@@ -403,17 +403,6 @@ const ErrorMessage = ({ message, onRetry }) => (
   </div>
 );
 
-// Professional Networking Component - Now fully responsive
-
-// Placeholder components for other tabs - Now responsive
-// const EventsCalendar = () => (
-//   <div className="bg-white rounded-lg shadow-sm border p-4 sm:p-6">
-//     <h2 className="text-xl font-semibold text-gray-900 mb-4">Events Calendar</h2>
-//     <p className="text-gray-600 text-sm sm:text-base">Events calendar functionality will be implemented here.</p>
-//   </div>
-// );
-
-
 // Main GELEP Platform Component - Fully responsive
 const GELEPPlatform = () => {
   const [activeTab, setActiveTab] = useState('networking');

@@ -1,19 +1,365 @@
+// // Enhanced API Service with Chat Functions and Better Error Handling
+// export const apiService = {
+//   baseURL: 'http://localhost:3000/api/v1',
+  
+//   getAuthHeaders: () => ({
+//     'Content-Type': 'application/json',
+//     'Authorization': `Bearer ${localStorage.getItem('token')}`
+//   }),
 
+//   // Existing connection methods...
+//   async getProfessionals(params = {}) {
+//     const URL = 'http://localhost:3000/api/v1'
+//     const queryParams = new URLSearchParams(params).toString();
+//     const response = await fetch(`${URL}/connections/professionals?${queryParams}`, {
+//       headers: this.getAuthHeaders()
+//     });
+//     if (!response.ok) {
+//       const error = await response.json();
+//       throw new Error(error.message || 'Failed to fetch professionals');
+//     }
+//     return response.json();
+//   },
 
-// API Service Functions
-export const apiService = {
+//   async sendConnectionRequest(recipientId, message = '') {
+//     const URL = 'http://localhost:3000/api/v1'
+//     const response = await fetch(`${URL}/connections`, {
+//       method: 'POST',
+//       headers: this.getAuthHeaders(),
+//       body: JSON.stringify({
+//         requester_id: this.getCurrentUserId(),
+//         recipient_id: recipientId,
+//         message: message || 'I would like to connect with you for professional networking.'
+//       })
+//     });
+//     if (!response.ok) {
+//       const error = await response.json();
+//       throw new Error(error.message || 'Failed to send connection request');
+//     }
+//     return response.json();
+//   },
+
+//   async getMyConnections() {
+//     const URL = 'http://localhost:3000/api/v1'
+//     const response = await fetch(`${URL}/connections/my-connections`, {
+//       headers: this.getAuthHeaders()
+//     });
+//     if (!response.ok) {
+//       const error = await response.json();
+//       throw new Error(error.message || 'Failed to fetch connections');
+//     }
+//     return response.json();
+//   },
+
+//   async getPendingRequests() {
+//     const URL = 'http://localhost:3000/api/v1'
+//     const response = await fetch(`${URL}/connections/requests`, {
+//       headers: this.getAuthHeaders()
+//     });
+//     if (!response.ok) {
+//       const error = await response.json();
+//       throw new Error(error.message || 'Failed to fetch requests');
+//     }
+//     return response.json();
+//   },
+
+//   async respondToRequest(requestId, status, message = '') {
+//     const URL = 'http://localhost:3000/api/v1'
+    
+//     const validStatuses = ['accepted', 'rejected'];
+//     if (!validStatuses.includes(status)) {
+//       throw new Error(`Invalid status: ${status}. Must be 'accepted' or 'rejected'`);
+//     }
+
+//     const requestBody = {
+//       status: status,
+//       ...(message && { message: message })
+//     };
+
+//     console.log('Sending request to:', `${URL}/connections/${requestId}/respond`);
+//     console.log('Request body:', requestBody);
+
+//     const response = await fetch(`${URL}/connections/${requestId}/respond`, {
+//       method: 'PUT',
+//       headers: this.getAuthHeaders(),
+//       body: JSON.stringify(requestBody)
+//     });
+
+//     if (!response.ok) {
+//       const error = await response.json();
+//       console.error('Backend error response:', error);
+//       throw new Error(error.message || error.error || 'Failed to respond to request');
+//     }
+//     return response.json();
+//   },
+
+//   async removeConnection(connectionId) {
+//     const URL = 'http://localhost:3000/api/v1'
+//     const response = await fetch(`${URL}/connections/${connectionId}`, {
+//       method: 'DELETE',
+//       headers: this.getAuthHeaders()
+//     });
+//     if (!response.ok) {
+//       const error = await response.json();
+//       throw new Error(error.message || 'Failed to remove connection');
+//     }
+//     return response.json();
+//   },
+
+//   async getConnectionStats() {
+//     const URL = 'http://localhost:3000/api/v1'
+
+//     const response = await fetch(`${URL}/connections/stats`, {
+//       headers: this.getAuthHeaders()
+//     });
+//     if (!response.ok) {
+//       const error = await response.json();
+//       throw new Error(error.message || 'Failed to fetch stats');
+//     }
+//     return response.json();
+//   },
+
+//   // NEW CHAT API METHODS
+
+//   async getChatConversations() {
+//     const URL = 'http://localhost:3000/api/v1';
+//     const response = await fetch(`${URL}/chat/conversations`, {
+//       headers: this.getAuthHeaders()
+//     });
+//     if (!response.ok) {
+//       const error = await response.json();
+//       throw new Error(error.message || 'Failed to fetch conversations');
+//     }
+//     const data = await response.json();
+//     // Backend returns array directly, wrap it for frontend compatibility
+//     return { conversations: Array.isArray(data) ? data : [] };
+//   },
+
+//   async getMessages(conversationId, page = 1, limit = 50) {
+//     const URL = 'http://localhost:3000/api/v1';
+//     const queryParams = new URLSearchParams({ 
+//       limit: limit.toString(),
+//       ...(page > 1 && { before: '' }) // Add pagination support if needed
+//     });
+//     const response = await fetch(`${URL}/chat/conversations/${conversationId}/messages?${queryParams}`, {
+//       headers: this.getAuthHeaders()
+//     });
+//     if (!response.ok) {
+//       const error = await response.json();
+//       throw new Error(error.message || 'Failed to fetch messages');
+//     }
+//     const data = await response.json();
+//     // Backend returns array directly, wrap it for frontend compatibility
+//     return { messages: Array.isArray(data) ? data : [] };
+//   },
+
+//   async getOrCreateConversation(participantId) {
+//     const URL = 'http://localhost:3000/api/v1';
+//     const response = await fetch(`${URL}/chat/conversations`, {
+//       method: 'POST',
+//       headers: this.getAuthHeaders(),
+//       body: JSON.stringify({
+//         participantId: participantId  // Changed from participant_id to participantId
+//       })
+//     });
+//     if (!response.ok) {
+//       const error = await response.json();
+//       throw new Error(error.error || error.message || 'Failed to create conversation');
+//     }
+//     return response.json();
+//   },
+
+//   // FIXED: Send a message with better error handling and logging
+//   async sendMessage(conversationId, content, type = 'text') {
+//     const URL = 'http://localhost:3000/api/v1';
+    
+//     // Log the data being sent for debugging
+//     const messageData = {
+//       content: content,
+//       type: type
+//     };
+    
+//     console.log('Sending message to:', `${URL}/chat/conversations/${conversationId}/messages`);
+//     console.log('Message data:', messageData);
+//     console.log('Headers:', this.getAuthHeaders());
+    
+//     const response = await fetch(`${URL}/chat/conversations/${conversationId}/messages`, {
+//       method: 'POST',
+//       headers: this.getAuthHeaders(),
+//       body: JSON.stringify(messageData)
+//     });
+    
+//     // Enhanced error handling
+//     if (!response.ok) {
+//       let errorMessage = 'Failed to send message';
+//       try {
+//         const errorData = await response.json();
+//         console.error('Backend error response:', errorData);
+        
+//         // Handle different error formats
+//         if (errorData.error) {
+//           errorMessage = errorData.error;
+//         } else if (errorData.message) {
+//           errorMessage = errorData.message;
+//         } else if (errorData.details) {
+//           errorMessage = errorData.details;
+//         }
+//       } catch (parseError) {
+//         console.error('Error parsing error response:', parseError);
+//         errorMessage = `HTTP ${response.status}: ${response.statusText}`;
+//       }
+      
+//       throw new Error(errorMessage);
+//     }
+    
+//     const result = await response.json();
+//     console.log('Message sent successfully:', result);
+//     return result;
+//   },
+
+//   async markMessagesAsRead(conversationId) {
+//     // Since your backend only supports marking individual messages as read,
+//     // we need to get all unread messages for this conversation first
+//     try {
+//       const messagesResponse = await this.getMessages(conversationId);
+//       const messages = messagesResponse.messages || [];
+      
+//       // Filter unread messages that the current user is the recipient of
+//       const currentUserId = this.getCurrentUserId();
+//       const unreadMessages = messages.filter(msg => 
+//         msg.recipientId === currentUserId && 
+//         msg.status !== 'read'
+//       );
+      
+//       // Mark each unread message as read
+//       const promises = unreadMessages.map(msg => {
+//         const URL = 'http://localhost:3000/api/v1';
+//         return fetch(`${URL}/chat/messages/${msg.id}/read`, {
+//           method: 'PUT',
+//           headers: this.getAuthHeaders()
+//         });
+//       });
+      
+//       await Promise.all(promises);
+//       return { success: true };
+//     } catch (error) {
+//       console.error('Error marking messages as read:', error);
+//       throw error;
+//     }
+//   },
+
+//   // Delete a message
+//   async deleteMessage(conversationId, messageId) {
+//     const URL = 'http://localhost:3000/api/v1';
+//     const response = await fetch(`${URL}/chat/conversations/${conversationId}/messages/${messageId}`, {
+//       method: 'DELETE',
+//       headers: this.getAuthHeaders()
+//     });
+//     if (!response.ok) {
+//       const error = await response.json();
+//       throw new Error(error.message || 'Failed to delete message');
+//     }
+//     return response.json();
+//   },
+
+//   // Get chat statistics
+//   async getChatStats() {
+//     const URL = 'http://localhost:3000/api/v1';
+//     const response = await fetch(`${URL}/chat/stats`, {
+//       headers: this.getAuthHeaders()
+//     });
+//     if (!response.ok) {
+//       const error = await response.json();
+//       throw new Error(error.message || 'Failed to fetch chat stats');
+//     }
+//     return response.json();
+//   },
+
+//   getCurrentUserId() {
+//     const token = localStorage.getItem('token');
+//     if (token) {
+//       try {
+//         const payload = JSON.parse(atob(token.split('.')[1]));
+//         console.log('Current user ID from token:', payload.id || payload.userId || payload.user_id);
+//         return payload.id || payload.userId || payload.user_id;
+//       } catch (e) {
+//         console.error('Error parsing token:', e);
+//         return null;
+//       }
+//     }
+//     return null;
+//   }
+// };
+
+// Enhanced API Service with Chat Functions and Better Error Handling
+const apiService = {
   baseURL: 'http://localhost:3000/api/v1',
   
+  // Cache for user ID to avoid repeated token parsing
+  _cachedUserId: null,
+  _tokenCache: null,
+  _lastCacheTime: 0,
+  
+  // Cache timeout (5 minutes)
+  CACHE_TIMEOUT: 5 * 60 * 1000,
+
   getAuthHeaders: () => ({
     'Content-Type': 'application/json',
     'Authorization': `Bearer ${localStorage.getItem('token')}`
   }),
 
-  // Get all professionals for networking
+  // OPTIMIZED: Cache user ID with timeout to avoid repeated token parsing
+  getCurrentUserId() {
+    const currentToken = localStorage.getItem('token');
+    const now = Date.now();
+    
+    // Return cached ID if token hasn't changed and cache is still valid
+    if (this._cachedUserId && 
+        this._tokenCache === currentToken && 
+        (now - this._lastCacheTime) < this.CACHE_TIMEOUT) {
+      return this._cachedUserId;
+    }
+    
+    if (currentToken) {
+      try {
+        const payload = JSON.parse(atob(currentToken.split('.')[1]));
+        this._cachedUserId = payload.id || payload.userId || payload.user_id;
+        this._tokenCache = currentToken;
+        this._lastCacheTime = now;
+        
+        // Only log once when cache is updated (removed excessive logging)
+        if (this._cachedUserId && !this._tokenCache) {
+          console.log('User ID cached:', this._cachedUserId);
+        }
+        
+        return this._cachedUserId;
+      } catch (e) {
+        console.error('Error parsing token:', e);
+        this.clearCache();
+        return null;
+      }
+    }
+    
+    this.clearCache();
+    return null;
+  },
+
+  // Clear cache when user logs out
+  clearCache() {
+    this._cachedUserId = null;
+    this._tokenCache = null;
+    this._lastCacheTime = 0;
+  },
+
+  // OPTIMIZED: Request caching for conversations
+  _conversationsCache: null,
+  _conversationsCacheTime: 0,
+  CONVERSATIONS_CACHE_TIMEOUT: 30 * 1000, // 30 seconds
+
+  // Existing connection methods...
   async getProfessionals(params = {}) {
-    const URL = 'http://localhost:3000/api/v1'
     const queryParams = new URLSearchParams(params).toString();
-    const response = await fetch(`${URL}/connections/professionals?${queryParams}`, {
+    const response = await fetch(`${this.baseURL}/connections/professionals?${queryParams}`, {
       headers: this.getAuthHeaders()
     });
     if (!response.ok) {
@@ -23,10 +369,8 @@ export const apiService = {
     return response.json();
   },
 
-  // Send connection request
   async sendConnectionRequest(recipientId, message = '') {
-    const URL = 'http://localhost:3000/api/v1'
-    const response = await fetch(`${URL}/connections`, {
+    const response = await fetch(`${this.baseURL}/connections`, {
       method: 'POST',
       headers: this.getAuthHeaders(),
       body: JSON.stringify({
@@ -42,10 +386,8 @@ export const apiService = {
     return response.json();
   },
 
-  // Get user's connections
   async getMyConnections() {
-    const URL = 'http://localhost:3000/api/v1'
-    const response = await fetch(`${URL}/connections/my-connections`, {
+    const response = await fetch(`${this.baseURL}/connections/my-connections`, {
       headers: this.getAuthHeaders()
     });
     if (!response.ok) {
@@ -55,10 +397,8 @@ export const apiService = {
     return response.json();
   },
 
-  // Get pending connection requests
   async getPendingRequests() {
-    const URL = 'http://localhost:3000/api/v1'
-    const response = await fetch(`${URL}/connections/requests`, {
+    const response = await fetch(`${this.baseURL}/connections/requests`, {
       headers: this.getAuthHeaders()
     });
     if (!response.ok) {
@@ -68,11 +408,7 @@ export const apiService = {
     return response.json();
   },
 
-  // Respond to connection request - FIXED
   async respondToRequest(requestId, status, message = '') {
-    const URL = 'http://localhost:3000/api/v1'
-    
-    // Validate status before sending
     const validStatuses = ['accepted', 'rejected'];
     if (!validStatuses.includes(status)) {
       throw new Error(`Invalid status: ${status}. Must be 'accepted' or 'rejected'`);
@@ -83,10 +419,7 @@ export const apiService = {
       ...(message && { message: message })
     };
 
-    console.log('Sending request to:', `${URL}/connections/${requestId}/respond`);
-    console.log('Request body:', requestBody);
-
-    const response = await fetch(`${URL}/connections/${requestId}/respond`, {
+    const response = await fetch(`${this.baseURL}/connections/${requestId}/respond`, {
       method: 'PUT',
       headers: this.getAuthHeaders(),
       body: JSON.stringify(requestBody)
@@ -94,16 +427,13 @@ export const apiService = {
 
     if (!response.ok) {
       const error = await response.json();
-      console.error('Backend error response:', error);
       throw new Error(error.message || error.error || 'Failed to respond to request');
     }
     return response.json();
   },
 
-  // Remove connection
   async removeConnection(connectionId) {
-    const URL = 'http://localhost:3000/api/v1'
-    const response = await fetch(`${URL}/connections/${connectionId}`, {
+    const response = await fetch(`${this.baseURL}/connections/${connectionId}`, {
       method: 'DELETE',
       headers: this.getAuthHeaders()
     });
@@ -114,11 +444,8 @@ export const apiService = {
     return response.json();
   },
 
-  // Get connection statistics
   async getConnectionStats() {
-    const URL = 'http://localhost:3000/api/v1'
-
-    const response = await fetch(`${URL}/connections/stats`, {
+    const response = await fetch(`${this.baseURL}/connections/stats`, {
       headers: this.getAuthHeaders()
     });
     if (!response.ok) {
@@ -128,312 +455,228 @@ export const apiService = {
     return response.json();
   },
 
-  // Get current user ID (you might need to implement this based on your auth system)
-  getCurrentUserId() {
-    // This should return the current user's ID from your auth state/token
-    // For now, returning a placeholder - implement based on your auth system
-    const token = localStorage.getItem('token');
-    if (token) {
-      try {
-        const payload = JSON.parse(atob(token.split('.')[1]));
-        return payload.id || payload.userId || payload.user_id;
-      } catch (e) {
-        console.error('Error parsing token:', e);
-        return null;
+  // OPTIMIZED CHAT API METHODS WITH CACHING
+
+  async getChatConversations(forceRefresh = false) {
+    const now = Date.now();
+    
+    // Return cached data if available and not expired
+    if (!forceRefresh && 
+        this._conversationsCache && 
+        (now - this._conversationsCacheTime) < this.CONVERSATIONS_CACHE_TIMEOUT) {
+      return this._conversationsCache;
+    }
+    
+    const response = await fetch(`${this.baseURL}/chat/conversations`, {
+      headers: this.getAuthHeaders()
+    });
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(error.message || 'Failed to fetch conversations');
+    }
+    const data = await response.json();
+    const result = { conversations: Array.isArray(data) ? data : [] };
+    
+    // Cache the result
+    this._conversationsCache = result;
+    this._conversationsCacheTime = now;
+    
+    return result;
+  },
+
+  // Message caching
+  _messagesCache: new Map(),
+  _messagesCacheTime: new Map(),
+  MESSAGES_CACHE_TIMEOUT: 15 * 1000, // 15 seconds
+
+  async getMessages(conversationId, page = 1, limit = 50, forceRefresh = false) {
+    const cacheKey = `${conversationId}-${page}-${limit}`;
+    const now = Date.now();
+    
+    // Return cached messages if available and not expired
+    if (!forceRefresh && 
+        this._messagesCache.has(cacheKey) && 
+        (now - this._messagesCacheTime.get(cacheKey)) < this.MESSAGES_CACHE_TIMEOUT) {
+      return this._messagesCache.get(cacheKey);
+    }
+    
+    const queryParams = new URLSearchParams({ 
+      limit: limit.toString(),
+      ...(page > 1 && { before: '' })
+    });
+    const response = await fetch(`${this.baseURL}/chat/conversations/${conversationId}/messages?${queryParams}`, {
+      headers: this.getAuthHeaders()
+    });
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(error.message || 'Failed to fetch messages');
+    }
+    const data = await response.json();
+    const result = { messages: Array.isArray(data) ? data : [] };
+    
+    // Cache the result
+    this._messagesCache.set(cacheKey, result);
+    this._messagesCacheTime.set(cacheKey, now);
+    
+    return result;
+  },
+
+  // Clear message cache for a specific conversation when new message is sent
+  clearMessageCache(conversationId) {
+    const keysToDelete = [];
+    for (let key of this._messagesCache.keys()) {
+      if (key.startsWith(`${conversationId}-`)) {
+        keysToDelete.push(key);
       }
     }
-    return null;
+    keysToDelete.forEach(key => {
+      this._messagesCache.delete(key);
+      this._messagesCacheTime.delete(key);
+    });
+  },
+
+  async getOrCreateConversation(participantId) {
+    const response = await fetch(`${this.baseURL}/chat/conversations`, {
+      method: 'POST',
+      headers: this.getAuthHeaders(),
+      body: JSON.stringify({
+        participantId: participantId
+      })
+    });
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(error.error || error.message || 'Failed to create conversation');
+    }
+    
+    // Clear conversations cache since we might have a new conversation
+    this._conversationsCache = null;
+    this._conversationsCacheTime = 0;
+    
+    return response.json();
+  },
+
+  // OPTIMIZED: Reduced logging and better error handling
+  async sendMessage(conversationId, content, type = 'text') {
+    const messageData = {
+      content: content,
+      type: type
+    };
+    
+    // Remove excessive logging
+    const response = await fetch(`${this.baseURL}/chat/conversations/${conversationId}/messages`, {
+      method: 'POST',
+      headers: this.getAuthHeaders(),
+      body: JSON.stringify(messageData)
+    });
+    
+    if (!response.ok) {
+      let errorMessage = 'Failed to send message';
+      try {
+        const errorData = await response.json();
+        errorMessage = errorData.error || errorData.message || errorData.details || errorMessage;
+      } catch (parseError) {
+        errorMessage = `HTTP ${response.status}: ${response.statusText}`;
+      }
+      throw new Error(errorMessage);
+    }
+    
+    // Clear message cache for this conversation
+    this.clearMessageCache(conversationId);
+    
+    // Clear conversations cache to refresh last message
+    this._conversationsCache = null;
+    this._conversationsCacheTime = 0;
+    
+    return response.json();
+  },
+
+  // OPTIMIZED: Batch mark messages as read with single API call
+  async markMessagesAsRead(conversationId) {
+    try {
+      const messagesResponse = await this.getMessages(conversationId);
+      const messages = messagesResponse.messages || [];
+      
+      const currentUserId = this.getCurrentUserId();
+      const unreadMessages = messages.filter(msg => 
+        msg.recipientId === currentUserId && 
+        msg.status !== 'read'
+      );
+      
+      if (unreadMessages.length === 0) {
+        return { success: true };
+      }
+      
+      // Process in smaller batches to avoid overwhelming the server
+      const batchSize = 3;
+      const batches = [];
+      for (let i = 0; i < unreadMessages.length; i += batchSize) {
+        batches.push(unreadMessages.slice(i, i + batchSize));
+      }
+      
+      for (const batch of batches) {
+        const promises = batch.map(msg => 
+          fetch(`${this.baseURL}/chat/messages/${msg.id}/read`, {
+            method: 'PUT',
+            headers: this.getAuthHeaders()
+          }).catch(error => {
+            console.warn(`Failed to mark message ${msg.id} as read:`, error);
+            return null;
+          })
+        );
+        await Promise.allSettled(promises);
+        
+        // Small delay between batches to avoid rate limiting
+        if (batches.indexOf(batch) < batches.length - 1) {
+          await new Promise(resolve => setTimeout(resolve, 100));
+        }
+      }
+      
+      // Clear message cache to refresh read status
+      this.clearMessageCache(conversationId);
+      
+      return { success: true };
+    } catch (error) {
+      console.error('Error marking messages as read:', error);
+      throw error;
+    }
+  },
+
+  async deleteMessage(conversationId, messageId) {
+    const response = await fetch(`${this.baseURL}/chat/conversations/${conversationId}/messages/${messageId}`, {
+      method: 'DELETE',
+      headers: this.getAuthHeaders()
+    });
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(error.message || 'Failed to delete message');
+    }
+    
+    // Clear message cache for this conversation
+    this.clearMessageCache(conversationId);
+    
+    return response.json();
+  },
+
+  async getChatStats() {
+    const response = await fetch(`${this.baseURL}/chat/stats`, {
+      headers: this.getAuthHeaders()
+    });
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(error.message || 'Failed to fetch chat stats');
+    }
+    return response.json();
+  },
+
+  // Clear all caches (useful for logout)
+  clearAllCaches() {
+    this.clearCache();
+    this._conversationsCache = null;
+    this._conversationsCacheTime = 0;
+    this._messagesCache.clear();
+    this._messagesCacheTime.clear();
   }
 };
 
-
-// // API Service Functions - Optimized
-// export const apiService = {
-//   baseURL: 'http://localhost:3000/api/v1',
-//   requestTimeout: 5000, // 5 second timeout
-  
-//   getAuthHeaders: () => ({
-//     'Content-Type': 'application/json',
-//     'Authorization': `Bearer ${localStorage.getItem('token')}`
-//   }),
-
-//   // Helper function to create fetch with timeout
-//   fetchWithTimeout: async (url, options = {}) => {
-//     const controller = new AbortController();
-//     const timeoutId = setTimeout(() => controller.abort(), apiService.requestTimeout);
-    
-//     try {
-//       const response = await fetch(url, {
-//         ...options,
-//         signal: controller.signal
-//       });
-//       clearTimeout(timeoutId);
-//       return response;
-//     } catch (error) {
-//       clearTimeout(timeoutId);
-//       if (error.name === 'AbortError') {
-//         throw new Error('Request timeout - Server took too long to respond');
-//       }
-//       throw error;
-//     }
-//   },
-
-//   // Get all professionals for networking - OPTIMIZED
-//   async getProfessionals(params = {}) {
-//     const URL = 'http://localhost:3000/api/v1';
-    
-//     // Limit the parameters to reduce query complexity
-//     const optimizedParams = {
-//       search: params.search || '',
-//       role: params.role || 'all',
-//       limit: Math.min(params.limit || 20, 20), // Cap at 20 for performance
-//       page: params.page || 1
-//     };
-    
-//     // Remove empty parameters
-//     Object.keys(optimizedParams).forEach(key => {
-//       if (!optimizedParams[key] || optimizedParams[key] === 'all') {
-//         delete optimizedParams[key];
-//       }
-//     });
-    
-//     const queryParams = new URLSearchParams(optimizedParams).toString();
-    
-//     try {
-//       const response = await this.fetchWithTimeout(
-//         `${URL}/connections/professionals?${queryParams}`, 
-//         {
-//           headers: this.getAuthHeaders(),
-//           // Add cache headers for static-ish data
-//           cache: 'default'
-//         }
-//       );
-      
-//       if (!response.ok) {
-//         const error = await response.json().catch(() => ({ message: 'Network error' }));
-//         throw new Error(error.message || `Server error: ${response.status}`);
-//       }
-      
-//       return response.json();
-//     } catch (error) {
-//       console.error('Error fetching professionals:', error);
-//       throw new Error(error.message || 'Failed to fetch professionals');
-//     }
-//   },
-
-//   // Send connection request - OPTIMIZED
-//   async sendConnectionRequest(recipientId, message = '') {
-//     const URL = 'http://localhost:3000/api/v1';
-    
-//     if (!recipientId) {
-//       throw new Error('Recipient ID is required');
-//     }
-    
-//     try {
-//       const response = await this.fetchWithTimeout(`${URL}/connections`, {
-//         method: 'POST',
-//         headers: this.getAuthHeaders(),
-//         body: JSON.stringify({
-//           requester_id: this.getCurrentUserId(),
-//           recipient_id: recipientId,
-//           message: message || 'I would like to connect with you for professional networking.'
-//         })
-//       });
-      
-//       if (!response.ok) {
-//         const error = await response.json().catch(() => ({ message: 'Network error' }));
-//         throw new Error(error.message || `Server error: ${response.status}`);
-//       }
-      
-//       return response.json();
-//     } catch (error) {
-//       console.error('Error sending connection request:', error);
-//       throw new Error(error.message || 'Failed to send connection request');
-//     }
-//   },
-
-//   // Get user's connections - OPTIMIZED  
-//   async getMyConnections() {
-//     const URL = 'http://localhost:3000/api/v1';
-    
-//     try {
-//       const response = await this.fetchWithTimeout(`${URL}/connections/my-connections`, {
-//         headers: this.getAuthHeaders()
-//       });
-      
-//       if (!response.ok) {
-//         const error = await response.json().catch(() => ({ message: 'Network error' }));
-//         throw new Error(error.message || `Server error: ${response.status}`);
-//       }
-      
-//       return response.json();
-//     } catch (error) {
-//       console.error('Error fetching connections:', error);
-//       throw new Error(error.message || 'Failed to fetch connections');
-//     }
-//   },
-
-//   // Get pending connection requests - OPTIMIZED
-//   async getPendingRequests() {
-//     const URL = 'http://localhost:3000/api/v1';
-    
-//     try {
-//       const response = await this.fetchWithTimeout(`${URL}/connections/requests`, {
-//         headers: this.getAuthHeaders()
-//       });
-      
-//       if (!response.ok) {
-//         const error = await response.json().catch(() => ({ message: 'Network error' }));
-//         throw new Error(error.message || `Server error: ${response.status}`);
-//       }
-      
-//       return response.json();
-//     } catch (error) {
-//       console.error('Error fetching requests:', error);
-//       throw new Error(error.message || 'Failed to fetch requests');
-//     }
-//   },
-
-//   // Respond to connection request - OPTIMIZED
-//   async respondToRequest(requestId, status, message = '') {
-//     const URL = 'http://localhost:3000/api/v1';
-    
-//     // Validate inputs immediately
-//     if (!requestId) {
-//       throw new Error('Request ID is required');
-//     }
-    
-//     const validStatuses = ['accepted', 'rejected'];
-//     if (!validStatuses.includes(status)) {
-//       throw new Error(`Invalid status: ${status}. Must be 'accepted' or 'rejected'`);
-//     }
-
-//     const requestBody = {
-//       status: status,
-//       ...(message && { message: message })
-//     };
-
-//     try {
-//       const response = await this.fetchWithTimeout(`${URL}/connections/${requestId}/respond`, {
-//         method: 'PUT',
-//         headers: this.getAuthHeaders(),
-//         body: JSON.stringify(requestBody)
-//       });
-
-//       if (!response.ok) {
-//         const error = await response.json().catch(() => ({ message: 'Network error' }));
-//         throw new Error(error.message || error.error || `Server error: ${response.status}`);
-//       }
-      
-//       return response.json();
-//     } catch (error) {
-//       console.error('Error responding to request:', error);
-//       throw new Error(error.message || 'Failed to respond to request');
-//     }
-//   },
-
-//   // Remove connection - OPTIMIZED
-//   async removeConnection(connectionId) {
-//     const URL = 'http://localhost:3000/api/v1';
-    
-//     if (!connectionId) {
-//       throw new Error('Connection ID is required');
-//     }
-    
-//     try {
-//       const response = await this.fetchWithTimeout(`${URL}/connections/${connectionId}`, {
-//         method: 'DELETE',
-//         headers: this.getAuthHeaders()
-//       });
-      
-//       if (!response.ok) {
-//         const error = await response.json().catch(() => ({ message: 'Network error' }));
-//         throw new Error(error.message || `Server error: ${response.status}`);
-//       }
-      
-//       return response.json();
-//     } catch (error) {
-//       console.error('Error removing connection:', error);
-//       throw new Error(error.message || 'Failed to remove connection');
-//     }
-//   },
-
-//   // Get connection statistics - OPTIMIZED
-//   async getConnectionStats() {
-//     const URL = 'http://localhost:3000/api/v1';
-
-//     try {
-//       const response = await this.fetchWithTimeout(`${URL}/connections/stats`, {
-//         headers: this.getAuthHeaders()
-//       });
-      
-//       if (!response.ok) {
-//         const error = await response.json().catch(() => ({ message: 'Network error' }));
-//         throw new Error(error.message || `Server error: ${response.status}`);
-//       }
-      
-//       return response.json();
-//     } catch (error) {
-//       console.error('Error fetching stats:', error);
-//       throw new Error(error.message || 'Failed to fetch stats');
-//     }
-//   },
-
-//   // Get current user ID - OPTIMIZED with better error handling
-//   getCurrentUserId() {
-//     try {
-//       const token = localStorage.getItem('token');
-//       if (!token) {
-//         throw new Error('No authentication token found');
-//       }
-      
-//       const payload = JSON.parse(atob(token.split('.')[1]));
-//       const userId = payload.id || payload.userId || payload.user_id;
-      
-//       if (!userId) {
-//         throw new Error('User ID not found in token');
-//       }
-      
-//       return userId;
-//     } catch (error) {
-//       console.error('Error parsing token:', error);
-//       // Redirect to login or handle authentication error
-//       return null;
-//     }
-//   },
-
-//   // Batch API calls for initial data loading - NEW
-//   async loadInitialData(searchParams = {}) {
-//     try {
-//       // Load all required data in parallel
-//       const [professionalsData, connectionsData, requestsData, statsData] = await Promise.all([
-//         this.getProfessionals(searchParams).catch(err => {
-//           console.error('Failed to load professionals:', err);
-//           return { professionals: [], totalPages: 1 };
-//         }),
-//         this.getMyConnections().catch(err => {
-//           console.error('Failed to load connections:', err);
-//           return [];
-//         }),
-//         this.getPendingRequests().catch(err => {
-//           console.error('Failed to load requests:', err);
-//           return [];
-//         }),
-//         this.getConnectionStats().catch(err => {
-//           console.error('Failed to load stats:', err);
-//           return { totalConnections: 0, pendingRequests: 0, sentRequests: 0 };
-//         })
-//       ]);
-
-//       return {
-//         professionals: professionalsData,
-//         connections: connectionsData,
-//         requests: requestsData,
-//         stats: statsData
-//       };
-//     } catch (error) {
-//       console.error('Error loading initial data:', error);
-//       throw new Error('Failed to load dashboard data');
-//     }
-//   }
-// };
+// PROPER EXPORT - This is the key fix for the import error
+export { apiService };
