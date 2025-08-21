@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Users, X,  Award, Calendar, Briefcase, MessageSquare, BookOpen, TrendingUp, UserCheck, Clock, CheckCircle, AlertTriangle, XCircle, Bell, Menu, Sun, Moon, User, Home, BarChart3, Settings, LogOut, Target, Network, GraduationCap, Building2, FileCheck } from 'lucide-react';
+import { Users, X,  Award, Calendar, Briefcase, MessageSquare, BookOpen, TrendingUp, UserCheck, Clock, CheckCircle, AlertTriangle, XCircle, Bell, Menu, Sun, Moon, User, Home, BarChart3, Settings, LogOut, Target, Network, GraduationCap, Building2, FileCheck, Bot } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import JobBoard from '../JobBoardOpportunites/JobBoard'
 import { EventsCalendar }from '../ProfessionalNetworking/EventsCalendar'
@@ -9,6 +9,7 @@ import GELEPPlatform from '../ProfessionalNetworking/GELEPPlatform';
 import JobApplicationsPage from '../JobBoardOpportunites/JobApplicationsPage';
 import LeadershipExam from '../online_course/LeadershipExam';
 import MentorshipDashboard from '../MatchingAlgorithim/MentorshipDashboard';
+import AIChatbotContainer from '../AI/AIChatbot';
 
 // Mock data for the dashboard (keeping stats and other data)
 const mockData = {
@@ -233,6 +234,7 @@ const Sidebar = ({ isCollapsed, setIsCollapsed, activeTab, setActiveTab }) => {
     { id: 'jobBoard' , icon: Briefcase, label: 'Job Opportunities'},
     { id : 'eventsCalendar', icon: Calendar, label: 'Events'},
     { id: 'leadershipTraining', icon: BookOpen, label: 'Training Courses' },
+    { id: 'ai-chatbot', icon: Bot, label: 'AI Chatbot' },
     { id: 'GELEPPlatform', icon: MessageSquare, label: 'Community Forums' },
     { id: 'applicationstatus', icon: BarChart3, label: 'Application Status' },
     { id: 'exam', icon: FileCheck, label: 'Take Exam' }
@@ -718,6 +720,10 @@ const GELEPDashboard = () => {
             
             {activeTab === 'leadershipTraining' && (
               <LeadershipTrainingDevelopment />
+            )}
+
+           {activeTab === 'ai-chatbot' && (
+              <AIChatbotContainer />
             )}
             
             {activeTab === 'GELEPPlatform' && (

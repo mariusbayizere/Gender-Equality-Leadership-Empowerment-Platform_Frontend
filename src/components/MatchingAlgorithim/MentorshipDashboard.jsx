@@ -387,31 +387,42 @@ const MentorshipDashboard = () => {
     }
   };
 
-  const handleCreateGoal = async () => {
-    if (!goalData.goal_title.trim()) return;
-    try {
-      await apiCall('/create-goal', {
-        method: 'POST',
-        body: JSON.stringify({
-          mentorship_id: selectedMentorship.id,
-          ...goalData
-        })
-      });
-      setGoalData({
-        goal_title: '',
-        goal_description: '',
-        target_date: '',
-        goal_category: 'general'
-      });
-      setShowGoalForm(false);
-      
-      // Clear goals cache and reload
-      clearCache(`goals/${selectedMentorship.id}`);
-      await fetchGoals(selectedMentorship.id);
-    } catch (error) {
-      setError('Error creating goal');
+const handleCreateGoal = async () => {
+  console.log('🚀 handleCreateGoal called');
+  
+  try {
+    const goalPayload = {
+      ...goalData,
+      mentorship_id: selectedMentorship.id
+    };
+    
+    console.log('📡 Making API call to /create-goal');
+    console.log('API endpoint:', '/create-goal');
+    console.log('Request payload:', goalPayload);
+    
+    const result = await apiCall('http://localhost:3000/api/v1/mentorship/set-goal', 'POST', goalPayload);
+    
+    console.log('✅ API call successful');
+    console.log('API response:', result);
+    
+    if (result && result.goal) {
+      // Add the new goal to the mentorshipGoals array
+      setMentorshipGoals(prev => [...prev, result.goal]);
+      console.log('📝 Goal added to mentorshipGoals array');
     }
-  };
+    
+    return result;
+    
+  } catch (error) {
+    console.error('🔥 handleCreateGoal error details:');
+    console.error('- Error type:', typeof error);
+    console.error('- Error message:', error.message);
+    console.error('- Error response:', error.response);
+    console.error('- Full error:', error);
+    
+    throw error; // Re-throw so the calling function can handle it
+  }
+};
 
   const handleUpdateGoal = async (goalId, updateData) => {
     try {
@@ -434,115 +445,6 @@ const MentorshipDashboard = () => {
     setLoadedTabs(new Set());
     loadInitialData();
   }, [loadInitialData]);
-
-// const MentorCard = ({ mentor, isMatched = false, matchData = null }) => {
-//   const [showRequestForm, setShowRequestForm] = useState(false);
-//   const [requestMessage, setRequestMessage] = useState('');
-  
-//   // Simple display of userRole since backend now provides it
-//   const displayRole = mentor.userRole || 'Mentors';
-  
-//   return (
-//     <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg hover:shadow-xl dark:hover:shadow-2xl transition-all duration-300 border border-gray-100 dark:border-gray-700 w-full max-w-full">
-//       <div className="p-4 sm:p-6">
-//         <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between">
-//           <div className="flex-1 w-full">
-//             <div className="flex flex-col sm:flex-row sm:items-center sm:space-x-3 mb-3 space-y-3 sm:space-y-0">
-//               <div className="w-12 h-12 sm:w-14 sm:h-14 bg-gradient-to-br from-blue-500 to-blue-600 dark:from-blue-400 dark:to-blue-500 rounded-full flex items-center justify-center text-white font-semibold text-lg sm:text-xl mx-auto sm:mx-0 flex-shrink-0">
-//                 {mentor.firstName?.[0]}{mentor.lastName?.[0]}
-//               </div>
-//               <div className="text-center sm:text-left flex-1 min-w-0">
-//                 <h3 className="text-lg sm:text-xl font-semibold text-gray-900 dark:text-white truncate">
-//                   {mentor.firstName} {mentor.lastName}
-//                 </h3>
-//                 {/* Fixed: Using direct userRole field */}
-//                 <p className="text-sm text-gray-600 dark:text-gray-300 capitalize">
-//                   {displayRole}
-//                 </p>
-//               </div>
-//             </div>
-            
-//             {/* Info Grid - Responsive layout */}
-//             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-1 xl:grid-cols-2 gap-2 sm:gap-3 mb-4">
-//               <div className="flex items-center text-sm text-gray-600 dark:text-gray-300 p-2 bg-gray-50 dark:bg-gray-700 rounded-lg">
-//                 <BookOpen className="w-4 h-4 mr-2 text-blue-500 dark:text-blue-400 flex-shrink-0" />
-//                 <span className="truncate">{mentor.field || 'Field not specified'}</span>
-//               </div>
-//               <div className="flex items-center text-sm text-gray-600 dark:text-gray-300 p-2 bg-gray-50 dark:bg-gray-700 rounded-lg">
-//                 <Award className="w-4 h-4 mr-2 text-blue-500 dark:text-blue-400 flex-shrink-0" />
-//                 <span className="truncate">{mentor.yearsOfExperience || mentor.years_of_experience || 0} years experience</span>
-//               </div>
-//               <div className="flex items-center text-sm text-gray-600 dark:text-gray-300 p-2 bg-gray-50 dark:bg-gray-700 rounded-lg sm:col-span-2 lg:col-span-1 xl:col-span-2">
-//                 <Star className="w-4 h-4 mr-2 text-blue-500 dark:text-blue-400 flex-shrink-0" />
-//                 <span className="truncate">{mentor.specialization || 'Specialization not specified'}</span>
-//               </div>
-//             </div>
-            
-//             {/* Match Info */}
-//             {isMatched && matchData && (
-//               <div className="bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-700 rounded-lg p-3 mb-4">
-//                 <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-2 space-y-1 sm:space-y-0">
-//                   <span className="text-sm font-medium text-green-800 dark:text-green-300">
-//                     {matchData.compatibility} Match
-//                   </span>
-//                   <span className="text-sm text-green-600 dark:text-green-400">
-//                     {matchData.matchScore}% compatibility
-//                   </span>
-//                 </div>
-//                 <p className="text-xs text-green-700 dark:text-green-300 break-words">
-//                   {matchData.matchReasons?.join(', ')}
-//                 </p>
-//               </div>
-//             )}
-//           </div>
-//         </div>
-        
-//         {/* Action Buttons */}
-//         {!showRequestForm ? (
-//           <button
-//             onClick={() => setShowRequestForm(true)}
-//             className="w-full bg-gradient-to-r from-blue-600 to-blue-600 dark:from-blue-500 dark:to-blue-600 text-white py-3 sm:py-2 px-4 rounded-lg hover:from-blue-700 hover:to-blue-700 dark:hover:from-blue-600 dark:hover:to-blue-700 transition-all duration-200 flex items-center justify-center space-x-2 font-medium"
-//           >
-//             <UserPlus className="w-4 h-4 sm:w-5 sm:h-5" />
-//             <span className="text-sm sm:text-base">Request Mentorship</span>
-//           </button>
-//         ) : (
-//           <div className="space-y-3">
-//             <textarea
-//               placeholder="Write a message to introduce yourself and explain why you'd like this mentor..."
-//               value={requestMessage}
-//               onChange={(e) => setRequestMessage(e.target.value)}
-//               className="w-full p-3 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent resize-none text-sm"
-//               rows={4}
-//             />
-//             <div className="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-2">
-//               <button
-//                 onClick={() => {
-//                   handleSelectMentor(mentor.id, requestMessage);
-//                   setShowRequestForm(false);
-//                   setRequestMessage('');
-//                 }}
-//                 disabled={loading || !requestMessage.trim()}
-//                 className="flex-1 bg-blue-600 dark:bg-blue-500 text-white py-3 sm:py-2 px-4 rounded-lg hover:bg-blue-700 dark:hover:bg-blue-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed font-medium text-sm sm:text-base"
-//               >
-//                 Send Request
-//               </button>
-//               <button
-//                 onClick={() => {
-//                   setShowRequestForm(false);
-//                   setRequestMessage('');
-//                 }}
-//                 className="px-4 py-3 sm:py-2 text-gray-600 dark:text-gray-300 hover:text-gray-800 dark:hover:text-white transition-colors rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 font-medium text-sm sm:text-base"
-//               >
-//                 Cancel
-//               </button>
-//             </div>
-//           </div>
-//         )}
-//       </div>
-//     </div>
-//   );
-// };
 
 const MentorCard = ({ mentor, isMatched = false, matchData = null }) => {
   const [showRequestForm, setShowRequestForm] = useState(false);
@@ -888,258 +790,349 @@ const MentorCard = ({ mentor, isMatched = false, matchData = null }) => {
   );
 };
 
-  const ChatModal = () => {
-    if (!showChat || !selectedMentorship) return null;
-    return (
-      <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-        <div className="bg-white rounded-lg w-full max-w-2xl h-96 flex flex-col">
-          <div className="p-4 border-b border-gray-200 flex items-center justify-between">
-            <h3 className="text-lg font-semibold">
-              Chat with {currentUser.userRole === 'mentor' ? selectedMentorship.mentee_details?.name : selectedMentorship.mentor_details?.name}
-            </h3>
-            <button
-              onClick={() => setShowChat(false)}
-              className="text-gray-500 hover:text-gray-700"
-            >
-              <XCircle className="w-6 h-6" />
-            </button>
-          </div>
-          <div className="flex-1 p-4 overflow-y-auto space-y-3">
-            {chatMessages.map(message => (
-              <div key={message.id} className={`flex ${message.sender_id === currentUser.id ? 'justify-end' : 'justify-start'}`}>
-                <div className={`max-w-xs lg:max-w-md px-4 py-2 rounded-lg ${
-                  message.sender_id === currentUser.id
-                    ? 'bg-blue-600 text-white'
-                    : 'bg-gray-200 text-gray-900'
-                }`}>
-                  <p className="text-sm">{message.message_content}</p>
-                  <p className="text-xs mt-1 opacity-70">
-                    {new Date(message.createdAt).toLocaleTimeString()}
-                  </p>
-                </div>
+const ChatModal = () => {
+  if (!showChat || !selectedMentorship) return null;
+  return (
+    <div className="fixed inset-0 bg-black bg-opacity-50 dark:bg-black dark:bg-opacity-70 flex items-center justify-center z-50 p-2 sm:p-4">
+      <div className="bg-white dark:bg-gray-800 rounded-lg w-full max-w-2xl h-[90vh] sm:h-96 flex flex-col shadow-xl">
+        <div className="p-3 sm:p-4 border-b border-gray-200 dark:border-gray-600 flex items-center justify-between">
+          <h3 className="text-base sm:text-lg font-semibold text-gray-900 dark:text-white truncate pr-2">
+            Chat with {currentUser.userRole === 'mentor' ? selectedMentorship.mentee_details?.name : selectedMentorship.mentor_details?.name}
+          </h3>
+          <button
+            onClick={() => setShowChat(false)}
+            className="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 flex-shrink-0"
+          >
+            <XCircle className="w-5 h-5 sm:w-6 sm:h-6" />
+          </button>
+        </div>
+        <div className="flex-1 p-3 sm:p-4 overflow-y-auto space-y-3">
+          {chatMessages.map(message => (
+            <div key={message.id} className={`flex ${message.sender_id === currentUser.id ? 'justify-end' : 'justify-start'}`}>
+              <div className={`max-w-[85%] sm:max-w-xs lg:max-w-md px-3 sm:px-4 py-2 rounded-lg ${
+                message.sender_id === currentUser.id
+                  ? 'bg-blue-600 dark:bg-blue-500 text-white'
+                  : 'bg-gray-200 dark:bg-gray-700 text-gray-900 dark:text-gray-100'
+              }`}>
+                <p className="text-sm break-words">{message.message_content}</p>
+                <p className="text-xs mt-1 opacity-70">
+                  {new Date(message.createdAt).toLocaleTimeString()}
+                </p>
               </div>
-            ))}
-          </div>
-          <div className="p-4 border-t border-gray-200 flex space-x-2">
-            <input
-              type="text" value={newMessage}
-              onChange={(e) => setNewMessage(e.target.value)}
-              placeholder="Type your message..."
-              className="flex-1 p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              onKeyPress={(e) => {
-                if (e.key === 'Enter' && !e.shiftKey) {
-                  e.preventDefault();
-                  handleSendMessage();
-                }
-              }}
-            />
-            <button
-              onClick={handleSendMessage}
-              disabled={!newMessage.trim()}
-              className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              <Send className="w-4 h-4" />
-            </button>
-          </div>
+            </div>
+          ))}
+        </div>
+        <div className="p-3 sm:p-4 border-t border-gray-200 dark:border-gray-600 flex space-x-2">
+          <input
+            type="text" 
+            value={newMessage}
+            onChange={(e) => setNewMessage(e.target.value)}
+            placeholder="Type your message..."
+            className="flex-1 p-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 text-sm sm:text-base"
+            onKeyPress={(e) => {
+              if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                handleSendMessage();
+              }
+            }}
+          />
+          <button
+            onClick={handleSendMessage}
+            disabled={!newMessage.trim()}
+            className="bg-blue-600 dark:bg-blue-500 text-white px-3 sm:px-4 py-2 rounded-lg hover:bg-blue-700 dark:hover:bg-blue-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex-shrink-0"
+          >
+            <Send className="w-4 h-4" />
+          </button>
         </div>
       </div>
-    );
+    </div>
+  );
+};
+
+const GoalsModal = () => {
+  if (!selectedMentorship) return null;
+  
+  const updateGoalProgress = (goalId, progress) => {
+    handleUpdateGoal(goalId, { progress_percentage: progress });
+  };
+  
+  const toggleGoalCompletion = (goalId, currentStatus) => {
+    handleUpdateGoal(goalId, { 
+      goal_status: currentStatus === 'completed' ? 'active' : 'completed',
+      progress_percentage: currentStatus === 'completed' ? 0 : 100
+    });
   };
 
-  const GoalsModal = () => {
-    if (!selectedMentorship) return null;
+  // Fixed input handlers to prevent re-rendering issues
+  const handleTitleChange = (e) => {
+    console.log('Title changed:', e.target.value);
+    setGoalData(prev => ({ ...prev, goal_title: e.target.value }));
+  };
+
+  const handleDescriptionChange = (e) => {
+    console.log('Description changed:', e.target.value);
+    setGoalData(prev => ({ ...prev, goal_description: e.target.value }));
+  };
+
+  const handleDateChange = (e) => {
+    console.log('Date changed:', e.target.value);
+    setGoalData(prev => ({ ...prev, target_date: e.target.value }));
+  };
+
+  const handleCategoryChange = (e) => {
+    console.log('Category changed:', e.target.value);
+    setGoalData(prev => ({ ...prev, goal_category: e.target.value }));
+  };
+
+  // Enhanced goal creation handler with detailed logging
+  const handleCreateGoalWithLogging = async () => {
+    console.log('=== GOAL CREATION STARTED ===');
+    console.log('Goal data before creation:', goalData);
+    console.log('Selected mentorship:', selectedMentorship);
+    console.log('Current user:', currentUser);
     
-    const updateGoalProgress = (goalId, progress) => {
-      handleUpdateGoal(goalId, { progress_percentage: progress });
-    };
+    try {
+      // Validate required fields
+      if (!goalData.goal_title?.trim()) {
+        console.error('❌ Goal creation failed: Title is required');
+        alert('Goal title is required');
+        return;
+      }
+
+      if (!selectedMentorship?.id) {
+        console.error('❌ Goal creation failed: No mentorship selected');
+        alert('No mentorship relationship selected');
+        return;
+      }
+
+      const goalPayload = {
+        ...goalData,
+        mentorship_id: selectedMentorship.id
+      };
+
+      console.log('📤 Sending goal creation request with payload:', goalPayload);
+      
+      // Call your existing handleCreateGoal function
+      const result = await handleCreateGoal();
+      
+      if (result && result.goal) {
+        console.log('✅ Goal created successfully!');
+        console.log('Created goal:', result.goal);
+        console.log('Goal ID:', result.goal.id);
+        
+        // Reset form
+        setGoalData({
+          goal_title: '',
+          goal_description: '',
+          target_date: '',
+          goal_category: 'general'
+        });
+        setShowGoalForm(false);
+        
+        console.log('📋 Form reset and modal closed');
+        
+        // Show success message
+        alert('Goal created successfully!');
+      } else {
+        console.log('⚠️ Goal creation completed but no result returned');
+      }
+      
+    } catch (error) {
+      console.error('❌ Goal creation error:', error);
+      console.error('Error message:', error.message);
+      console.error('Error stack:', error.stack);
+      
+      // Show user-friendly error message
+      alert(`Failed to create goal: ${error.message || 'Unknown error'}`);
+    }
     
-    const toggleGoalCompletion = (goalId, currentStatus) => {
-      handleUpdateGoal(goalId, { 
-        goal_status: currentStatus === 'completed' ? 'active' : 'completed',
-        progress_percentage: currentStatus === 'completed' ? 0 : 100
-      });
-    };
-    
-    return (
-      <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-        <div className="bg-white rounded-lg w-full max-w-4xl max-h-[90vh] overflow-hidden flex flex-col">
-          <div className="p-6 border-b border-gray-200 flex items-center justify-between">
-            <h3 className="text-xl font-semibold">
-              Goals for {currentUser.userRole === 'mentor' ? selectedMentorship.mentee_details?.name : selectedMentorship.mentor_details?.name}
-            </h3>
+    console.log('=== GOAL CREATION ENDED ===');
+  };
+  
+  return (
+    <div className="fixed inset-0 bg-black bg-opacity-50 dark:bg-black dark:bg-opacity-70 flex items-center justify-center z-50 p-2 sm:p-4">
+      <div className="bg-white dark:bg-gray-800 rounded-lg w-full max-w-4xl max-h-[90vh] overflow-hidden flex flex-col shadow-xl">
+        <div className="p-4 sm:p-6 border-b border-gray-200 dark:border-gray-600 flex items-center justify-between">
+          <h3 className="text-lg sm:text-xl font-semibold text-gray-900 dark:text-white truncate pr-2">
+            Goals for {currentUser.userRole === 'mentor' ? selectedMentorship.mentee_details?.name : selectedMentorship.mentor_details?.name}
+          </h3>
+          <button
+            onClick={() => {
+              setSelectedMentorship(null);
+              setMentorshipGoals([]);
+              setShowGoalForm(false);
+            }}
+            className="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 flex-shrink-0"
+          >
+            <XCircle className="w-5 h-5 sm:w-6 sm:h-6" />
+          </button>
+        </div>
+        
+        <div className="flex-1 overflow-y-auto p-4 sm:p-6">
+          <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-4 sm:mb-6 space-y-3 sm:space-y-0">
+            <div>
+              <h4 className="text-base sm:text-lg font-medium text-gray-900 dark:text-white">Progress Tracking</h4>
+              <p className="text-sm text-gray-600 dark:text-gray-400">Set and track goals for your mentorship journey</p>
+            </div>
             <button
-              onClick={() => {
-                setSelectedMentorship(null);
-                setMentorshipGoals([]);
-                setShowGoalForm(false);
-              }}
-              className="text-gray-500 hover:text-gray-700"
+              onClick={() => setShowGoalForm(true)}
+              className="bg-blue-600 dark:bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-700 dark:hover:bg-blue-600 transition-colors flex items-center justify-center space-x-2 w-full sm:w-auto"
             >
-              <XCircle className="w-6 h-6" />
+              <Plus className="w-4 h-4" />
+              <span>New Goal</span>
             </button>
           </div>
           
-          <div className="flex-1 overflow-y-auto p-6">
-            <div className="flex justify-between items-center mb-6">
-              <div>
-                <h4 className="text-lg font-medium text-gray-900">Progress Tracking</h4>
-                <p className="text-sm text-gray-600">Set and track goals for your mentorship journey</p>
-              </div>
-              <button
-                onClick={() => setShowGoalForm(true)}
-                className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors flex items-center space-x-2"
-              >
-                <Plus className="w-4 h-4" />
-                <span>New Goal</span>
-              </button>
-            </div>
-            
-            {showGoalForm && (
-              <div className="bg-gray-50 rounded-lg p-4 mb-6">
-                <h5 className="font-medium text-gray-900 mb-3">Create New Goal</h5>
-                <div className="space-y-3">
+          {showGoalForm && (
+            <div key="goal-form" className="bg-gray-50 dark:bg-gray-700 rounded-lg p-3 sm:p-4 mb-4 sm:mb-6">
+              <h5 className="font-medium text-gray-900 dark:text-white mb-3">Create New Goal</h5>
+              <div className="space-y-3">
+                <input
+                  key="goal-title-input"
+                  type="text"
+                  placeholder="Goal title"
+                  value={goalData.goal_title || ''}
+                  onChange={handleTitleChange}
+                  className="w-full p-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 text-sm sm:text-base"
+                />
+                <textarea
+                  key="goal-description-input"
+                  placeholder="Goal description"
+                  value={goalData.goal_description || ''}
+                  onChange={handleDescriptionChange}
+                  className="w-full p-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 text-sm sm:text-base"
+                  rows={3}
+                />
+                <div className="flex flex-col sm:flex-row space-y-3 sm:space-y-0 sm:space-x-3">
                   <input
-                    type="text"
-                    placeholder="Goal title"
-                    value={goalData.goal_title}
-                    onChange={(e) => setGoalData(prev => ({ ...prev, goal_title: e.target.value }))}
-                    className="w-full p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    key="goal-date-input"
+                    type="date"
+                    value={goalData.target_date || ''}
+                    onChange={handleDateChange}
+                    className="flex-1 p-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-800 text-gray-900 dark:text-white text-sm sm:text-base"
                   />
-                  <textarea
-                    placeholder="Goal description"
-                    value={goalData.goal_description}
-                    onChange={(e) => setGoalData(prev => ({ ...prev, goal_description: e.target.value }))}
-                    className="w-full p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
-                    rows={3}
-                  />
-                  <div className="flex space-x-3">
-                    <input
-                      type="date"
-                      value={goalData.target_date}
-                      onChange={(e) => setGoalData(prev => ({ ...prev, target_date: e.target.value }))}
-                      className="flex-1 p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    />
-                    <select
-                      value={goalData.goal_category}
-                      onChange={(e) => setGoalData(prev => ({ ...prev, goal_category: e.target.value }))}
-                      className="flex-1 p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    >
-                      <option value="general">General</option>
-                      <option value="skill">Skill Development</option>
-                      <option value="career">Career</option>
-                      <option value="project">Project</option>
-                      <option value="learning">Learning</option>
-                    </select>
-                  </div>
-                  <div className="flex space-x-2">
-                    <button
-                      onClick={handleCreateGoal}
-                      disabled={!goalData.goal_title.trim()}
-                      className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                    >
-                      Create Goal
-                    </button>
-                    <button
-                      onClick={() => setShowGoalForm(false)}
-                      className="px-4 py-2 text-gray-600 hover:text-gray-800 transition-colors"
-                    >
-                      Cancel
-                    </button>
-                  </div>
+                  <select
+                    key="goal-category-select"
+                    value={goalData.goal_category || 'general'}
+                    onChange={handleCategoryChange}
+                    className="flex-1 p-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-800 text-gray-900 dark:text-white text-sm sm:text-base"
+                  >
+                    <option value="general">General</option>
+                    <option value="skill">Skill Development</option>
+                    <option value="career">Career</option>
+                    <option value="project">Project</option>
+                    <option value="learning">Learning</option>
+                  </select>
+                </div>
+                <div className="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-2">
+                  <button
+                    onClick={handleCreateGoalWithLogging}
+                    disabled={!goalData.goal_title?.trim()}
+                    className="bg-blue-600 dark:bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-700 dark:hover:bg-blue-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed w-full sm:w-auto"
+                  >
+                    Create Goal
+                  </button>
+                  <button
+                    onClick={() => setShowGoalForm(false)}
+                    className="px-4 py-2 text-gray-600 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200 transition-colors w-full sm:w-auto"
+                  >
+                    Cancel
+                  </button>
                 </div>
               </div>
-            )}
-            
-            <div className="space-y-4">
-              {mentorshipGoals.length === 0 ? (
-                <div className="text-center py-8 text-gray-500">
-                  <Target className="w-12 h-12 mx-auto mb-3 text-gray-300" />
-                  <p>No goals set yet</p>
-                  <p className="text-sm">Create your first goal to start tracking progress</p>
-                </div>
-              ) : (
-                mentorshipGoals.map(goal => (
-                  <div key={goal.id} className="bg-white border border-gray-200 rounded-lg p-4">
-                    <div className="flex items-start justify-between mb-3">
-                      <div className="flex-1">
-                        <h6 className="font-medium text-gray-900 flex items-center space-x-2">
-                          <span>{goal.goal_title}</span>
-                          {goal.goal_status === 'completed' && (
-                            <CheckCircle className="w-5 h-5 text-green-500" />
-                          )}
-                        </h6>
-                        <p className="text-sm text-gray-600 mt-1">{goal.goal_description}</p>
-                      </div>
-                      <div className="flex items-center space-x-2">
-                        <span className={`px-2 py-1 rounded-full text-xs font-medium ${
-                          goal.goal_category === 'skill' ? 'bg-blue-100 text-blue-800' :
-                          goal.goal_category === 'career' ? 'bg-green-100 text-green-800' :
-                          goal.goal_category === 'project' ? 'bg-purple-100 text-purple-800' :
-                          goal.goal_category === 'learning' ? 'bg-yellow-100 text-yellow-800' :
-                          'bg-gray-100 text-gray-800'
-                        }`}>
-                          {goal.goal_category}
-                        </span>
-                      </div>
+            </div>
+          )}
+          
+          <div className="space-y-4">
+            {mentorshipGoals.length === 0 ? (
+              <div className="text-center py-8 text-gray-500 dark:text-gray-400">
+                <Target className="w-12 h-12 mx-auto mb-3 text-gray-300 dark:text-gray-600" />
+                <p>No goals set yet</p>
+                <p className="text-sm">Create your first goal to start tracking progress</p>
+              </div>
+            ) : (
+              mentorshipGoals.map(goal => (
+                <div key={`goal-${goal.id}`} className="bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg p-3 sm:p-4">
+                  <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between mb-3 space-y-2 sm:space-y-0">
+                    <div className="flex-1">
+                      <h6 className="font-medium text-gray-900 dark:text-white flex items-center space-x-2">
+                        <span className="break-words">{goal.goal_title}</span>
+                        {goal.goal_status === 'completed' && (
+                          <CheckCircle className="w-5 h-5 text-green-500 flex-shrink-0" />
+                        )}
+                      </h6>
+                      <p className="text-sm text-gray-600 dark:text-gray-400 mt-1 break-words">{goal.goal_description}</p>
                     </div>
-                    
-                    {goal.target_date && (
-                      <div className="flex items-center text-sm text-gray-500 mb-3">
-                        <Calendar className="w-4 h-4 mr-2" />
-                        Target: {new Date(goal.target_date).toLocaleDateString()}
-                      </div>
-                    )}
-                    
-                    <div className="mb-3">
-                      <div className="flex justify-between text-sm mb-1">
-                        <span className="text-gray-600">Progress</span>
-                        <span className="text-gray-900 font-medium">{goal.progress_percentage || 0}%</span>
-                      </div>
-                      <div className="w-full bg-gray-200 rounded-full h-2">
-                        <div
-                          className="bg-blue-600 h-2 rounded-full transition-all duration-300"
-                          style={{ width: `${goal.progress_percentage || 0}%` }}
-                        ></div>
-                      </div>
+                    <div className="flex items-center justify-start sm:justify-end">
+                      <span className={`px-2 py-1 rounded-full text-xs font-medium ${
+                        goal.goal_category === 'skill' ? 'bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200' :
+                        goal.goal_category === 'career' ? 'bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200' :
+                        goal.goal_category === 'project' ? 'bg-purple-100 dark:bg-purple-900 text-purple-800 dark:text-purple-200' :
+                        goal.goal_category === 'learning' ? 'bg-yellow-100 dark:bg-yellow-900 text-yellow-800 dark:text-yellow-200' :
+                        'bg-gray-100 dark:bg-gray-600 text-gray-800 dark:text-gray-200'
+                      }`}>
+                        {goal.goal_category}
+                      </span>
                     </div>
-                    
-                    <div className="flex items-center justify-between">
-                      <div className="flex space-x-2">
-                        <button
-                          onClick={() => updateGoalProgress(goal.id, Math.min(100, (goal.progress_percentage || 0) + 25))}
-                          disabled={goal.goal_status === 'completed'}
-                          className="text-sm bg-blue-100 text-blue-700 px-3 py-1 rounded-lg hover:bg-blue-200 transition-colors disabled:opacity-50"
-                        >
-                          +25%
-                        </button>
-                        <button
-                          onClick={() => updateGoalProgress(goal.id, Math.max(0, (goal.progress_percentage || 0) - 25))}
-                          disabled={goal.goal_status === 'completed'}
-                          className="text-sm bg-gray-100 text-gray-700 px-3 py-1 rounded-lg hover:bg-gray-200 transition-colors disabled:opacity-50"
-                        >
-                          -25%
-                        </button>
-                      </div>
+                  </div>
+                  
+                  {goal.target_date && (
+                    <div className="flex items-center text-sm text-gray-500 dark:text-gray-400 mb-3">
+                      <Calendar className="w-4 h-4 mr-2 flex-shrink-0" />
+                      <span>Target: {new Date(goal.target_date).toLocaleDateString()}</span>
+                    </div>
+                  )}
+                  
+                  <div className="mb-3">
+                    <div className="flex justify-between text-sm mb-1">
+                      <span className="text-gray-600 dark:text-gray-400">Progress</span>
+                      <span className="text-gray-900 dark:text-white font-medium">{goal.progress_percentage || 0}%</span>
+                    </div>
+                    <div className="w-full bg-gray-200 dark:bg-gray-600 rounded-full h-2">
+                      <div
+                        className="bg-blue-600 dark:bg-blue-500 h-2 rounded-full transition-all duration-300"
+                        style={{ width: `${goal.progress_percentage || 0}%` }}
+                      ></div>
+                    </div>
+                  </div>
+                  
+                  <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between space-y-3 sm:space-y-0">
+                    <div className="flex space-x-2">
                       <button
-                        onClick={() => toggleGoalCompletion(goal.id, goal.goal_status)}
-                        className={`text-sm px-3 py-1 rounded-lg transition-colors ${
-                          goal.goal_status === 'completed'
-                            ? 'bg-green-100 text-green-700 hover:bg-green-200'
-                            : 'bg-blue-100 text-blue-700 hover:bg-blue-200'
-                        }`}
+                        onClick={() => updateGoalProgress(goal.id, Math.min(100, (goal.progress_percentage || 0) + 25))}
+                        disabled={goal.goal_status === 'completed'}
+                        className="text-sm bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-200 px-3 py-1 rounded-lg hover:bg-blue-200 dark:hover:bg-blue-800 transition-colors disabled:opacity-50 flex-1 sm:flex-none"
                       >
-                        {goal.goal_status === 'completed' ? 'Mark Incomplete' : 'Mark Complete'}
+                        +25%
+                      </button>
+                      <button
+                        onClick={() => updateGoalProgress(goal.id, Math.max(0, (goal.progress_percentage || 0) - 25))}
+                        disabled={goal.goal_status === 'completed'}
+                        className="text-sm bg-gray-100 dark:bg-gray-600 text-gray-700 dark:text-gray-200 px-3 py-1 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-500 transition-colors disabled:opacity-50 flex-1 sm:flex-none"
+                      >
+                        -25%
                       </button>
                     </div>
+                    <button
+                      onClick={() => toggleGoalCompletion(goal.id, goal.goal_status)}
+                      className={`text-sm px-3 py-1 rounded-lg transition-colors w-full sm:w-auto ${
+                        goal.goal_status === 'completed'
+                          ? 'bg-green-100 dark:bg-green-900 text-green-700 dark:text-green-200 hover:bg-green-200 dark:hover:bg-green-800'
+                          : 'bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-200 hover:bg-blue-200 dark:hover:bg-blue-800'
+                      }`}
+                    >
+                      {goal.goal_status === 'completed' ? 'Mark Incomplete' : 'Mark Complete'}
+                    </button>
                   </div>
-                ))
-              )}
-            </div>
+                </div>
+              ))
+            )}
           </div>
         </div>
       </div>
-    );
-  };
+    </div>
+  );
+};
 
   const AnalyticsView = () => {
     return (

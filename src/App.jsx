@@ -35,6 +35,7 @@ import MentorshipProgram from './components/MatchingAlgorithim/MentorshipProgram
 import { MentorRequests } from './components/MatchingAlgorithim/MentorRequests';
 import  AIChatbot from './components/AI/AIChatbot.jsx';
 import MentorshipDashboard from './components/MatchingAlgorithim/MentorshipDashboard';
+import GELEPLandingPage from './components/Homepage/GELEPLandingPage';
 
 // Dashboard Page Components
 const DashboardUsersPage = () => (
@@ -378,6 +379,10 @@ function App() {
         {
             path: "/ai-chatbot",
             element: <AIChatbot />
+        },
+        {
+            path: "/home",
+            element: <GELEPLandingPage />,
         },
         {
             path: "/user",
