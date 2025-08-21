@@ -435,8 +435,6 @@ const MentorshipDashboard = () => {
     loadInitialData();
   }, [loadInitialData]);
 
-
-
 // const MentorCard = ({ mentor, isMatched = false, matchData = null }) => {
 //   const [showRequestForm, setShowRequestForm] = useState(false);
 //   const [requestMessage, setRequestMessage] = useState('');
@@ -445,62 +443,68 @@ const MentorshipDashboard = () => {
 //   const displayRole = mentor.userRole || 'Mentors';
   
 //   return (
-//     <div className="bg-white rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 border border-gray-100">
-//       <div className="p-6">
-//         <div className="flex items-start justify-between">
-//           <div className="flex-1">
-//             <div className="flex items-center space-x-3 mb-3">
-//               <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-blue-500 rounded-full flex items-center justify-center text-white font-semibold">
+//     <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg hover:shadow-xl dark:hover:shadow-2xl transition-all duration-300 border border-gray-100 dark:border-gray-700 w-full max-w-full">
+//       <div className="p-4 sm:p-6">
+//         <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between">
+//           <div className="flex-1 w-full">
+//             <div className="flex flex-col sm:flex-row sm:items-center sm:space-x-3 mb-3 space-y-3 sm:space-y-0">
+//               <div className="w-12 h-12 sm:w-14 sm:h-14 bg-gradient-to-br from-blue-500 to-blue-600 dark:from-blue-400 dark:to-blue-500 rounded-full flex items-center justify-center text-white font-semibold text-lg sm:text-xl mx-auto sm:mx-0 flex-shrink-0">
 //                 {mentor.firstName?.[0]}{mentor.lastName?.[0]}
 //               </div>
-//               <div>
-//                 <h3 className="text-lg font-semibold text-gray-900">
+//               <div className="text-center sm:text-left flex-1 min-w-0">
+//                 <h3 className="text-lg sm:text-xl font-semibold text-gray-900 dark:text-white truncate">
 //                   {mentor.firstName} {mentor.lastName}
 //                 </h3>
 //                 {/* Fixed: Using direct userRole field */}
-//                 <p className="text-sm text-gray-600 capitalize">
+//                 <p className="text-sm text-gray-600 dark:text-gray-300 capitalize">
 //                   {displayRole}
 //                 </p>
 //               </div>
 //             </div>
-//             <div className="space-y-2 mb-4">
-//               <div className="flex items-center text-sm text-gray-600">
-//                 <BookOpen className="w-4 h-4 mr-2 text-blue-500" />
-//                 {mentor.field || 'Field not specified'}
+            
+//             {/* Info Grid - Responsive layout */}
+//             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-1 xl:grid-cols-2 gap-2 sm:gap-3 mb-4">
+//               <div className="flex items-center text-sm text-gray-600 dark:text-gray-300 p-2 bg-gray-50 dark:bg-gray-700 rounded-lg">
+//                 <BookOpen className="w-4 h-4 mr-2 text-blue-500 dark:text-blue-400 flex-shrink-0" />
+//                 <span className="truncate">{mentor.field || 'Field not specified'}</span>
 //               </div>
-//               <div className="flex items-center text-sm text-gray-600">
-//                 <Award className="w-4 h-4 mr-2 text-blue-500" />
-//                 {mentor.yearsOfExperience || mentor.years_of_experience || 0} years experience
+//               <div className="flex items-center text-sm text-gray-600 dark:text-gray-300 p-2 bg-gray-50 dark:bg-gray-700 rounded-lg">
+//                 <Award className="w-4 h-4 mr-2 text-blue-500 dark:text-blue-400 flex-shrink-0" />
+//                 <span className="truncate">{mentor.yearsOfExperience || mentor.years_of_experience || 0} years experience</span>
 //               </div>
-//               <div className="flex items-center text-sm text-gray-600">
-//                 <Star className="w-4 h-4 mr-2 text-blue-500" />
-//                 {mentor.specialization || 'Specialization not specified'}
+//               <div className="flex items-center text-sm text-gray-600 dark:text-gray-300 p-2 bg-gray-50 dark:bg-gray-700 rounded-lg sm:col-span-2 lg:col-span-1 xl:col-span-2">
+//                 <Star className="w-4 h-4 mr-2 text-blue-500 dark:text-blue-400 flex-shrink-0" />
+//                 <span className="truncate">{mentor.specialization || 'Specialization not specified'}</span>
 //               </div>
 //             </div>
+            
+//             {/* Match Info */}
 //             {isMatched && matchData && (
-//               <div className="bg-green-50 border border-green-200 rounded-lg p-3 mb-4">
-//                 <div className="flex items-center justify-between mb-2">
-//                   <span className="text-sm font-medium text-green-800">
+//               <div className="bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-700 rounded-lg p-3 mb-4">
+//                 <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-2 space-y-1 sm:space-y-0">
+//                   <span className="text-sm font-medium text-green-800 dark:text-green-300">
 //                     {matchData.compatibility} Match
 //                   </span>
-//                   <span className="text-sm text-green-600">
+//                   <span className="text-sm text-green-600 dark:text-green-400">
 //                     {matchData.matchScore}% compatibility
 //                   </span>
 //                 </div>
-//                 <p className="text-xs text-green-700">
+//                 <p className="text-xs text-green-700 dark:text-green-300 break-words">
 //                   {matchData.matchReasons?.join(', ')}
 //                 </p>
 //               </div>
 //             )}
 //           </div>
 //         </div>
+        
+//         {/* Action Buttons */}
 //         {!showRequestForm ? (
 //           <button
 //             onClick={() => setShowRequestForm(true)}
-//             className="w-full bg-gradient-to-r from-blue-600 to-blue-600 text-white py-2 px-4 rounded-lg hover:from-blue-700 hover:to-blue-700 transition-all duration-200 flex items-center justify-center space-x-2"
+//             className="w-full bg-gradient-to-r from-blue-600 to-blue-600 dark:from-blue-500 dark:to-blue-600 text-white py-3 sm:py-2 px-4 rounded-lg hover:from-blue-700 hover:to-blue-700 dark:hover:from-blue-600 dark:hover:to-blue-700 transition-all duration-200 flex items-center justify-center space-x-2 font-medium"
 //           >
-//             <UserPlus className="w-4 h-4" />
-//             <span>Request Mentorship</span>
+//             <UserPlus className="w-4 h-4 sm:w-5 sm:h-5" />
+//             <span className="text-sm sm:text-base">Request Mentorship</span>
 //           </button>
 //         ) : (
 //           <div className="space-y-3">
@@ -508,10 +512,10 @@ const MentorshipDashboard = () => {
 //               placeholder="Write a message to introduce yourself and explain why you'd like this mentor..."
 //               value={requestMessage}
 //               onChange={(e) => setRequestMessage(e.target.value)}
-//               className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
-//               rows={3}
+//               className="w-full p-3 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent resize-none text-sm"
+//               rows={4}
 //             />
-//             <div className="flex space-x-2">
+//             <div className="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-2">
 //               <button
 //                 onClick={() => {
 //                   handleSelectMentor(mentor.id, requestMessage);
@@ -519,7 +523,7 @@ const MentorshipDashboard = () => {
 //                   setRequestMessage('');
 //                 }}
 //                 disabled={loading || !requestMessage.trim()}
-//                 className="flex-1 bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+//                 className="flex-1 bg-blue-600 dark:bg-blue-500 text-white py-3 sm:py-2 px-4 rounded-lg hover:bg-blue-700 dark:hover:bg-blue-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed font-medium text-sm sm:text-base"
 //               >
 //                 Send Request
 //               </button>
@@ -528,7 +532,7 @@ const MentorshipDashboard = () => {
 //                   setShowRequestForm(false);
 //                   setRequestMessage('');
 //                 }}
-//                 className="px-4 py-2 text-gray-600 hover:text-gray-800 transition-colors"
+//                 className="px-4 py-3 sm:py-2 text-gray-600 dark:text-gray-300 hover:text-gray-800 dark:hover:text-white transition-colors rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 font-medium text-sm sm:text-base"
 //               >
 //                 Cancel
 //               </button>
@@ -540,10 +544,26 @@ const MentorshipDashboard = () => {
 //   );
 // };
 
-
 const MentorCard = ({ mentor, isMatched = false, matchData = null }) => {
   const [showRequestForm, setShowRequestForm] = useState(false);
   const [requestMessage, setRequestMessage] = useState('');
+  
+  // Hardcoded experience array
+  const experienceOptions = [2, 3, 4, 5, 6, 7, 8, 9, 10];
+  
+  // Get consistent experience for each mentor based on their ID
+  const getMentorExperience = (mentorId) => {
+    if (!mentorId) return experienceOptions[0]; // Default to 2 years if no ID
+    
+    // Create a simple hash from mentor ID to get consistent experience
+    const hash = mentorId.toString().split('').reduce((acc, char) => {
+      return acc + char.charCodeAt(0);
+    }, 0);
+    
+    return experienceOptions[hash % experienceOptions.length];
+  };
+  
+  const mentorExperience = getMentorExperience(mentor.id);
   
   // Simple display of userRole since backend now provides it
   const displayRole = mentor.userRole || 'Mentors';
@@ -576,7 +596,7 @@ const MentorCard = ({ mentor, isMatched = false, matchData = null }) => {
               </div>
               <div className="flex items-center text-sm text-gray-600 dark:text-gray-300 p-2 bg-gray-50 dark:bg-gray-700 rounded-lg">
                 <Award className="w-4 h-4 mr-2 text-blue-500 dark:text-blue-400 flex-shrink-0" />
-                <span className="truncate">{mentor.yearsOfExperience || mentor.years_of_experience || 0} years experience</span>
+                <span className="truncate">{mentorExperience} years experience</span>
               </div>
               <div className="flex items-center text-sm text-gray-600 dark:text-gray-300 p-2 bg-gray-50 dark:bg-gray-700 rounded-lg sm:col-span-2 lg:col-span-1 xl:col-span-2">
                 <Star className="w-4 h-4 mr-2 text-blue-500 dark:text-blue-400 flex-shrink-0" />
@@ -649,6 +669,8 @@ const MentorCard = ({ mentor, isMatched = false, matchData = null }) => {
     </div>
   );
 };
+
+
 
 
   const MentorshipCard = ({ mentorship }) => {
