@@ -8,6 +8,7 @@ import LeadershipTrainingDevelopment from '../online_course/LeadershipTrainingDe
 import GELEPPlatform from '../ProfessionalNetworking/GELEPPlatform';
 import JobApplicationsPage from '../JobBoardOpportunites/JobApplicationsPage';
 import LeadershipExam from '../online_course/LeadershipExam';
+import MentorshipDashboard from '../MatchingAlgorithim/MentorshipDashboard';
 
 // Mock data for the dashboard (keeping stats and other data)
 const mockData = {
@@ -227,7 +228,8 @@ const Sidebar = ({ isCollapsed, setIsCollapsed, activeTab, setActiveTab }) => {
 
   const menuItems = [
     { id: 'overview', icon: Home, label: 'Overview' },
-    { id: 'GELEPMentorship', icon: Users, label: 'Mentorship' },
+    // { id: 'GELEPMentorship', icon: Users, label: 'Mentorship' },
+    { id: 'mentorshiptest', icon: Users, label: 'Mentorship' },
     { id: 'jobBoard' , icon: Briefcase, label: 'Job Opportunities'},
     { id : 'eventsCalendar', icon: Calendar, label: 'Events'},
     { id: 'leadershipTraining', icon: BookOpen, label: 'Training Courses' },
@@ -697,10 +699,15 @@ const GELEPDashboard = () => {
               />
             )}
             
-            {activeTab === 'GELEPMentorship' && (
+            {/* {activeTab === 'GELEPMentorship' && (
               <GELEPMentorshipPlat />
-            )}
+            )} */}
             
+            {activeTab === 'mentorshiptest' && (
+              // <GELEPMentorshipPlat />
+              <MentorshipDashboard />
+            )}
+
             {activeTab === 'jobBoard' && (
               <JobBoard />
             )}
