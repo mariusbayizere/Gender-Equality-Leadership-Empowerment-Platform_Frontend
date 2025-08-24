@@ -159,7 +159,7 @@
           const [userResponse, eventResponse, mentorshipResponse, forumResponse] = await Promise.all([
             fetch('http://localhost:3000/api/v1/users/count', { headers }),
             fetch('http://localhost:3000/api/v1/events/count', { headers }),
-            fetch('http://localhost:3000/api/v1/mentorship/count', { headers }),
+            fetch('http://localhost:3000/api/v1/mentorshipsecond/count', { headers }),
             fetch('http://localhost:3000/api/v1/forums/count', { headers })
           ]);
 

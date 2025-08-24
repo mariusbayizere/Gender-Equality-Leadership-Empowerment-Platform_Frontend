@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { X, Users, User, Calendar, CheckCircle, AlertCircle, Plus, Edit3, Clock } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { X, Users, User, Calendar, CheckCircle, AlertCircle, Plus, Edit3, Clock, ChevronDown } from 'lucide-react';
 
 const MentorshipRelationshipForm = ({ 
   showModal = true, 
@@ -24,11 +24,96 @@ const MentorshipRelationshipForm = ({
   const [submitStatus, setSubmitStatus] = useState(null);
   const [submitMessage, setSubmitMessage] = useState('');
 
+  // New state for user data
+  const [mentors, setMentors] = useState([]);
+  const [mentees, setMentees] = useState([]);
+  const [loadingUsers, setLoadingUsers] = useState(false);
+  const [userLoadError, setUserLoadError] = useState(null);
+
   const programStatusOptions = [
     { value: 'active', label: 'Active', icon: '🟢' },
     { value: 'completed', label: 'Completed', icon: '✅' },
     { value: 'paused', label: 'Paused', icon: '⏸️' }
   ];
+
+  // Fetch users when component mounts or modal opens
+  useEffect(() => {
+    if (showModal) {
+      fetchUsers();
+    }
+  }, [showModal]);
+
+  // Function to fetch users from API
+  const fetchUsers = async () => {
+    setLoadingUsers(true);
+    setUserLoadError(null);
+    
+    try {
+      // Get token from localStorage
+      const token = (
+        localStorage.getItem('token') || 
+        localStorage.getItem('authToken') || 
+        localStorage.getItem('accessToken') ||
+        localStorage.getItem('jwt')
+      );
+
+      console.log('Fetching users from API...');
+      
+      const response = await fetch('http://localhost:3000/api/v1/users', {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          ...(token && { 'Authorization': `Bearer ${token}` })
+        }
+      });
+
+      if (!response.ok) {
+        throw new Error(`Failed to fetch users: ${response.status}`);
+      }
+
+      const userData = await response.json();
+      
+      console.log('Raw API Response:', userData);
+      console.log('Total users fetched:', userData.length);
+      
+      // Debug: Log all user roles
+      if (userData.length > 0) {
+        const roles = userData.map(user => ({
+          id: user.id,
+          fullName: `${user.firstName} ${user.lastName}`,
+          userRole: user.userRole,
+          role: user.role,
+          field: user.field
+        }));
+        console.log('All users with roles:', roles);
+      }
+      
+      // Filter users by userRole field (based on your schema)
+      const mentorUsers = userData.filter(user => {
+        const role = (user.userRole || user.role || '').toLowerCase();
+        return role === 'mentor';
+      });
+      
+      const menteeUsers = userData.filter(user => {
+        const role = (user.userRole || user.role || '').toLowerCase();
+        return role === 'mentee';
+      });
+      
+      console.log('Filtered mentors:', mentorUsers);
+      console.log('Filtered mentees:', menteeUsers);
+      console.log('Mentors count:', mentorUsers.length);
+      console.log('Mentees count:', menteeUsers.length);
+      
+      setMentors(mentorUsers);
+      setMentees(menteeUsers);
+
+    } catch (error) {
+      console.error('Error fetching users:', error);
+      setUserLoadError('Failed to load users. Please try again.');
+    } finally {
+      setLoadingUsers(false);
+    }
+  };
 
   // Enhanced validation function
   const validateForm = () => {
@@ -59,13 +144,19 @@ const MentorshipRelationshipForm = ({
     }
     
     // Mentor ID validation
-    if (!form.mentor_id.trim()) {
-      errors.mentor_id = 'Mentor ID is required';
+    if (!form.mentor_id) {
+      errors.mentor_id = 'Please select a mentor';
     }
     
     // Mentee ID validation
-    if (!form.mentee_id.trim()) {
-      errors.mentee_id = 'Mentee ID is required';
+    if (!form.mentee_id) {
+      errors.mentee_id = 'Please select a mentee';
+    }
+    
+    // Check if mentor and mentee are the same
+    if (form.mentor_id && form.mentee_id && form.mentor_id === form.mentee_id) {
+      errors.mentor_id = 'Mentor and mentee cannot be the same person';
+      errors.mentee_id = 'Mentor and mentee cannot be the same person';
     }
     
     // Program status validation
@@ -101,7 +192,7 @@ const MentorshipRelationshipForm = ({
     if (Object.keys(errors).length > 0) {
       setValidationErrors(errors);
       setSubmitStatus('error');
-      setSubmitMessage('Please Insert all required fields correctly.');
+      setSubmitMessage('Please fill in all required fields correctly.');
       return;
     }
     
@@ -116,8 +207,8 @@ const MentorshipRelationshipForm = ({
         status: form.status.trim(),
         start_date: form.start_date,
         matching_criteria: form.matching_criteria.trim(),
-        mentor_id: form.mentor_id.trim(),
-        mentee_id: form.mentee_id.trim(),
+        mentor_id: form.mentor_id,
+        mentee_id: form.mentee_id,
         program_status: form.program_status,
         ...(form.end_date && { end_date: form.end_date })
       };
@@ -134,8 +225,8 @@ const MentorshipRelationshipForm = ({
       
       // API call
       const url = mode === 'create' 
-        ? 'http://localhost:3000/api/v1/mentorship'
-        : `http://localhost:3000/api/v1/mentorship/${editingRelationship.id}`;
+        ? 'http://localhost:3000/api/v1/mentorshipsecond'
+        : `http://localhost:3000/api/v1/mentorshipsecond/${editingRelationship.id}`;
       
       const response = await fetch(url, {
         method: mode === 'create' ? 'POST' : 'PUT',
@@ -279,6 +370,23 @@ const MentorshipRelationshipForm = ({
             </div>
           )}
 
+
+
+          {/* User Load Error */}
+          {userLoadError && (
+            <div className="p-3 sm:p-4 rounded-lg flex items-center space-x-2 bg-yellow-100 text-yellow-800 border border-yellow-200">
+              <AlertCircle className="w-4 h-4 sm:w-5 sm:h-5 flex-shrink-0" />
+              <span className="text-xs sm:text-sm font-medium">{userLoadError}</span>
+              <button 
+                onClick={fetchUsers}
+                className="ml-2 text-yellow-800 underline text-xs sm:text-sm"
+                disabled={loadingUsers}
+              >
+                Retry
+              </button>
+            </div>
+          )}
+
           {/* Status and Program Status Fields */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
@@ -309,20 +417,23 @@ const MentorshipRelationshipForm = ({
                 <Clock className="w-4 h-4 inline mr-1" />
                 Program Status *
               </label>
-              <select
-                value={form.program_status}
-                onChange={(e) => handleInputChange('program_status', e.target.value)}
-                className={`w-full px-3 py-2 text-sm sm:text-base border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors ${
-                  validationErrors.program_status ? 'border-red-500 bg-red-50' : 'border-gray-300'
-                }`}
-                disabled={isSubmitting}
-              >
-                {programStatusOptions.map(status => (
-                  <option key={status.value} value={status.value}>
-                    {status.icon} {status.label}
-                  </option>
-                ))}
-              </select>
+              <div className="relative">
+                <select
+                  value={form.program_status}
+                  onChange={(e) => handleInputChange('program_status', e.target.value)}
+                  className={`w-full px-3 py-2 text-sm sm:text-base border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors appearance-none ${
+                    validationErrors.program_status ? 'border-red-500 bg-red-50' : 'border-gray-300'
+                  }`}
+                  disabled={isSubmitting}
+                >
+                  {programStatusOptions.map(status => (
+                    <option key={status.value} value={status.value}>
+                      {status.icon} {status.label}
+                    </option>
+                  ))}
+                </select>
+                <ChevronDown className="absolute right-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" />
+              </div>
               {validationErrors.program_status && (
                 <p className="text-red-500 text-xs mt-1 flex items-center">
                   <AlertCircle className="w-3 h-3 mr-1" />
@@ -379,27 +490,44 @@ const MentorshipRelationshipForm = ({
             </div>
           </div>
 
-          {/* Mentor ID and Mentee ID Fields */}
+          {/* Updated Mentor ID and Mentee ID Dropdown Fields */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
               <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-2">
                 <User className="w-4 h-4 inline mr-1" />
-                Mentor ID *
+                Select Mentor *
               </label>
-              <input
-                type="text"
-                value={form.mentor_id}
-                onChange={(e) => handleInputChange('mentor_id', e.target.value)}
-                className={`w-full px-3 py-2 text-sm sm:text-base border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors ${
-                  validationErrors.mentor_id ? 'border-red-500 bg-red-50' : 'border-gray-300'
-                }`}
-                placeholder="Enter mentor ID"
-                disabled={isSubmitting}
-              />
+              <div className="relative">
+                <select
+                  value={form.mentor_id}
+                  onChange={(e) => handleInputChange('mentor_id', e.target.value)}
+                  className={`w-full px-3 py-2 text-sm sm:text-base border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors appearance-none ${
+                    validationErrors.mentor_id ? 'border-red-500 bg-red-50' : 'border-gray-300'
+                  }`}
+                  disabled={isSubmitting || loadingUsers}
+                >
+                  <option value="">
+                    {loadingUsers ? 'Loading mentors...' : 'Select a mentor'}
+                  </option>
+                  {mentors.map(mentor => (
+                    <option key={mentor.id} value={mentor.id}>
+                      {mentor.firstName} {mentor.lastName}
+                      {mentor.userRole && ` (${mentor.userRole})`}
+                    </option>
+                  ))}
+                </select>
+                <ChevronDown className="absolute right-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" />
+              </div>
               {validationErrors.mentor_id && (
                 <p className="text-red-500 text-xs mt-1 flex items-center">
                   <AlertCircle className="w-3 h-3 mr-1" />
                   {validationErrors.mentor_id}
+                </p>
+              )}
+              {mentors.length === 0 && !loadingUsers && !userLoadError && (
+                <p className="text-yellow-600 text-xs mt-1 flex items-center">
+                  <AlertCircle className="w-3 h-3 mr-1" />
+                  No mentors found
                 </p>
               )}
             </div>
@@ -407,22 +535,39 @@ const MentorshipRelationshipForm = ({
             <div>
               <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-2">
                 <User className="w-4 h-4 inline mr-1" />
-                Mentee ID *
+                Select Mentee *
               </label>
-              <input
-                type="text"
-                value={form.mentee_id}
-                onChange={(e) => handleInputChange('mentee_id', e.target.value)}
-                className={`w-full px-3 py-2 text-sm sm:text-base border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors ${
-                  validationErrors.mentee_id ? 'border-red-500 bg-red-50' : 'border-gray-300'
-                }`}
-                placeholder="Enter mentee ID"
-                disabled={isSubmitting}
-              />
+              <div className="relative">
+                <select
+                  value={form.mentee_id}
+                  onChange={(e) => handleInputChange('mentee_id', e.target.value)}
+                  className={`w-full px-3 py-2 text-sm sm:text-base border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors appearance-none ${
+                    validationErrors.mentee_id ? 'border-red-500 bg-red-50' : 'border-gray-300'
+                  }`}
+                  disabled={isSubmitting || loadingUsers}
+                >
+                  <option value="">
+                    {loadingUsers ? 'Loading mentees...' : 'Select a mentee'}
+                  </option>
+                  {mentees.map(mentee => (
+                    <option key={mentee.id} value={mentee.id}>
+                      {mentee.firstName} {mentee.lastName}
+                      {mentee.userRole && ` (${mentee.userRole})`}
+                    </option>
+                  ))}
+                </select>
+                <ChevronDown className="absolute right-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" />
+              </div>
               {validationErrors.mentee_id && (
                 <p className="text-red-500 text-xs mt-1 flex items-center">
                   <AlertCircle className="w-3 h-3 mr-1" />
                   {validationErrors.mentee_id}
+                </p>
+              )}
+              {mentees.length === 0 && !loadingUsers && !userLoadError && (
+                <p className="text-yellow-600 text-xs mt-1 flex items-center">
+                  <AlertCircle className="w-3 h-3 mr-1" />
+                  No mentees found
                 </p>
               )}
             </div>
@@ -459,7 +604,8 @@ const MentorshipRelationshipForm = ({
               <li>• All fields marked with * are required</li>
               <li>• End date is optional but must be after start date if provided</li>
               <li>• Program status can be: Active, Completed, or Paused</li>
-              <li>• Mentor and Mentee IDs should be valid user identifiers</li>
+              <li>• Select valid mentors and mentees from the dropdown lists</li>
+              <li>• Mentor and mentee cannot be the same person</li>
               <li>• Matching criteria should describe why this pairing was made</li>
             </ul>
           </div>
@@ -475,7 +621,7 @@ const MentorshipRelationshipForm = ({
             </button>
             <button
               onClick={handleSubmit}
-              disabled={isSubmitting}
+              disabled={isSubmitting || loadingUsers}
               className={`flex-1 px-4 py-2 text-sm sm:text-base ${
                 mode === 'create' 
                   ? 'bg-blue-500 hover:bg-blue-600 disabled:bg-blue-400' 

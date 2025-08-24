@@ -890,6 +890,8 @@
 
 // export default ModernTrainingCourseManagement;
 
+
+
 import React, { useState, useEffect } from 'react';
 import { Edit, List, Trash2, BookOpen, User, Clock, Hash, MoreVertical, AlertCircle, X, Plus, Search, RefreshCw, Grid3X3, Menu, Calendar, Award, Globe, Video } from 'lucide-react';
 import TrainingCourseForm from './TrainingCourseForm';
@@ -1021,30 +1023,12 @@ const handleCreateCourse = () => {
   setShowCreateModal(true);
 };
 
-// const handleEdit = (course) => {
-//   setEditingCourse(course);
-//   setShowUpdateModal(true);
-// };
-
 const handleCourseCreated = (newCourse) => {
   // Add the new course to your courses list
   setCourses(prevCourses => [...prevCourses, newCourse]);
   // Or refresh the courses list
   // fetchCourses();
 };
-
-// const handleCourseUpdated = (updatedCourse) => {
-//   // Update the course in your courses list
-//   setCourses(prevCourses => 
-//     prevCourses.map(course => 
-//       course.id === updatedCourse.id ? updatedCourse : course
-//     )
-//   );
-//   // Or refresh the courses list
-//   // fetchCourses();
-// };
-
-  // Fetch courses on component mount
   useEffect(() => {
     fetchCourses();
   }, []);
@@ -1487,15 +1471,6 @@ useEffect(() => {
       onCourseCreated={handleCourseCreated}
       mode="create"
     />
-    
-    {/* <TrainingCourseForm 
-      showModal={showUpdateModal}
-      setShowModal={setShowUpdateModal}
-      onCourseUpdated={handleCourseUpdated}
-      editingCourse={editingCourse}
-      mode="update"
-    />       */}
-
 <TrainingCourseForm 
   showModal={showUpdateModal}
   setShowModal={handleCloseUpdateModal}

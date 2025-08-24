@@ -2,8 +2,8 @@
 // API Configuration
 export const API_BASE_URL = 'http://localhost:3000/api/v1';
 export const API_ENDPOINTS = {
-  mentorship: `${API_BASE_URL}/mentorship`,
-  mentorshipById: (id) => `${API_BASE_URL}/mentorship/${id}`,
+  mentorship: `${API_BASE_URL}/mentorshipsecond`,
+  mentorshipById: (id) => `${API_BASE_URL}/mentorshipsecond/${id}`,
   users: `${API_BASE_URL}/users`,
   auth: `${API_BASE_URL}/auth/login`,
   refresh: `${API_BASE_URL}/auth/refresh`
