@@ -180,29 +180,35 @@ const [isEditMode, setIsEditMode] = useState(false);
 const [jobToEdit, setJobToEdit] = useState(null);
 // const [jobs, setJobs] = useState([]);
 
-
-
-  // Fetch jobs from API
   const fetchJobs = async () => {
-    setLoading(true);
-    setError('');
-    try {
-      const token = localStorage.getItem('token') || localStorage.getItem('authToken') || localStorage.getItem('accessToken');
-      const res = await fetch('http://localhost:3000/api/v1/job-opportunities', {
-        headers: { 
-          'Content-Type': 'application/json', 
-          ...(token && { Authorization: `Bearer ${token}` }) 
-        }
-      });
-      if (!res.ok) throw new Error('Failed to fetch job opportunities');
-      const data = await res.json();
+  setLoading(true);
+  setError('');
+  try {
+    const token = localStorage.getItem('token') || localStorage.getItem('authToken') || localStorage.getItem('accessToken');
+    const res = await fetch('http://localhost:3000/api/v1/job-opportunities', {
+      headers: { 
+        'Content-Type': 'application/json', 
+        ...(token && { Authorization: `Bearer ${token}` }) 
+      }
+    });
+    if (!res.ok) throw new Error('Failed to fetch job opportunities');
+    const data = await res.json();
+    
+    // Fix: Access the jobs array from the response object
+    if (data.jobs && Array.isArray(data.jobs)) {
+      setJobs(data.jobs);
+    } else {
+      // Fallback: if the response structure is different, try to handle it
       setJobs(Array.isArray(data) ? data : []);
-    } catch (err) {
-      setError(err.message || 'Failed to load job opportunities');
-    } finally {
-      setLoading(false);
     }
-  };
+  } catch (err) {
+    setError(err.message || 'Failed to load job opportunities');
+    setJobs([]); // Set empty array on error
+  } finally {
+    setLoading(false);
+  }
+};
+
 
   useEffect(() => { fetchJobs(); }, []);
 

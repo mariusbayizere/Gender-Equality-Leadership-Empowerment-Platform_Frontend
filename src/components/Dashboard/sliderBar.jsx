@@ -1,80 +1,9 @@
-
-//   import React, { useState, useEffect } from 'react';
-//   import { ChevronDown,ChevronUp,
-//     Users, Calendar, MessageSquare, UserCheck, BarChart3, TrendingUp, Activity, Bell, Settings, 
-//     Search, Menu, Eye, UserPlus, CalendarPlus, FileText, Target, LogOut, ChevronLeft, User,
-//     Server, Database, Cpu, HardDrive, Clock, Zap, AlertTriangle, CheckCircle, XCircle,
-//     Briefcase, GraduationCap, HandHeart, MessageCircle, Award
-//   } from 'lucide-react';
-
-
-
-// const sidebarItems = [
-//       { name: 'Dashboard', icon: BarChart3, active: true },
-//       { name: 'Users', icon: Users },
-//       { name: 'Events', icon: Calendar },
-//       { name: 'Mentorship', icon: UserCheck },
-//       { name: 'Reports', icon: FileText },
-//       { name: 'Forum', icon: MessageSquare },
-//       { name: 'Progress', icon: Target },
-//     ];
-
-// export const SliderBar = () =>{
-
-
-//     return <>
-    
-//     <div className={`${isSidebarOpen ? 'w-64' : 'w-20'} bg-white shadow-lg transition-all duration-300 ease-in-out flex flex-col`}>
-//           <div className="p-4 border-b border-gray-200">
-//             <div className="flex items-center justify-between">
-//               <h1 className={`font-bold text-xl text-gray-800 ${!isSidebarOpen && 'hidden'}`}>
-//                 GELEP Admin
-//               </h1>
-//               <button
-//                 onClick={() => setIsSidebarOpen(!isSidebarOpen)}
-//                 className="p-2 rounded-lg hover:bg-gray-100 transition-colors"
-//               >
-//                 {isSidebarOpen ? <ChevronLeft size={20} /> : <Menu size={20} />}
-//               </button>
-//             </div>
-//           </div>
-          
-//           <nav className="mt-4 flex-1">
-//             {sidebarItems.map((item, index) => (
-//               <a
-//                 key={index}
-//                 href="#"
-//                 className={`flex items-center px-4 py-3 mx-2 rounded-lg transition-colors ${
-//                   item.active 
-//                     ? 'text-white' 
-//                     : 'text-gray-600 hover:bg-gray-50'
-//                 }`}
-//                 style={item.active ? { backgroundColor: '#1E90FF' } : {}}
-//               >
-//                 <item.icon size={20} />
-//                 {isSidebarOpen && <span className="ml-3 font-medium">{item.name}</span>}
-//               </a>
-//             ))}
-//           </nav>
-          
-//           <div className="p-4 border-t border-gray-200 mt-auto">
-//             <button className="flex items-center w-full px-4 py-3 text-red-600 hover:bg-red-50 rounded-lg transition-colors">
-//               <LogOut size={20} />
-//               {isSidebarOpen && <span className="ml-3 font-medium">Logout</span>}
-//             </button>
-//           </div>
-//         </div>
-    
-    
-//     </>
-// }
-
-
 import React, { useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import {
   BarChart3, Users, Calendar, UserCheck, FileText, MessageSquare, Target,
-  Settings, LogOut, ChevronLeft, Menu
+  Settings, LogOut, ChevronLeft, Menu,
+  Briefcase
 } from 'lucide-react';
 
 export const SliderBar = ({ isOpen = true, onToggle }) => {
@@ -119,6 +48,12 @@ export const SliderBar = ({ isOpen = true, onToggle }) => {
       icon: MessageSquare, 
       path: '/dashboard/forum',
       description: 'Forum management'
+    },
+        { 
+      name: 'Job Opportunities', 
+      icon: Briefcase, 
+      path: '/dashboard/job-opportunities',
+      description: 'Job opportunities management'
     },
     { 
       name: 'Progress', 

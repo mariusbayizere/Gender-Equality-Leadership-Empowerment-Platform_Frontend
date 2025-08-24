@@ -249,6 +249,10 @@ function App() {
                     element: <ModernTrainingCourseManagement />,
                 },
                 {
+                    path: "job-opportunities",
+                    element: <JobOpportunitiesManagement />,
+                },
+                {
                     path: "testTraining",
                     element: <OnlineCourse/>
 

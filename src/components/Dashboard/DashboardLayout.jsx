@@ -250,7 +250,8 @@ import { Outlet, useNavigate, useLocation } from 'react-router-dom';
 import {
   BarChart3, Users, Calendar, UserCheck, FileText, MessageSquare, Target,
   Settings, LogOut, ChevronLeft, Menu, Bell, User, X,
-  BookOpen
+  BookOpen,
+  Briefcase
 } from 'lucide-react';
 import { Header } from './header';
 
@@ -269,6 +270,7 @@ const DashboardLayout = () => {
     { name: 'Reports', icon: FileText, path: '/dashboard/reports' },
     { name: 'Forum', icon: MessageSquare, path: '/dashboard/forum' },
     { name: 'Training Courses', icon: BookOpen, path: '/dashboard/training-courses' },
+    { name: 'Job Opportunities', icon: Briefcase, path: '/dashboard/job-opportunities' },
     { name: 'Progress', icon: Target, path: '/dashboard/progress' },
     { name: 'Settings', icon: Settings, path: '/dashboard/settings' },
   ];
