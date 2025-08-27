@@ -53,23 +53,6 @@ export const DeleteConfirmation = ({ isOpen, courseToDelete, onConfirm, onCancel
           </p>
           <p className="text-sm text-gray-500">This action cannot be undone.</p>
         </div>
-        {/* <div className="flex gap-3 p-6 pt-0">
-          <button
-            onClick={onCancel}
-            // className="flex-1 px-4 py-2.5 text-gray-700 bg-gray-100 rounded-xl hover:bg-gray-200 transition-colors font-medium"
-            className="w-full sm:w-auto px-4 py-2.5 sm:py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 active:bg-gray-100 transition-colors font-medium text-sm sm:text-base"
-          >
-            Cancel
-          </button>
-          <button
-            onClick={() => onConfirm(courseToDelete?.id)}
-            // className="flex-1 px-4 py-2.5 text-white bg-red-500 rounded-xl hover:bg-red-600 transition-colors font-medium"
-            // >
-            className="w-full sm:w-auto px-4 py-2.5 sm:py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 active:bg-red-800 transition-colors flex items-center justify-center gap-2 font-medium text-sm sm:text-base"
-              >
-            Delete Course
-          </button>
-        </div> */}
 <div className="flex flex-col sm:flex-row gap-3 p-6 pt-0">
   <button
     onClick={() => onConfirm(courseToDelete?.id)}

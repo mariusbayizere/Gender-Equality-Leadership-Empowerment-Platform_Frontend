@@ -381,19 +381,10 @@ const [jobToEdit, setJobToEdit] = useState(null);
                   Deadline: {formatDate(job?.application_deadline)}
                 </span>
               </div>
-            )}
-            
-            {/* {job?.description && (
-              <div className="bg-gray-50 rounded-lg p-3">
-                <p className="text-gray-700 text-sm">{job.description}</p>
-              </div>
-            )} */}
-            
+            )}    
             {visibleColumns.actions && (
               <div className="flex items-center space-x-3 pt-3">
                 <button
-                //  onClick={handleCreateJob}
-                //   onClick={() => console.log('Edit job:', job.id)}
                   onClick={() => handleEditJob(job)}
                   className="flex-1 bg-blue-600 bg-opacity-1 hover:bg-opacity-30 text-white px-4 py-2.5 rounded-lg flex items-center justify-center gap-2 text-sm font-medium transition-all duration-200 backdrop-blur-sm disabled:opacity-50 disabled:cursor-not-allowed"
                   title="Edit"
@@ -676,7 +667,7 @@ const [jobToEdit, setJobToEdit] = useState(null);
                       {visibleColumns.id && (
                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                           <div className="flex items-center">
-                            <Hash className="w-4 h-4 text-gray-400 mr-2" />
+                            {/* <Hash className="w-4 h-4 text-gray-400 mr-2" /> */}
                             {actualStartIndex + index + 1}
                           </div>
                         </td>
@@ -718,16 +709,6 @@ const [jobToEdit, setJobToEdit] = useState(null);
                           </div>
                         </td>
                       )}
-                      {/* {visibleColumns.application_deadline && (
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                          <div className="flex items-center">
-                            <Clock className="w-4 h-4 text-gray-400 mr-2" />
-                            <span className={isDeadlinePassed(job?.application_deadline) ? 'text-red-600 font-medium' : 'text-gray-900'}>
-                              {formatDate(job?.application_deadline)}
-                            </span>
-                          </div>
-                        </td>
-                      )} */}
                       {visibleColumns.is_active && (
                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                           <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
