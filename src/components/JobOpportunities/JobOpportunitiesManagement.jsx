@@ -779,3 +779,5 @@ const [jobToEdit, setJobToEdit] = useState(null);
 };
 
 export default JobOpportunitiesManagement;
+
+
